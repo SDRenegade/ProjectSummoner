@@ -27,9 +27,6 @@ public class CameraMovement : MonoBehaviour
         mouseY -= Input.GetAxis("Mouse Y") * RotationSpeed;
         mouseY = Mathf.Clamp(mouseY, -60, 50);
 
-        Debug.Log("mouse X: " + mouseX);
-        Debug.Log("mouse Y: " + mouseY);
-
         transform.LookAt(CamBase);
 
         CamBase.rotation = Quaternion.Euler(mouseY, mouseX, 0);
