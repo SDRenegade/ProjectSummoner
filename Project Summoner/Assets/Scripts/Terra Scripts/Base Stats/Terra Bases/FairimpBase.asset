@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fde9e97446f31c4b8b993b8476a777a, type: 3}
+  m_Name: FairimpBase
+  m_EditorClassIdentifier: 
+  speciesName: Fairimp
+  logEntry: Water Starter
+  terraTypes: 02000000
+  naturalMovePool:
+  - movebase: {fileID: 11400000, guid: 5222ac2f0cf2d8a4a88aeb639082873b, type: 2}
+    levelLearned: 1
+  - movebase: {fileID: 11400000, guid: bbab58efed0be3d4493ef2893699d3fd, type: 2}
+    levelLearned: 1
+  - movebase: {fileID: 11400000, guid: 757428f5e0f077547a0b7a01a3c85a81, type: 2}
+    levelLearned: 7
+  teachableMovePool: []
+  baseHP: 57
+  baseAttack: 50
+  baseDefence: 47
+  baseSpAttack: 50
+  baseSpDefence: 70
+  baseSpeed: 40
+  terraGameObject: {fileID: 3156000226517777618, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
