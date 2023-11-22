@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af8e501818d971740952df36d06c3f73, type: 3}
+  m_Name: FlaregonSpawn
+  m_EditorClassIdentifier: 
+  terraBase: {fileID: 11400000, guid: 2f168a1530418724e8e4fd080557a192, type: 2}
+  minLevel: 5
+  maxLevel: 12
+  weight: 3
