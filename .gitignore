@@ -3,6 +3,7 @@
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
 /Project Summoner/[Ll]ibrary/
+!/Project Summoner/[Ll]ibrary/ScriptAssemblies/
 /Project Summoner/[Tt]emp/
 /Project Summoner/[Oo]bj/
 /Project Summoner/[Bb]uild/
