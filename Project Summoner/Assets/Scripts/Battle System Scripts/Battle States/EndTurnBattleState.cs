@@ -6,9 +6,10 @@ public class EndTurnBattleState : BattleState
 {
     public void EnterState(BattleStateManager battleManager)
     {
-        //Check Post combat berries, items, status effects, and abilities
-        Debug.Log("Entered End of Turn Battle State");
-        battleManager.GetBattleSystem().InvokeOnEndTurn();
+        //*** Entering End Turn State Event ***
+        battleManager.GetBattleSystem().InvokeOnEnteringEndTurnState();
+
+        Debug.Log("============== Entered End of Turn Battle State ==============");
         battleManager.SwitchState(battleManager.GetStartTurnState());
     }
 }

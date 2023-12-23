@@ -8,10 +8,11 @@ public class StartTurnBattleState : BattleState
 
     public void EnterState(BattleStateManager battleManager)
     {
-        //Set main camera to start moving along track
-        //Check if there are any item actives
-        //Check for environment effects
-        Debug.Log("Entered Start of Turn Battle State");
+        //*** Entering Start Turn State Event ***
+        battleManager.GetBattleSystem().InvokeOnEnteringStartTurnState();
+
+        Debug.Log("============== Entered Start of Turn Battle State ==============");
+        //TODO Set main camera to start moving along track
         battleManager.SwitchState(battleManager.GetActionSelectionState());
     }
 }

@@ -6,11 +6,8 @@ public class Battlefield
 {
     private BattleSide primaryBattleSide;
     private BattleSide secondaryBattleSide;
-
-    private List<TerraAttack> terraAttackList;
-    //private SummonerDie nextCatchAttemptDie;
-    //private List<TerraSwitchBattleAction> TerraSwitchList;
-    private bool attemptEscape;
+    //private WeatherCondition weatherCondition
+    //private BattleTerrain battleTerrain
 
     public Battlefield(TerraParty primarySideParty, Terra secondarySideTerra)
     {
@@ -19,9 +16,6 @@ public class Battlefield
         else
             Debug.LogError("Primary Battle Side Party does not have a leading Terra");
         secondaryBattleSide = new BattleSide(secondarySideTerra);
-
-        terraAttackList = new List<TerraAttack>();
-        attemptEscape = false;
     }
 
     public Battlefield(TerraParty primarySideParty, TerraParty secondarySideParty)
@@ -34,9 +28,6 @@ public class Battlefield
             secondaryBattleSide = new BattleSide(secondarySideParty.GetTerraList()[0]);
         else
             Debug.LogError("Secondary Battle Side Party does not have a leading Terra");
-
-        terraAttackList = new List<TerraAttack>();
-        attemptEscape = false;
     }
 
     public BattleSide GetPrimaryBattleSide() { return primaryBattleSide; }
@@ -50,13 +41,4 @@ public class Battlefield
             secondaryBattleSide.GetTerraBattlePosition().GetTerra()
         };
     }
-
-    public List<TerraAttack> GetTerraAttackList() {  return terraAttackList; }
-
-    public void SetTerraAttackList(List<TerraAttack> terraAttackList) { this.terraAttackList = terraAttackList; }
-
-    public bool GetIsAttemptEscape() { return attemptEscape; }
-
-    public void SetAttemptEscape(bool attemptEscape) { this.attemptEscape = attemptEscape; }
-
 }

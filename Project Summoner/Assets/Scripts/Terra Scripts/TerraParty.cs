@@ -30,6 +30,16 @@ public class TerraParty : MonoBehaviour
         return false;
     }
 
+    public bool AddPartyMemberList(List<Terra> newTerraList)
+    {
+        if (terraList.Count + newTerraList.Count > MAX_PARTY_SIZE)
+            return false;
+
+        foreach (Terra terra in newTerraList)
+            terraList.Add(terra);
+        return true;
+    }
+
     public Terra RemovePartyMember(int index)
     {
         if(index >= terraList.Count)

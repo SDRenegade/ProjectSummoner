@@ -12,7 +12,7 @@ public class Terra
     [SerializeField] private string terraNickname;
     [SerializeField] [Range(1, 100)] private int level;
     [SerializeField] private List<TerraMove> moves;
-    [SerializeField] private StatusEffect statusEffect;
+    [SerializeField] private StatusEffectWrapper statusEffect;
     [SerializeField] [Min(0)] private int currentHP;
 
     public Terra(TerraBase terraBase)
@@ -22,7 +22,7 @@ public class Terra
         level = 1;
         moves = new List<TerraMove>();
         GenerateNaturalMoveSet();
-        statusEffect = null;
+        statusEffect = new StatusEffectWrapper(null, this);
         currentHP = GetMaxHP();
     }
 
@@ -33,7 +33,7 @@ public class Terra
         this.level = level;
         moves = new List<TerraMove>();
         GenerateNaturalMoveSet();
-        statusEffect = null;
+        statusEffect = new StatusEffectWrapper(null, this);
         currentHP = GetMaxHP();
     }
 
@@ -45,7 +45,8 @@ public class Terra
         moves = new List<TerraMove>();
         for(int i = 0; i < terraSavable.GetSavableMoves().Count; i++)
             moves.Add(new TerraMove(terraSavable.GetSavableMoves()[i]));
-        statusEffect = terraSavable.GetStatusEffect();
+        StatusEffectBase savedStatusEffect = SODatabase.GetInstance().GetStatusEffectByName(terraSavable.GetStatusEffectBaseName());
+        statusEffect = (savedStatusEffect != null) ? new StatusEffectWrapper(savedStatusEffect, this) : new StatusEffectWrapper(null, this);
         currentHP = terraSavable.GetCurrentHP();
     }
 
@@ -85,11 +86,12 @@ public class Terra
 
     public void TakeDamage(int damage)
     {
-        currentHP -= damage;
-        if (currentHP < 0)
-            currentHP = 0;
-        if (currentHP > GetMaxHP())
-            currentHP = GetMaxHP();
+        int hp;
+        hp = (currentHP - damage >= 0) ? currentHP - damage : 0;
+        if (hp > GetMaxHP())
+            hp = GetMaxHP();
+
+        currentHP = hp;
     }
 
     public override string ToString()
@@ -123,14 +125,17 @@ public class Terra
 
     public void SetCurrentHP(int currentHP)
     {
-        this.currentHP = (currentHP >= 0) ? currentHP : 0;
+        int hp;
+        hp = (currentHP >= 0) ? currentHP : 0;
         if (currentHP > GetMaxHP())
-            this.currentHP = GetMaxHP();
+            hp = GetMaxHP();
+
+        this.currentHP = hp;
     }
 
-    public StatusEffect GetStatusEffect() { return statusEffect; }
+    public StatusEffectWrapper GetStatusEffect() { return statusEffect; }
 
-    public void SetStatusEffect(StatusEffect statusEffect) { this.statusEffect = statusEffect; }
+    public void SetStatusEffect(StatusEffectWrapper statusEffect) { this.statusEffect = statusEffect; }
 
     public int GetMaxHP() { return Mathf.FloorToInt(level * terraBase.GetBaseHP() * BASE_STAT_MULTIPLIER + 10); }
 

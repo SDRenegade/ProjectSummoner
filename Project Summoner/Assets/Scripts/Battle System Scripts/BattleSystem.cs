@@ -15,22 +15,22 @@ public enum BattleType
 public class BattleSystem : MonoBehaviour
 {
     //Battle Events
-    public event EventHandler<BattleEventArgs> OnStartTurn;
-    public event EventHandler<BattleEventArgs> OnActionStep;
+    public event EventHandler<BattleEventArgs> OnEnteringStartTurnState;
+    public event EventHandler<BattleEventArgs> OnEnteringActionSelectionState;
+    public event EventHandler<BattleEventArgs> OnActionSelection;
+    public event EventHandler<BattleEventArgs> OnEnteringCombatState;
     public event EventHandler<BattleEventArgs> OnTerraSwitch; //Include BattleSide and the two Terra being switched
     public event EventHandler<BattleEventArgs> OnPlayerAttemptEscape; //Include Escape chance
     public event EventHandler<BattleEventArgs> OnTerraUseHeldItem; //Include Terra and Item
-    public event EventHandler<TerraAttackTerraEventArgs> OnTerraAttackTerra;
-    public event EventHandler<TerraAttackTerraEventArgs> OnTerraPostAttack;
-    public event EventHandler<BattleEventArgs> OnEndTurn;
+    public event EventHandler<BattleEventArgs> OnStartingCombat;
+    public event EventHandler<TerraAttackDeclarationEventArgs> OnTerraAttackDeclaration; //Might not need
+    public event EventHandler<TerraAttackParamsEventArgs> OnTerraDirectAttack;
+    public event EventHandler<TerraDamageByTerraEventArgs> OnTerraDamageByTerra; //Might not need now that there is a damage calculation event
+    public event EventHandler<BattleEventArgs> OnEnteringEndTurnState;
 
-    //UI elements
-    [SerializeField] private TerraBattleStatusBar playerTerraStatusBar;
-    [SerializeField] private TerraBattleStatusBar opponentTerraStatusBar;
-    [SerializeField] private GameObject menuSelectionUIGO;
-    [SerializeField] private GameObject moveSelectionUIGO;
+    [SerializeField] private BattleHUD battleHUD;
 
-    //Game Object positions
+    //Actor Positions
     [SerializeField] private Transform playerTransform;
     [SerializeField] private Transform opponentTransform;
     [SerializeField] private Transform playerTerraTransform;
@@ -40,50 +40,50 @@ public class BattleSystem : MonoBehaviour
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private GameObject opponentPrefab;
 
-    //Player & opposing summoner Game Objects
-    private GameObject playerGO;
-    //private GameObject opponentGO
-
+    //Player & opposing summoner gameobject's
+    private GameObject playerBattleObject;
+    //private GameObject opponentBattleObject
     //The currently battling Terras and their gameobject (Change the neme of the variables later)
     private TerraBattleObject playerLeadingTerra;
     private TerraBattleObject wildTerra;
 
+    private BattleType battleType;
     private Battlefield battlefield;
     private BattleStateManager battleStateManager;
+    private BattleActionManager battleActionManager;
 
-    private BattleType battleType;
-
-    void Start()
+    public void Start()
     {
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
         battleType = BattleLoader.GetInstance().GetBattleType();
 
-        InitializeBattleScene();
+        SetupBattleScene();
 
-        battlefield = new Battlefield(playerGO.GetComponent<TerraParty>(), wildTerra.GetTerra());
+        battlefield = new Battlefield(playerBattleObject.GetComponent<TerraParty>(), wildTerra.GetTerra());
         //Initialize the existing status conditions on the terra in the event system
-        if (battlefield.GetPrimaryBattleSide().GetTerraBattlePosition().GetTerra().GetStatusEffect() != null)
-            battlefield.GetPrimaryBattleSide().GetTerraBattlePosition().GetTerra().GetStatusEffect().AddBattleEvent(this);
-        if (battlefield.GetSecondaryBattleSide().GetTerraBattlePosition().GetTerra().GetStatusEffect() != null)
-            battlefield.GetSecondaryBattleSide().GetTerraBattlePosition().GetTerra().GetStatusEffect().AddBattleEvent(this);
+        Terra playerLeadingTerra = battlefield.GetPrimaryBattleSide().GetTerraBattlePosition().GetTerra();
+        Terra opponentLeadingTerra = battlefield.GetSecondaryBattleSide().GetTerraBattlePosition().GetTerra();
+        playerLeadingTerra.GetStatusEffect()?.AddStatusEffectBattleActoin(this, playerLeadingTerra);
+        opponentLeadingTerra.GetStatusEffect()?.AddStatusEffectBattleActoin(this, opponentLeadingTerra);
+
+        battleActionManager = new BattleActionManager();
         battleStateManager = new BattleStateManager(this);
 
         UpdateTerraStatusBars();
     }
 
-    private void InitializeBattleScene()
+    private void SetupBattleScene()
     {
-        CloseAllSelectionUI();
+        battleHUD.CloseAllSelectionUI();
 
-        if (BattleLoader.GetInstance().GetPlayer() != null) {
-            playerGO = Instantiate(playerPrefab);
-            playerGO.transform.position = playerTransform.position;
-            playerGO.transform.eulerAngles = playerTransform.eulerAngles;
-            TerraParty playerParty = playerGO.GetComponent<TerraParty>();
-            playerParty.CopyTerraParty(BattleLoader.GetInstance().GetPlayer().GetComponent<TerraParty>());
-            Destroy(BattleLoader.GetInstance().GetPlayer());
+        if (BattleLoader.GetInstance().GetPlayerTerraList() != null) {
+            playerBattleObject = Instantiate(playerPrefab);
+            playerBattleObject.transform.position = playerTransform.position;
+            playerBattleObject.transform.eulerAngles = playerTransform.eulerAngles;
+            TerraParty playerParty = playerBattleObject.GetComponent<TerraParty>();
+            playerParty.AddPartyMemberList(BattleLoader.GetInstance().GetPlayerTerraList());
 
             playerLeadingTerra = new TerraBattleObject(playerParty.GetTerraList()[0]);
             playerLeadingTerra.SetTerraGO(Instantiate(playerLeadingTerra.GetTerra().GetTerraBase().GetTerraGameObject()));
@@ -91,7 +91,7 @@ public class BattleSystem : MonoBehaviour
             playerLeadingTerra.GetTerraGO().transform.eulerAngles = playerTerraTransform.eulerAngles;
         }
         else
-            Debug.Log("No player object detected in BattleLoader");
+            Debug.Log("No player terra party detected in BattleLoader");
 
         if (battleType == BattleType.WILD) {
             if (BattleLoader.GetInstance().GetWildTerra() != null) {
@@ -109,32 +109,12 @@ public class BattleSystem : MonoBehaviour
 
     public void UpdateTerraStatusBars()
     {
-        playerTerraStatusBar.UpdateStatusBar(battlefield.GetPrimaryBattleSide().GetTerraBattlePosition().GetTerra());
-        opponentTerraStatusBar.UpdateStatusBar(battlefield.GetSecondaryBattleSide().GetTerraBattlePosition().GetTerra());
-    }
-
-    public void OpenMenuSelectionUI()
-    {
-        moveSelectionUIGO.SetActive(false);
-        menuSelectionUIGO.SetActive(true);
+        battleHUD.UpdateTerraStatusBars(battlefield);
     }
 
     public void OpenMoveSelectionUI()
     {
-        menuSelectionUIGO.SetActive(false);
-
-        MoveSelectionUI moveSelectionUI = moveSelectionUIGO.GetComponent<MoveSelectionUI>();
-        List<TerraMove> terraMoves = playerGO.GetComponent<TerraParty>().GetTerraList()[0].GetMoves();
-        for (int i = 0; i < Terra.MOVE_SLOTS; i++) {
-            if (moveSelectionUI.GetMoveBtns().Length <= i)
-                break;
-
-            string moveBtnName = MoveSelectionUI.EMPTY_SLOT_NAME;
-            if (i < terraMoves.Count && terraMoves[i] != null)
-                moveBtnName = terraMoves[i].GetMoveBase().GetMoveName() + " " + terraMoves[i].GetCurrentPP() + "/" + terraMoves[i].GetMaxPP();
-            moveSelectionUI.GetMoveBtns()[i].GetComponentInChildren<TextMeshProUGUI>().SetText(moveBtnName);
-        }
-        this.moveSelectionUIGO.SetActive(true);
+        battleHUD.OpenMoveSelectionUI(playerBattleObject.GetComponent<TerraParty>().GetTerraList()[0].GetMoves());
     }
 
     public void MoveSelectionAction(int moveIndex)
@@ -144,18 +124,24 @@ public class BattleSystem : MonoBehaviour
 
         TerraMove selectedMove = battlefield.GetPrimaryBattleSide().GetTerraBattlePosition().GetTerra().GetMoves()[moveIndex];
         if (selectedMove == null) {
-            Debug.Log("The move at index " + moveIndex + " is null");
+            Debug.LogError("The move at index " + moveIndex + " is null");
             return;
         }
-        if (battlefield.GetPrimaryBattleSide().GetTerraBattlePosition().GetTerra().GetMoves()[moveIndex].GetCurrentPP() <= 0) {
-            Debug.Log(selectedMove.GetMoveBase().GetMoveName() + " has no PP left");
+        if (selectedMove.GetCurrentPP() <= 0) {
+            Debug.Log(BattleDialog.NoMovePowerPointsLeftMsg(selectedMove));
             return;
         }
 
-        battlefield.GetTerraAttackList().Add(new TerraAttack(
+        //Decrement the selected mvoes PP
+        selectedMove.SetCurrentPP(selectedMove.GetCurrentPP() - 1);
+        //Initializes the selected attack and add the new TerraAttack to the TerraAttackList
+        TerraAttack selectedTerraAttack = new TerraAttack(
             battlefield.GetPrimaryBattleSide().GetTerraBattlePosition(),
             battlefield.GetSecondaryBattleSide().GetTerraBattlePosition(),
-            battlefield.GetPrimaryBattleSide().GetTerraBattlePosition().GetTerra().GetMoves()[moveIndex]));
+            selectedMove);
+        selectedMove.GetMoveBase().AttackSelectionInit(selectedTerraAttack, this);
+        battleActionManager.GetTerraAttackList().Add(selectedTerraAttack);
+
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 
@@ -168,7 +154,7 @@ public class BattleSystem : MonoBehaviour
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 
-    public void SwitchLeadingTerraAction(int switchingTerraPartyIndex)
+    public void SwitchTerraAction(int switchingTerraPartyIndex)
     {
         if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
             return;
@@ -184,7 +170,7 @@ public class BattleSystem : MonoBehaviour
         if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
             return;
         if(battleType != BattleType.WILD) {
-            Debug.Log("You cannot flee from a summoner battle");
+            Debug.Log(BattleDialog.ATTEMPT_ESCAPE_SUMMONER_BATTLE);
             return;
         }
 
@@ -192,25 +178,29 @@ public class BattleSystem : MonoBehaviour
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 
-    public void CloseAllSelectionUI()
-    {
-        moveSelectionUIGO.SetActive(false);
-        menuSelectionUIGO.SetActive(false);
-    }
-
     public void EndBattle()
     {
         SceneManager.LoadScene("GameScene");
     }
 
-    public void InvokeOnStartTurn()
+    public void InvokeOnEnteringStartTurnState()
     {
-        OnStartTurn?.Invoke(this, new BattleEventArgs(this));
+        OnEnteringStartTurnState?.Invoke(this, new BattleEventArgs(this));
     }
 
-    public void InvokeOnActionStep()
+    public void InvokeOnEnteringActionSelectionState()
     {
-        OnActionStep?.Invoke(this, new BattleEventArgs(this));
+        OnEnteringActionSelectionState?.Invoke(this, new BattleEventArgs(this));
+    }
+
+    public void InvokeOnActionSelection()
+    {
+        OnActionSelection?.Invoke(this, new BattleEventArgs(this));
+    }
+
+    public void InvokeOnEnteringCombatState()
+    {
+        OnEnteringCombatState?.Invoke(this, new BattleEventArgs(this));
     }
 
     public void InvokeOnTerraSwitch()
@@ -228,22 +218,39 @@ public class BattleSystem : MonoBehaviour
         OnTerraUseHeldItem?.Invoke(this, new BattleEventArgs(this));
     }
 
-    public void InvokeOnTerraAttackTerra(TerraAttack terraAttack)
+    public void InvokeOnStartingCombat()
     {
-        OnTerraAttackTerra?.Invoke(this, new TerraAttackTerraEventArgs(terraAttack, this));
+        OnStartingCombat?.Invoke(this, new BattleEventArgs(this));
     }
 
-    public void InvokeOnTerraPostAttack(TerraAttack terraAttack)
+    public void InvokeOnTerraAttackDeclaration(TerraAttack terraAttack)
     {
-        OnTerraPostAttack?.Invoke(this, new TerraAttackTerraEventArgs(terraAttack, this));
+        OnTerraAttackDeclaration?.Invoke(this, new TerraAttackDeclarationEventArgs(terraAttack, this));
     }
 
-    public void InvokeOnEndTurn()
+    public void InvokeOnTerraDirectAttack(TerraAttackParams terraAttackParams)
     {
-        OnEndTurn?.Invoke(this, new BattleEventArgs(this));
+        OnTerraDirectAttack?.Invoke(this, new TerraAttackParamsEventArgs(terraAttackParams, this));
     }
+
+    public TerraDamageByTerraEventArgs InvokeOnTerraDamageByTerra(TerraAttack terraAttack, TerraAttackLog terraAttackLog, int? damage)
+    {
+        TerraDamageByTerraEventArgs eventArgs = new TerraDamageByTerraEventArgs(terraAttack, terraAttackLog, damage, this);
+        OnTerraDamageByTerra?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public void InvokeOnEnteringEndTurnState()
+    {
+        OnEnteringEndTurnState?.Invoke(this, new BattleEventArgs(this));
+    }
+
+    public BattleHUD GetBattleHUD() { return battleHUD; }
 
     public BattleType GetBattleType() { return battleType; }
 
     public Battlefield GetBattlefield() { return battlefield; }
+
+    public BattleActionManager GetBattleActionManager() { return battleActionManager; }
 }

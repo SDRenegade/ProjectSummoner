@@ -6,6 +6,9 @@ public class ActionSelectionBattleState : BattleState
 {
     public void EnterState(BattleStateManager battleManager)
     {
-        battleManager.GetBattleSystem().OpenMenuSelectionUI();
+        //*** Entering Action Selection State Event ***
+        battleManager.GetBattleSystem().InvokeOnEnteringActionSelectionState();
+
+        battleManager.GetBattleSystem().GetBattleHUD().OpenMenuSelectionUI();
     }
 }

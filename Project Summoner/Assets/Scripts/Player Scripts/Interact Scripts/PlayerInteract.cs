@@ -42,6 +42,6 @@ public class PlayerInteract : MonoBehaviour
         }
         Debug.Log(sb);
 
-        BattleLoader.GetInstance().LoadWildBattle(gameObject.transform.root.gameObject, terraEncounter.GetTerra());
+        BattleLoader.GetInstance().LoadWildBattle(gameObject.transform.root.GetComponent<PlayerTerraParty>().GetTerraList(), terraEncounter.GetTerra());
     }
 }

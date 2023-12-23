@@ -11,6 +11,8 @@ public class TerraBattlePosition
     private StatStages spAttackStage;
     private StatStages spDefenceStage;
     private StatStages speedStage;
+    private StatStages accuracyStage;
+    private StatStages evasivenessStage;
     //private List<MinorStatusEffect> minorStatusEffectList;
 
     public TerraBattlePosition(Terra terra, BattleSide battleSide)
@@ -27,6 +29,8 @@ public class TerraBattlePosition
         spAttackStage = StatStages.NEUTRAL;
         spDefenceStage = StatStages.NEUTRAL;
         speedStage = StatStages.NEUTRAL;
+        accuracyStage = StatStages.NEUTRAL;
+        evasivenessStage = StatStages.NEUTRAL;
     }
 
     public Terra GetTerra() { return terra; }
@@ -56,5 +60,13 @@ public class TerraBattlePosition
     public StatStages GetSpeedStage() { return speedStage; }
 
     public void SetSpeedStage(StatStages statStage) { speedStage = statStage; }
+
+    public StatStages GetAccuracyStage() { return accuracyStage; }
+
+    public void SetAccuracyStage(StatStages statStage) {  accuracyStage = statStage; }
+
+    public StatStages GetEvasivenessStage() { return evasivenessStage; }
+
+    public void SetEvasivenessStage(StatStages statStage) {  evasivenessStage = statStage; }
 
 }

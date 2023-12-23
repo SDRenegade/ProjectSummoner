@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c1a3af386de9d44c98d6b70a78e607c, type: 3}
   m_Name: Terra Database
   m_EditorClassIdentifier: 
-  terraBases:
-  - {fileID: 11400000, guid: 4be40f0e713c22742b9dbccd4d87c6be, type: 2}
+  terraBaseList:
   - {fileID: 11400000, guid: 4423df2580197fe468e0df8e1d363e6d, type: 2}
   - {fileID: 11400000, guid: 2f168a1530418724e8e4fd080557a192, type: 2}
+  - {fileID: 11400000, guid: 4be40f0e713c22742b9dbccd4d87c6be, type: 2}

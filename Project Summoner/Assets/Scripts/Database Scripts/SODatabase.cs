@@ -9,6 +9,7 @@ public class SODatabase : MonoBehaviour
     private static SODatabase instance;
     [SerializeField] private TerraDatabase terraDatabase;
     [SerializeField] private TerraMoveDatabase terraMoveDatabase;
+    [SerializeField] private StatusEffectDatabase statusEffectDatabase;
 
     private void Awake()
     {
@@ -60,6 +61,27 @@ public class SODatabase : MonoBehaviour
         }
 
         return terraMove;
+    }
+
+    public StatusEffectBase GetStatusEffectByID(int id)
+    {
+        if (id >= statusEffectDatabase.GetStatusEffectBases().Count)
+            return null;
+
+        return statusEffectDatabase.GetStatusEffectBases()[id];
+    }
+
+    public StatusEffectBase GetStatusEffectByName(string statusEffectName)
+    {
+        StatusEffectBase statusEffect = null;
+        foreach (StatusEffectBase statusEffectBase in statusEffectDatabase.GetStatusEffectBases()) {
+            if (statusEffectBase.GetStatusName() == statusEffectName) {
+                statusEffect = statusEffectBase;
+                break;
+            }
+        }
+
+        return statusEffect;
     }
 
     public static SODatabase GetInstance() { return instance; }
