@@ -15,7 +15,7 @@ MonoBehaviour:
   moveName: Sucker Punch
   description: A strike that always hits first if the opponent uses a move that infilicts
     damage this turn.
-  moveType: 10
+  moveType: 11
   damageType: 0
   baseMovePriority: 2
   baseDamage:

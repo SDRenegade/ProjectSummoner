@@ -5,12 +5,22 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Explosion")]
 public class ExplosionBase : TerraMoveBase
 {
-    public override void AttackSelectionInit(TerraAttack terraAttack, BattleSystem battleSystem) {}
-    
-    public override void PreAttackEffect(TerraAttackParams terraAttackParams, BattleSystem battleSystem) {}
-
-    public override void PostAttackEffect(List<TerraAttackLog> terraAttackLogList, BattleSystem battleSystem)
+    public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
     {
-        terraAttackLogList[0].GetAttackerPosition().GetTerra().SetCurrentHP(0);
+        return new ExplosionAction();
     }
+}
+
+public class ExplosionAction : TerraMoveAction
+{
+    public ExplosionAction() {}
+
+    public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
+    {
+        directAttackLog.GetAttackerPosition().GetTerra().SetCurrentHP(0);
+    }
+
+    public void AddBattleActions(BattleSystem battleSystem) {}
+
+    public void RemoveBattleActions(BattleSystem battleSystem) {}
 }

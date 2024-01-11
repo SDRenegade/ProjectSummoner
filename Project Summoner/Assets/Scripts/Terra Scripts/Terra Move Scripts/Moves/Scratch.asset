@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Scratch
   description: Claws that the opponent
-  moveType: 0
+  moveType: 1
+  damageType: 1
+  baseMovePriority: 0
   baseDamage:
     value: 35
     isNull: 0

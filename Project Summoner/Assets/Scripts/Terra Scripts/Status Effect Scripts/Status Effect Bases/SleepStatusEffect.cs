@@ -5,19 +5,15 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "StatusEffect", menuName = "StatusEffect/Sleep")]
 public class SleepStatusEffect : StatusEffectBase
 {
-    public SleepStatusEffect()
-    {
-        statusName = "Sleep";
-        description = "Inflicted Terra are unable to attack until they wake up";
-    }
+    public SleepStatusEffect() {}
 
     public override BattleAction CreateBattleAction(Terra terra)
     {
-        return new SleepStatusEffectBattleAction(terra);
+        return new SleepStatusEffectAction(terra);
     }
 }
 
-public class SleepStatusEffectBattleAction : BattleAction
+public class SleepStatusEffectAction : BattleAction
 {
     private static readonly int MIN_TURNS_SLEEP = 2;
     private static readonly int MAX_TURNS_SLEEP = 5;
@@ -26,37 +22,37 @@ public class SleepStatusEffectBattleAction : BattleAction
     private int numTurnsSleep;
     private int turnCounter;
 
-    public SleepStatusEffectBattleAction(Terra terra)
+    public SleepStatusEffectAction(Terra terra)
     {
         this.terra = terra;
         numTurnsSleep = Random.Range(MIN_TURNS_SLEEP, MAX_TURNS_SLEEP + 1);
         turnCounter = 0;
     }
 
-    public void AddBattleAction(BattleSystem battleSystem)
+    public void AddBattleActions(BattleSystem battleSystem)
     {
-        battleSystem.OnTerraAttackDeclaration += SleepActive;
+        battleSystem.OnAttackDeclaration += SleepActive;
     }
 
-    public void RemoveBattleAction(BattleSystem battleSystem)
+    public void RemoveBattleActions(BattleSystem battleSystem)
     {
-        battleSystem.OnTerraAttackDeclaration -= SleepActive;
+        battleSystem.OnAttackDeclaration -= SleepActive;
     }
 
-    private void SleepActive(object sender, TerraAttackDeclarationEventArgs terraAttackDeclaration)
+    private void SleepActive(object sender, AttackDeclarationEventArgs eventArgs)
     {
-        if (terraAttackDeclaration.GetTerraAttack().GetAttackerPosition().GetTerra() != terra)
+        if (eventArgs.GetTerraAttack().GetAttackerPosition().GetTerra() != terra)
             return;
 
         turnCounter++;
         if (turnCounter <= numTurnsSleep) {
-            terraAttackDeclaration.GetTerraAttack().SetIsCanceled(true);
+            eventArgs.GetTerraAttack().SetCanceled(true);
             Debug.Log(BattleDialog.SleepProkedMsg(terra));
-            terraAttackDeclaration.GetBattleSystem().UpdateTerraStatusBars();
+            eventArgs.GetBattleSystem().UpdateTerraStatusBars();
         }
         else {
             terra.SetStatusEffect(null);
-            terraAttackDeclaration.GetBattleSystem().OnTerraAttackDeclaration -= SleepActive;
+            eventArgs.GetBattleSystem().OnAttackDeclaration -= SleepActive;
             Debug.Log(BattleDialog.TerraWokeUpMsg(terra));
         }
     }

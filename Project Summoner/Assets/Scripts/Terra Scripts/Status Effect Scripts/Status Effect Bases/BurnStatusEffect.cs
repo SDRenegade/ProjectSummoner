@@ -5,40 +5,36 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "StatusEffect", menuName = "StatusEffect/Burn")]
 public class BurnStatusEffect : StatusEffectBase
 {
-    public BurnStatusEffect()
-    {
-        statusName = "Burn";
-        description = "Inflicted Terra take damage each turn and their attack stat is reduced";
-    }
+    public BurnStatusEffect() {}
 
     public override BattleAction CreateBattleAction(Terra terra)
     {
-        return new BurnStatusEffectBattleAction(terra);
+        return new BurnStatusEffectAction(terra);
     }
 }
 
-class BurnStatusEffectBattleAction : BattleAction
+class BurnStatusEffectAction : BattleAction
 {
     private static readonly float PERCENT_MAX_HEALTH_BURN = 1/8f;
     private static readonly float DAMAGE_REDUCTION = 0.8f;
 
     private Terra terra;
 
-    public BurnStatusEffectBattleAction(Terra terra)
+    public BurnStatusEffectAction(Terra terra)
     {
         this.terra = terra;
     }
 
-    public void AddBattleAction(BattleSystem battleSystem)
+    public void AddBattleActions(BattleSystem battleSystem)
     {
-        battleSystem.OnEnteringEndTurnState += BurnActive;
-        battleSystem.OnTerraDirectAttack += AttackReductionActive;
+        battleSystem.OnEndOfTurn += BurnActive;
+        battleSystem.OnDirectAttack += AttackReductionActive;
     }
 
-    public void RemoveBattleAction(BattleSystem battleSystem)
+    public void RemoveBattleActions(BattleSystem battleSystem)
     {
-        battleSystem.OnEnteringEndTurnState -= BurnActive;
-        battleSystem.OnTerraDirectAttack -= AttackReductionActive;
+        battleSystem.OnEndOfTurn -= BurnActive;
+        battleSystem.OnDirectAttack -= AttackReductionActive;
     }
 
     private void BurnActive(object sender, BattleEventArgs eventArgs)
@@ -49,8 +45,8 @@ class BurnStatusEffectBattleAction : BattleAction
         eventArgs.GetBattleSystem().UpdateTerraStatusBars();
     }
 
-    private void AttackReductionActive(object sender, TerraAttackParamsEventArgs eventArgs)
+    private void AttackReductionActive(object sender, DirectAttackEventArgs eventArgs)
     {
-        eventArgs.GetTerraAttackParmas().SetDamageModifier(eventArgs.GetTerraAttackParmas().GetDamageModifier() * DAMAGE_REDUCTION);
+        eventArgs.GetDirectAttackParams().SetDamageModifier(eventArgs.GetDirectAttackParams().GetDamageModifier() * DAMAGE_REDUCTION);
     }
 }

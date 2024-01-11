@@ -15,8 +15,9 @@ MonoBehaviour:
   moveName: Sparks
   description: Shoot a flurry of sparks at the opponent, with a chance of paralyzing
     the enemy
-  moveType: 4
+  moveType: 5
   damageType: 1
+  baseMovePriority: 0
   baseDamage:
     value: 40
     isNull: 0

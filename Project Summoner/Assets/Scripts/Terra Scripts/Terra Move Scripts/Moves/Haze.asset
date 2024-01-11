@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Haze
   description: Resets all stat stages back to neutral.
-  moveType: 0
+  moveType: 1
   damageType: 2
   baseMovePriority: 0
   baseDamage:

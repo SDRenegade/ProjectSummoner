@@ -49,7 +49,7 @@ public class TerraMove
 
     public void SetCurrentPP(int currentPP)
     {
-        if (currentPP <= 0)
+        if (currentPP < 0)
             return;
 
         this.currentPP = (currentPP > maxPP) ? maxPP : currentPP;

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Absorb
   description: Strike the opponent and heal for half the damage dealt
-  moveType: 1
+  moveType: 2
   damageType: 1
   baseMovePriority: 0
   baseDamage:

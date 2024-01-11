@@ -15,8 +15,9 @@ MonoBehaviour:
   moveName: Flash Freeze
   description: Instantly freeze the area around your opponent dealing damage and
     has a chance to freeze
-  moveType: 9
+  moveType: 10
   damageType: 1
+  baseMovePriority: 0
   baseDamage:
     value: 85
     isNull: 0

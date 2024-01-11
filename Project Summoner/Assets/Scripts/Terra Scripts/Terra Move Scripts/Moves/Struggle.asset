@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a0c3b82b4b80434d8bd032b49d63039, type: 3}
+  m_Name: Struggle
+  m_EditorClassIdentifier: 
+  moveName: Struggle
+  description: A move that is only usable when all other moves have zero power points
+    left.
+  moveType: 0
+  damageType: 0
+  baseMovePriority: 0
+  baseDamage:
+    value: 50
+    isNull: 0
+  baseAccuracy:
+    value: 100
+    isNull: 0
+  basePP: 1

@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Sleep Spore
   description: A spore that sents the opponenet into a deep slumber
-  moveType: 1
+  moveType: 2
   damageType: 2
+  baseMovePriority: 0
   baseDamage:
     value: 0
     isNull: 1

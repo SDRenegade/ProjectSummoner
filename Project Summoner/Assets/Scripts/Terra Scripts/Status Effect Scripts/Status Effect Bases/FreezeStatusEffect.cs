@@ -5,54 +5,48 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "StatusEffect", menuName = "StatusEffect/Freeze")]
 public class FreezeStatusEffect : StatusEffectBase
 {
-    public FreezeStatusEffect()
-    {
-        statusName = "Freeze";
-        description = "Inflicted Terra are unable to attack until they have thawed";
-    }
+    public FreezeStatusEffect() {}
 
     public override BattleAction CreateBattleAction(Terra terra)
     {
-        return new FreezeStatusEffectBattleAction(terra);
+        return new FreezeStatusEffectAction(terra);
     }
 }
 
-public class FreezeStatusEffectBattleAction : BattleAction
+public class FreezeStatusEffectAction : BattleAction
 {
     private static readonly float THAW_CHANCE = 0.25f;
 
     private Terra terra;
 
-    public FreezeStatusEffectBattleAction(Terra terra)
+    public FreezeStatusEffectAction(Terra terra)
     {
         this.terra = terra;
     }
 
-    public void AddBattleAction(BattleSystem battleSystem)
+    public void AddBattleActions(BattleSystem battleSystem)
     {
-        battleSystem.OnTerraAttackDeclaration += FreezeActive;
+        battleSystem.OnAttackDeclaration += FreezeActive;
     }
 
-    public void RemoveBattleAction(BattleSystem battleSystem)
+    public void RemoveBattleActions(BattleSystem battleSystem)
     {
-        battleSystem.OnTerraAttackDeclaration -= FreezeActive;
+        battleSystem.OnAttackDeclaration -= FreezeActive;
     }
 
-    private void FreezeActive(object sender, TerraAttackDeclarationEventArgs terraAttackDeclaration)
+    private void FreezeActive(object sender, AttackDeclarationEventArgs eventArgs)
     {
-        if (terraAttackDeclaration.GetTerraAttack().GetAttackerPosition().GetTerra() != terra)
+        if (eventArgs.GetTerraAttack().GetAttackerPosition().GetTerra() != terra)
             return;
 
         bool hasThawed = THAW_CHANCE >= Random.Range(0f, 1f);
         if (hasThawed) {
-            terra.SetStatusEffect(null);
-            terraAttackDeclaration.GetBattleSystem().OnTerraAttackDeclaration -= FreezeActive;
+            terra.SetStatusEffect(null, eventArgs.GetBattleSystem());
             Debug.Log(BattleDialog.TerraThawedMsg(terra));
         }
         else {
-            terraAttackDeclaration.GetTerraAttack().SetIsCanceled(true);
+            eventArgs.GetTerraAttack().SetCanceled(true);
             Debug.Log(BattleDialog.FreezeProkedMsg(terra));
-            terraAttackDeclaration.GetBattleSystem().UpdateTerraStatusBars();
         }
     }
 }

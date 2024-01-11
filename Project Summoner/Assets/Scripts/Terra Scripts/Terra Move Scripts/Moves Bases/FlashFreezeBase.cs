@@ -5,22 +5,30 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Flash Freeze")]
 public class FlashFreezeBase : TerraMoveBase
 {
+    public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
+    {
+        return new FlashFreezeAction();
+    }
+}
+
+public class FlashFreezeAction : TerraMoveAction
+{
     private static readonly float FREEZE_CHANCE = 0.2f;
 
-    public override void AttackSelectionInit(TerraAttack terraAttack, BattleSystem battleSystem) {}
+    public FlashFreezeAction() {}
 
-    public override void PreAttackEffect(TerraAttackParams terraAttackParams, BattleSystem battleSystem) { }
-
-    public override void PostAttackEffect(List<TerraAttackLog> terraAttackTerraList, BattleSystem battleSystem)
+    public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
-        TerraBattlePosition attackerPosition = terraAttackTerraList[0].GetAttackerPosition();
-        TerraBattlePosition defenderPosition = terraAttackTerraList[0].GetDefenderPosition();
+        TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
 
         bool hasFreezeProked = FREEZE_CHANCE >= Random.Range(0f, 1f);
-        if (defenderPosition.GetTerra().GetStatusEffect().GetStatusEffectBase() == null && hasFreezeProked) {
-            defenderPosition.GetTerra().GetStatusEffect().SetStatusEffectBase(SODatabase.GetInstance().GetStatusEffectByName("Freeze"), defenderPosition.GetTerra());
-            defenderPosition.GetTerra().GetStatusEffect().AddStatusEffectBattleActoin(battleSystem, defenderPosition.GetTerra());
+        if (!defenderPosition.GetTerra().HasStatusEffect() && hasFreezeProked) {
+            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Freeze"), battleSystem);
             BattleDialog.FreezeInflictedMsg(defenderPosition.GetTerra());
         }
     }
+
+    public void AddBattleActions(BattleSystem battleSystem) {}
+
+    public void RemoveBattleActions(BattleSystem battleSystem) {}
 }

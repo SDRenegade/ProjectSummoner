@@ -5,14 +5,14 @@ using UnityEngine;
 [System.Serializable]
 public class Terra
 {
-    public const int MOVE_SLOTS = 4;
-    private const float BASE_STAT_MULTIPLIER = 0.033f;
+    public static readonly int MOVE_SLOTS = 4;
+    private static readonly float BASE_STAT_MULTIPLIER = 0.033f;
 
     [SerializeField] private TerraBase terraBase;
     [SerializeField] private string terraNickname;
     [SerializeField] [Range(1, 100)] private int level;
     [SerializeField] private List<TerraMove> moves;
-    [SerializeField] private StatusEffectWrapper statusEffect;
+    [SerializeField] private StatusEffectWrapper statusEffectWrapper;
     [SerializeField] [Min(0)] private int currentHP;
 
     public Terra(TerraBase terraBase)
@@ -22,7 +22,7 @@ public class Terra
         level = 1;
         moves = new List<TerraMove>();
         GenerateNaturalMoveSet();
-        statusEffect = new StatusEffectWrapper(null, this);
+        statusEffectWrapper = new StatusEffectWrapper(null, this);
         currentHP = GetMaxHP();
     }
 
@@ -33,7 +33,7 @@ public class Terra
         this.level = level;
         moves = new List<TerraMove>();
         GenerateNaturalMoveSet();
-        statusEffect = new StatusEffectWrapper(null, this);
+        statusEffectWrapper = new StatusEffectWrapper(null, this);
         currentHP = GetMaxHP();
     }
 
@@ -46,7 +46,7 @@ public class Terra
         for(int i = 0; i < terraSavable.GetSavableMoves().Count; i++)
             moves.Add(new TerraMove(terraSavable.GetSavableMoves()[i]));
         StatusEffectBase savedStatusEffect = SODatabase.GetInstance().GetStatusEffectByName(terraSavable.GetStatusEffectBaseName());
-        statusEffect = (savedStatusEffect != null) ? new StatusEffectWrapper(savedStatusEffect, this) : new StatusEffectWrapper(null, this);
+        statusEffectWrapper = (savedStatusEffect != null) ? new StatusEffectWrapper(savedStatusEffect, this) : new StatusEffectWrapper(null, this);
         currentHP = terraSavable.GetCurrentHP();
     }
 
@@ -133,9 +133,21 @@ public class Terra
         this.currentHP = hp;
     }
 
-    public StatusEffectWrapper GetStatusEffect() { return statusEffect; }
+    public StatusEffectWrapper GetStatusEffectWrapper() { return statusEffectWrapper; }
 
-    public void SetStatusEffect(StatusEffectWrapper statusEffect) { this.statusEffect = statusEffect; }
+    //Sets the status effect without adding/removing battle system events
+    public void SetStatusEffect(StatusEffectBase statusEffectBase)
+    {
+        statusEffectWrapper.SetStatusEffectBase(statusEffectBase, this);
+    }
+
+    //Sets the status effect and adds/removes battle system events
+    public void SetStatusEffect(StatusEffectBase statusEffectBase, BattleSystem battleSystem)
+    {
+        statusEffectWrapper.SetStatusEffectBase(statusEffectBase, this, battleSystem);
+    }
+
+    public bool HasStatusEffect() { return statusEffectWrapper.GetStatusEffectBase() != null; }
 
     public int GetMaxHP() { return Mathf.FloorToInt(level * terraBase.GetBaseHP() * BASE_STAT_MULTIPLIER + 10); }
 

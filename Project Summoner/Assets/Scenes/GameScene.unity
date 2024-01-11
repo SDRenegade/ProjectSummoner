@@ -228,7 +228,7 @@ MonoBehaviour:
     - moveBase: {fileID: 11400000, guid: 625642123288b564ea27374ef0a2e221, type: 2}
       maxPP: 20
       currentPP: 20
-    statusEffect:
+    statusEffectWrapper:
       statusEffectBase: {fileID: 0}
     currentHP: 24
 --- !u!1 &16921876
@@ -560,16 +560,13 @@ MonoBehaviour:
     terraNickname: 
     level: 8
     moves:
-    - moveBase: {fileID: 0}
+    - moveBase: {fileID: 11400000, guid: bbab58efed0be3d4493ef2893699d3fd, type: 2}
       maxPP: 30
       currentPP: 30
-    - moveBase: {fileID: 0}
+    - moveBase: {fileID: 11400000, guid: f7a9f8f0e8fe2dd4a95a4adfba7076f1, type: 2}
       maxPP: 20
       currentPP: 20
-    - moveBase: {fileID: 0}
-      maxPP: 10
-      currentPP: 10
-    statusEffect:
+    statusEffectWrapper:
       statusEffectBase: {fileID: 0}
     currentHP: 20
 --- !u!1 &251490208 stripped
@@ -1342,7 +1339,7 @@ MonoBehaviour:
     - moveBase: {fileID: 0}
       maxPP: 0
       currentPP: 0
-    statusEffect:
+    statusEffectWrapper:
       statusEffectBase: {fileID: 0}
     currentHP: 20
 --- !u!135 &624831009
@@ -1911,7 +1908,7 @@ MonoBehaviour:
     - moveBase: {fileID: 0}
       maxPP: 0
       currentPP: 0
-    statusEffect:
+    statusEffectWrapper:
       statusEffectBase: {fileID: 0}
     currentHP: 20
 --- !u!135 &788169155
@@ -2364,6 +2361,8 @@ MonoBehaviour:
   terraDatabase: {fileID: 11400000, guid: 76e43666dcf6f244986ba497bd989545, type: 2}
   terraMoveDatabase: {fileID: 11400000, guid: ded2c76fbd0f6204696684742a5424ff, type: 2}
   statusEffectDatabase: {fileID: 11400000, guid: f6a75da7ab9b85743ad2fa9c43c87113, type: 2}
+  volatileStatusEffectDatabase: {fileID: 11400000, guid: 5da54d3cf7b794a4da4862f1b4e33c38, type: 2}
+  metronomeMovesDatabase: {fileID: 11400000, guid: 1aed8a852b1bccb4c92ad6eb4a785de0, type: 2}
 --- !u!4 &1143186513
 Transform:
   m_ObjectHideFlags: 0
@@ -2807,7 +2806,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 12.8
+      value: 19.28
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3184,7 +3183,7 @@ MonoBehaviour:
     - moveBase: {fileID: 0}
       maxPP: 15
       currentPP: 15
-    statusEffect:
+    statusEffectWrapper:
       statusEffectBase: {fileID: 0}
     currentHP: 20
 --- !u!135 &1672181197

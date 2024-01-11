@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Take Down
   description: A strong atttack that causes recoil damage
-  moveType: 0
+  moveType: 1
   damageType: 0
   baseMovePriority: 0
   baseDamage:

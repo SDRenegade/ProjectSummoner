@@ -5,43 +5,49 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Dream Eater")]
 public class DreamEaterBase : TerraMoveBase
 {
-    public override void AttackSelectionInit(TerraAttack terraAttack, BattleSystem battleSystem)
+    public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
     {
-        new DreamEaterAction(terraAttack, battleSystem);
+        return new DreamEaterAction(terraAttack);
+    }
+}
+
+public class DreamEaterAction : TerraMoveAction
+{
+    TerraAttack terraAttack;
+
+    public DreamEaterAction(TerraAttack terraAttack)
+    {
+        this.terraAttack = terraAttack;
     }
 
-    public override void PreAttackEffect(TerraAttackParams terraAttackParams, BattleSystem battleSystem) {}
-
-    public override void PostAttackEffect(List<TerraAttackLog> terraAttackLogList, BattleSystem battleSystem)
+    public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
-        Terra attacker = terraAttackLogList[0].GetAttackerPosition().GetTerra();
+        Terra attacker = directAttackLog.GetAttackerPosition().GetTerra();
 
-        if (terraAttackLogList[0].GetDamage() != null) {
-            int healthAbsorbed = (int)Mathf.Ceil((int)terraAttackLogList[0].GetDamage() / 2f);
+        if (directAttackLog.GetDamage() != null) {
+            int healthAbsorbed = (int)Mathf.Ceil((int)directAttackLog.GetDamage() / 2f);
             attacker.SetCurrentHP(attacker.GetCurrentHP() + healthAbsorbed);
             Debug.Log(BattleDialog.HealthHealedMsg(attacker, healthAbsorbed));
         }
     }
-}
 
-public class DreamEaterAction
-{
-    TerraAttack thisTerraAttack;
-
-    public DreamEaterAction(TerraAttack terraAttack, BattleSystem battleSystem)
+    public void AddBattleActions(BattleSystem battleSystem)
     {
-        thisTerraAttack = terraAttack;
-        battleSystem.OnTerraAttackDeclaration += CheckOpponentIsSleeping;
+        battleSystem.OnDirectAttack += CheckOpponentIsSleeping;
     }
 
-    private void CheckOpponentIsSleeping(object sender, TerraAttackDeclarationEventArgs eventArgs)
+    public void RemoveBattleActions(BattleSystem battleSystem)
     {
-        if (thisTerraAttack != eventArgs.GetTerraAttack())
+        battleSystem.OnDirectAttack -= CheckOpponentIsSleeping;
+    }
+
+    private void CheckOpponentIsSleeping(object sender, DirectAttackEventArgs eventArgs)
+    {
+        if (eventArgs.GetDirectAttackParams().GetMove() != terraAttack.GetMove())
             return;
 
-        TerraBattlePosition defenderPosition = eventArgs.GetTerraAttack().GetDefendersPositionList()[0];
-
-        if (defenderPosition.GetTerra().GetStatusEffect().GetStatusEffectBase() != SODatabase.GetInstance().GetStatusEffectByName("Sleep"))
-            thisTerraAttack.SetIsCanceled(true);
+        Terra defendingTerra = eventArgs.GetDirectAttackParams().GetDefenderPosition().GetTerra();
+        if (defendingTerra.GetStatusEffectWrapper().GetStatusEffectBase() != SODatabase.GetInstance().GetStatusEffectByName("Sleep"))
+            eventArgs.SetCanceled(true);
     }
 }

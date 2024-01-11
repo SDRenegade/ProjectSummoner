@@ -5,14 +5,24 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Growl")]
 public class GrowlBase : TerraMoveBase
 {
-    public override void AttackSelectionInit(TerraAttack terraAttack, BattleSystem battleSystem) {}
-
-    public override void PreAttackEffect(TerraAttackParams terraAttackParams, BattleSystem battleSystem) { }
-
-    public override void PostAttackEffect(List<TerraAttackLog> terraAttackTerraList, BattleSystem battleSystem)
+    public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
     {
-        TerraBattlePosition defenderPosition = terraAttackTerraList[0].GetDefenderPosition();
+        return new GrowlAction();
+    }
+}
+
+public class GrowlAction : TerraMoveAction
+{
+    public GrowlAction() {}
+
+    public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
+    {
+        TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
         defenderPosition.SetAttackStage(StatStagesExtension.DecrementStage(defenderPosition.GetAttackStage()));
         Debug.Log(BattleDialog.StatStageDecrementMsg(defenderPosition.GetTerra(), defenderPosition.GetAttackStage(), -1));
     }
+
+    public void AddBattleActions(BattleSystem battleSystem) {}
+
+    public void RemoveBattleActions(BattleSystem battleSystem) {}
 }

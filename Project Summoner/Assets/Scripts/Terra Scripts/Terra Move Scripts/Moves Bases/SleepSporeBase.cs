@@ -5,20 +5,29 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Sleep Spore")]
 public class SleepSporeBase : TerraMoveBase
 {
-    public override void AttackSelectionInit(TerraAttack terraAttack, BattleSystem battleSystem) {}
-
-    public override void PreAttackEffect(TerraAttackParams terraAttackParams, BattleSystem battleSystem) {}
-
-    public override void PostAttackEffect(List<TerraAttackLog> terraAttackTerraList, BattleSystem battleSystem)
+    public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
     {
-        TerraBattlePosition defenderPosition = terraAttackTerraList[0].GetDefenderPosition();
+        return new SleepSporeAction();
+    }
+}
 
-        if (defenderPosition.GetTerra().GetStatusEffect().GetStatusEffectBase() == null) {
-            defenderPosition.GetTerra().GetStatusEffect().SetStatusEffectBase(SODatabase.GetInstance().GetStatusEffectByName("Sleep"), defenderPosition.GetTerra());
-            defenderPosition.GetTerra().GetStatusEffect().AddStatusEffectBattleActoin(battleSystem, defenderPosition.GetTerra());
+public class SleepSporeAction : TerraMoveAction
+{
+    public SleepSporeAction() {}
+
+    public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
+    {
+        TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
+
+        if (!defenderPosition.GetTerra().HasStatusEffect()) {
+            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Sleep"), battleSystem);
             BattleDialog.SleepInflictedMsg(defenderPosition.GetTerra());
         }
         else
             Debug.Log(BattleDialog.ATTACK_FAILED);
     }
+
+    public void AddBattleActions(BattleSystem battleSystem) {}
+
+    public void RemoveBattleActions(BattleSystem battleSystem) {}
 }

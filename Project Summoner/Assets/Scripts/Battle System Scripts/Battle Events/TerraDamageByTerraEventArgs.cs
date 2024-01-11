@@ -5,19 +5,19 @@ using UnityEngine;
 public class TerraDamageByTerraEventArgs : BattleEventArgs
 {
     private TerraAttack terraAttack;
-    private TerraAttackLog terraAttackLog;
+    private DirectAttackLog directAttackLog;
     private int? damage;
 
-    public TerraDamageByTerraEventArgs(TerraAttack terraAttack, TerraAttackLog terraAttackLog, int? damage, BattleSystem battleSystem) : base(battleSystem)
+    public TerraDamageByTerraEventArgs(TerraAttack terraAttack, DirectAttackLog directAttackLog, int? damage, BattleSystem battleSystem) : base(battleSystem)
     {
         this.terraAttack = terraAttack;
-        this.terraAttackLog = terraAttackLog;
+        this.directAttackLog = directAttackLog;
         this.damage = damage;
     }
 
     public TerraAttack GetTerraAttack() { return terraAttack; }
 
-    public TerraAttackLog GetTerraAttacLog() { return terraAttackLog; }
+    public DirectAttackLog GetDirectAttackLog() { return directAttackLog; }
 
     public int? GetDamage() { return damage; }
 

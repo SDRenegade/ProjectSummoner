@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Dragon Rage
   description: A move that always deals 40 damage
-  moveType: 11
+  moveType: 12
   damageType: 1
   baseMovePriority: 0
   baseDamage:

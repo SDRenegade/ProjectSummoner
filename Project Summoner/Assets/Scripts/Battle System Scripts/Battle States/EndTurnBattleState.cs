@@ -6,10 +6,14 @@ public class EndTurnBattleState : BattleState
 {
     public void EnterState(BattleStateManager battleManager)
     {
-        //*** Entering End Turn State Event ***
-        battleManager.GetBattleSystem().InvokeOnEnteringEndTurnState();
+        BattleSystem battleSystem = battleManager.GetBattleSystem();
+
+        //*** End of Turn Event ***
+        battleSystem.InvokeOnEndOfTurn();
 
         Debug.Log("============== Entered End of Turn Battle State ==============");
+        battleSystem.GetBattleActionManager().ResetActions();
+
         battleManager.SwitchState(battleManager.GetStartTurnState());
     }
 }

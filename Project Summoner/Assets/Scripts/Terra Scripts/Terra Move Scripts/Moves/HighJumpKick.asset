@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c06d8f211079c742af7b2b15595bbda, type: 3}
+  m_Name: HighJumpKick
+  m_EditorClassIdentifier: 
+  moveName: High Jump Kick
+  description: A strong attack that if missed deals double damage to the attacker.
+  moveType: 9
+  damageType: 0
+  baseMovePriority: 0
+  baseDamage:
+    value: 50
+    isNull: 0
+  baseAccuracy:
+    value: 50
+    isNull: 0
+  basePP: 15

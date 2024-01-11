@@ -5,24 +5,31 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Sucker Punch")]
 public class SuckerPunchBase : TerraMoveBase
 {
-    public override void AttackSelectionInit(TerraAttack terraAttack, BattleSystem battleSystem)
+    public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
     {
-        new SuckerPunchAction(terraAttack, battleSystem);
+        return new SuckerPunchAction(terraAttack);
     }
-
-    public override void PreAttackEffect(TerraAttackParams terraAttackParams, BattleSystem battleSystem) {}
-
-    public override void PostAttackEffect(List<TerraAttackLog> terraAttackTerraList, BattleSystem battleSystem) {}
 }
 
-public class SuckerPunchAction
+public class SuckerPunchAction : TerraMoveAction
 {
-    private TerraAttack thisTerraAttack;
+    private TerraAttack terraAttack;
 
-    public SuckerPunchAction(TerraAttack terraAttack, BattleSystem battleSystem)
+    public SuckerPunchAction(TerraAttack terraAttack)
     {
-        thisTerraAttack = terraAttack;
-        battleSystem.OnStartingCombat += DetermineAttackResult;
+        this.terraAttack = terraAttack;
+    }
+
+    public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem) {}
+
+    public void AddBattleActions(BattleSystem battleSystem)
+    {
+        battleSystem.OnEnteringCombatState += DetermineAttackResult;
+    }
+
+    public void RemoveBattleActions(BattleSystem battleSystem)
+    {
+        battleSystem.OnEnteringCombatState -= DetermineAttackResult;
     }
 
     private void DetermineAttackResult(object sender, BattleEventArgs eventArgs)
@@ -30,13 +37,13 @@ public class SuckerPunchAction
         BattleSystem battleSystem = eventArgs.GetBattleSystem();
         bool isOpponenetAttacking = false;
         foreach (TerraAttack terraAttack in battleSystem.GetBattleActionManager().GetTerraAttackList()) {
-            if (terraAttack.GetAttackerPosition() == thisTerraAttack.GetDefendersPositionList()[0]) {
+            if (terraAttack.GetAttackerPosition() == this.terraAttack.GetDefendersPositionList()[0]) {
                 if (terraAttack.GetMove().GetMoveBase().GetDamageType() != DamageType.STATUS)
                     isOpponenetAttacking = true;
                 break;
             }
         }
 
-        thisTerraAttack.SetIsCanceled(!isOpponenetAttacking);
+        terraAttack.SetCanceled(!isOpponenetAttacking);
     }
 }

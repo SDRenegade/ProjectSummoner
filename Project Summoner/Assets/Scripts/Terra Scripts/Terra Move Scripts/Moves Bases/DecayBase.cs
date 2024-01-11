@@ -5,18 +5,27 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Decay")]
 public class DecayBase : TerraMoveBase
 {
-    public override void AttackSelectionInit(TerraAttack terraAttack, BattleSystem battleSystem) {}
-
-    public override void PreAttackEffect(TerraAttackParams terraAttackParams, BattleSystem battleSystem) { }
-
-    public override void PostAttackEffect(List<TerraAttackLog> terraAttackTerraList, BattleSystem battleSystem)
+    public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
     {
-        TerraBattlePosition defenderPosition = terraAttackTerraList[0].GetDefenderPosition();
+        return new DecayAction();
+    }
+}
 
-        if (defenderPosition.GetTerra().GetStatusEffect().GetStatusEffectBase() == null) {
-            defenderPosition.GetTerra().GetStatusEffect().SetStatusEffectBase(SODatabase.GetInstance().GetStatusEffectByName("Blight"), defenderPosition.GetTerra());
-            defenderPosition.GetTerra().GetStatusEffect().AddStatusEffectBattleActoin(battleSystem, defenderPosition.GetTerra());
+public class DecayAction : TerraMoveAction
+{
+    public DecayAction() {}
+
+    public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
+    {
+        TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
+
+        if (!defenderPosition.GetTerra().HasStatusEffect()) {
+            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Blight"), battleSystem);
             Debug.Log(BattleDialog.BlightInflictedMsg(defenderPosition.GetTerra()));
         }
     }
+
+    public void AddBattleActions(BattleSystem battleSystem) {}
+
+    public void RemoveBattleActions(BattleSystem battleSystem) {}
 }

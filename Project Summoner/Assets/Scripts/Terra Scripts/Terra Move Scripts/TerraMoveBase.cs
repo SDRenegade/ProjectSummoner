@@ -14,11 +14,7 @@ public abstract class TerraMoveBase : ScriptableObject
     [SerializeField] protected IntNullable baseAccuracy;
     [SerializeField] protected int basePP;
 
-    public abstract void AttackSelectionInit(TerraAttack terraAttack, BattleSystem battleSystem);
-
-    public abstract void PreAttackEffect(TerraAttackParams terraAttackParams, BattleSystem battleSystem);
-
-    public abstract void PostAttackEffect(List<TerraAttackLog> terraAttackLogList, BattleSystem battleSystem);
+    public abstract TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack);
     
     public string GetMoveName() { return moveName; }
     

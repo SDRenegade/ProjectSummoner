@@ -5,19 +5,15 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "StatusEffect", menuName = "StatusEffect/Blight")]
 public class BlightStatusEffect : StatusEffectBase
 {
-    public BlightStatusEffect()
-    {
-        statusName = "Blight";
-        description = "Inflicted Terra take increased amounts of damage each turn";
-    }
+    public BlightStatusEffect() {}
 
     public override BattleAction CreateBattleAction(Terra terra)
     {
-        return new BlightStatusEffectBattleAction(terra);
+        return new BlightStatusEffectAction(terra);
     }
 }
 
-public class BlightStatusEffectBattleAction : BattleAction
+public class BlightStatusEffectAction : BattleAction
 {
     private static readonly float[] BLIGHT_DAMAGE_LIST = new float[5] {
         1/12f, 1/8f, 1/6f, 1/4f, 1/3f
@@ -26,22 +22,22 @@ public class BlightStatusEffectBattleAction : BattleAction
     private Terra terra;
     private int blightCounter;
 
-    public BlightStatusEffectBattleAction(Terra terra)
+    public BlightStatusEffectAction(Terra terra)
     {
         this.terra = terra;
         blightCounter = 0;
     }
 
-    public void AddBattleAction(BattleSystem battleSystem)
+    public void AddBattleActions(BattleSystem battleSystem)
     {
         blightCounter = 0;
-        battleSystem.OnEnteringEndTurnState += BlightActive;
+        battleSystem.OnEndOfTurn += BlightActive;
     }
 
-    public void RemoveBattleAction(BattleSystem battleSystem)
+    public void RemoveBattleActions(BattleSystem battleSystem)
     {
         blightCounter = 0;
-        battleSystem.OnEnteringEndTurnState -= BlightActive;
+        battleSystem.OnEndOfTurn -= BlightActive;
     }
 
     private void BlightActive(object sender, BattleEventArgs battlesArgs)

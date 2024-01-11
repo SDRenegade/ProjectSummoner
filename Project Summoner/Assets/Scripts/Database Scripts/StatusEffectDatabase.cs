@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Status Effect Database", menuName = "Database/Status Effect Database")]
+[CreateAssetMenu(fileName = "StatusEffectDatabase", menuName = "Database/Status Effect Database")]
 public class StatusEffectDatabase : ScriptableObject
 {
-    [SerializeField] private List<StatusEffectBase> statusEffectBaseList;
+    [SerializeField] private List<StatusEffectBase> statusEffectList;
 
-    public List<StatusEffectBase> GetStatusEffectBases() { return statusEffectBaseList; }
+    public List<StatusEffectBase> GetStatusEffectList() { return statusEffectList; }
 }

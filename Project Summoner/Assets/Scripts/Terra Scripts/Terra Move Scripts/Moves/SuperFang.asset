@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Super Fang
   description: An attack that always deals half of the opponents health
-  moveType: 0
+  moveType: 1
   damageType: 0
   baseMovePriority: 0
   baseDamage:

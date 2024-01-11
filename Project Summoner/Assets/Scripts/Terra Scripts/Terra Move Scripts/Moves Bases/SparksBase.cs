@@ -5,21 +5,30 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Sparks")]
 public class SparksBase : TerraMoveBase
 {
+    public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
+    {
+        return new SparksAction();
+    }
+}
+
+public class SparksAction : TerraMoveAction
+{
     private static readonly int PARALYZE_CHANCE = 20;
 
-    public override void AttackSelectionInit(TerraAttack terraAttack, BattleSystem battleSystem) {}
+    public SparksAction() {}
 
-    public override void PreAttackEffect(TerraAttackParams terraAttackParams, BattleSystem battleSystem) {}
-
-    public override void PostAttackEffect(List<TerraAttackLog> terraAttackTerraList, BattleSystem battleSystem)
+    public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
-        TerraBattlePosition defenderPosition = terraAttackTerraList[0].GetDefenderPosition();
+        TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
 
         bool isParalyzed = PARALYZE_CHANCE >= Random.Range(0, 100);
-        if (defenderPosition.GetTerra().GetStatusEffect().GetStatusEffectBase() == null && isParalyzed) {
-            defenderPosition.GetTerra().GetStatusEffect().SetStatusEffectBase(SODatabase.GetInstance().GetStatusEffectByName("Paralysis"), defenderPosition.GetTerra());
-            defenderPosition.GetTerra().GetStatusEffect().AddStatusEffectBattleActoin(battleSystem, defenderPosition.GetTerra());
+        if (!defenderPosition.GetTerra().HasStatusEffect() && isParalyzed) {
+            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Paralysis"), battleSystem);
             Debug.Log(BattleDialog.ParalysisInflictedMsg(defenderPosition.GetTerra()));
         }
     }
+
+    public void AddBattleActions(BattleSystem battleSystem) {}
+
+    public void RemoveBattleActions(BattleSystem battleSystem) {}
 }

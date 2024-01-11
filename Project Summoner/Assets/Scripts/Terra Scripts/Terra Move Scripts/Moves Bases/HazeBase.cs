@@ -5,15 +5,25 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Haze")]
 public class HazeBase : TerraMoveBase
 {
-    public override void AttackSelectionInit(TerraAttack terraAttack, BattleSystem battleSystem) { }
-
-    public override void PreAttackEffect(TerraAttackParams terraAttackParams, BattleSystem battleSystem) { }
-
-    public override void PostAttackEffect(List<TerraAttackLog> terraAttackLogList, BattleSystem battleSystem)
+    public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
     {
-        TerraBattlePosition attackerPosition = terraAttackLogList[0].GetAttackerPosition();
+        return new HazeAction();
+    }
+}
+
+public class HazeAction : TerraMoveAction
+{
+    public HazeAction() {}
+
+    public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
+    {
+        TerraBattlePosition attackerPosition = directAttackLog.GetAttackerPosition();
 
         attackerPosition.ResetStatStages();
         Debug.Log(BattleDialog.ResetStatStagesMsg(attackerPosition.GetTerra()));
     }
+
+    public void AddBattleActions(BattleSystem battleSystem) {}
+
+    public void RemoveBattleActions(BattleSystem battleSystem) {}
 }

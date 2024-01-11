@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Ember
   description: Small embers that can burn the opponenet
-  moveType: 3
+  moveType: 4
   damageType: 1
+  baseMovePriority: 0
   baseDamage:
     value: 50
     isNull: 0

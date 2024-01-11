@@ -5,34 +5,41 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Super Fang")]
 public class SuperFangBase : TerraMoveBase
 {
-    public override void AttackSelectionInit(TerraAttack terraAttack, BattleSystem battleSystem)
+    public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
     {
-        new SuperFangAction(terraAttack, battleSystem);
+        return new SuperFangAction(terraAttack);
     }
-
-    public override void PreAttackEffect(TerraAttackParams terraAttackParams, BattleSystem battleSystem) {}
-    
-    public override void PostAttackEffect(List<TerraAttackLog> terraAttackLogList, BattleSystem battleSystem) {}
 }
 
-public class SuperFangAction
+public class SuperFangAction : TerraMoveAction
 {
     private readonly float PERCENT_HEALTH_DAMAGE = 1/2f;
 
-    private TerraAttack thisTerraAttack;
+    private TerraAttack terraAttack;
 
-    public SuperFangAction(TerraAttack terraAttack, BattleSystem battleSystem)
+    public SuperFangAction(TerraAttack terraAttack)
     {
-        thisTerraAttack = terraAttack;
+        this.terraAttack = terraAttack;
+    }
+
+    public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem) {}
+
+    public void AddBattleActions(BattleSystem battleSystem)
+    {
         battleSystem.OnTerraDamageByTerra += SetSuperFangDamage;
+    }
+
+    public void RemoveBattleActions(BattleSystem battleSystem)
+    {
+        battleSystem.OnTerraDamageByTerra -= SetSuperFangDamage;
     }
 
     private void SetSuperFangDamage(object sender, TerraDamageByTerraEventArgs eventArgs)
     {
-        if (thisTerraAttack != eventArgs.GetTerraAttack())
+        if (terraAttack != eventArgs.GetTerraAttack())
             return;
 
-        Terra defendingTerra = eventArgs.GetTerraAttacLog().GetDefenderPosition().GetTerra();
+        Terra defendingTerra = eventArgs.GetDirectAttackLog().GetDefenderPosition().GetTerra();
         eventArgs.SetDamage((int)(defendingTerra.GetCurrentHP() * PERCENT_HEALTH_DAMAGE));
     }
 }

@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Vine Whip
   description: Long vines extend form the Terra and lash out at the opponenet
-  moveType: 1
+  moveType: 2
+  damageType: 0
+  baseMovePriority: 0
   baseDamage:
     value: 50
     isNull: 0

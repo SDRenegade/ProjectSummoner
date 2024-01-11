@@ -1,32 +1,30 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public enum BattleType
 {
     WILD,
-    NPC_SUMMONER,
-    PLAYER_SUMMONER
+    SUMMONER
 }
 
 public class BattleSystem : MonoBehaviour
 {
-    //Battle Events
-    public event EventHandler<BattleEventArgs> OnEnteringStartTurnState;
-    public event EventHandler<BattleEventArgs> OnEnteringActionSelectionState;
+    public event EventHandler<BattleEventArgs> OnStartOfTurn;
+    public event EventHandler<EnteringActionSelectionEventArgs> OnEnteringActionSelection;
+    public event EventHandler<OpeningMoveSelectionUIEventArgs> OnOpeningMoveSelectionUI;
     public event EventHandler<BattleEventArgs> OnActionSelection;
     public event EventHandler<BattleEventArgs> OnEnteringCombatState;
     public event EventHandler<BattleEventArgs> OnTerraSwitch; //Include BattleSide and the two Terra being switched
     public event EventHandler<BattleEventArgs> OnPlayerAttemptEscape; //Include Escape chance
     public event EventHandler<BattleEventArgs> OnTerraUseHeldItem; //Include Terra and Item
-    public event EventHandler<BattleEventArgs> OnStartingCombat;
-    public event EventHandler<TerraAttackDeclarationEventArgs> OnTerraAttackDeclaration; //Might not need
-    public event EventHandler<TerraAttackParamsEventArgs> OnTerraDirectAttack;
-    public event EventHandler<TerraDamageByTerraEventArgs> OnTerraDamageByTerra; //Might not need now that there is a damage calculation event
-    public event EventHandler<BattleEventArgs> OnEnteringEndTurnState;
+    public event EventHandler<AttackDeclarationEventArgs> OnAttackDeclaration;
+    public event EventHandler<DirectAttackEventArgs> OnDirectAttack;
+    public event EventHandler<DirectAttackLogEventArgs> OnAttackMissed;
+    public event EventHandler<TerraDamageByTerraEventArgs> OnTerraDamageByTerra;
+    public event EventHandler<BattleEventArgs> OnEndOfTurn;
 
     [SerializeField] private BattleHUD battleHUD;
 
@@ -48,6 +46,8 @@ public class BattleSystem : MonoBehaviour
     private TerraBattleObject wildTerra;
 
     private BattleType battleType;
+    private BattleAI primarySideAI; // Might move BattleAI to the BattleSide classes
+    private BattleAI secondarySideAI;
     private Battlefield battlefield;
     private BattleStateManager battleStateManager;
     private BattleActionManager battleActionManager;
@@ -63,15 +63,19 @@ public class BattleSystem : MonoBehaviour
 
         battlefield = new Battlefield(playerBattleObject.GetComponent<TerraParty>(), wildTerra.GetTerra());
         //Initialize the existing status conditions on the terra in the event system
-        Terra playerLeadingTerra = battlefield.GetPrimaryBattleSide().GetTerraBattlePosition().GetTerra();
-        Terra opponentLeadingTerra = battlefield.GetSecondaryBattleSide().GetTerraBattlePosition().GetTerra();
-        playerLeadingTerra.GetStatusEffect()?.AddStatusEffectBattleActoin(this, playerLeadingTerra);
-        opponentLeadingTerra.GetStatusEffect()?.AddStatusEffectBattleActoin(this, opponentLeadingTerra);
-
-        battleActionManager = new BattleActionManager();
-        battleStateManager = new BattleStateManager(this);
+        Terra playerLeadingTerra = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0].GetTerra();
+        Terra opponentLeadingTerra = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0].GetTerra();
+        playerLeadingTerra.GetStatusEffectWrapper()?.AddStatusEffectBattleAction(playerLeadingTerra, this);
+        opponentLeadingTerra.GetStatusEffectWrapper()?.AddStatusEffectBattleAction(opponentLeadingTerra, this);
 
         UpdateTerraStatusBars();
+
+        primarySideAI = null;
+        secondarySideAI = new WildTerraAI();
+
+        //--- (Temp) Change second argument once more battle positions are added ---
+        battleActionManager = new BattleActionManager(this, 2);
+        battleStateManager = new BattleStateManager(this);
     }
 
     private void SetupBattleScene()
@@ -112,9 +116,41 @@ public class BattleSystem : MonoBehaviour
         battleHUD.UpdateTerraStatusBars(battlefield);
     }
 
+    //TODO Find a way to pass the terrraBattlePosition of the action you are choosing
     public void OpenMoveSelectionUI()
     {
-        battleHUD.OpenMoveSelectionUI(playerBattleObject.GetComponent<TerraParty>().GetTerraList()[0].GetMoves());
+        TerraBattlePosition terraBattlePosition = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0];
+
+        //*** Opening Move Selection UI Event ***
+        OpeningMoveSelectionUIEventArgs eventArgs = InvokeOnOpeningMoveSelectionUI(terraBattlePosition);
+
+        List<TerraMove> moveList = terraBattlePosition.GetTerra().GetMoves();
+
+        //Create a list of available moves indicies after acounting for null move slots and disabled moves
+        List<int> availableMoveIndicies = new List<int>() { 0, 1, 2, 3 };
+        for (int i = availableMoveIndicies.Count - 1; i >= 0; i--) {
+            if (availableMoveIndicies[i] >= terraBattlePosition.GetTerra().GetMoves().Count || terraBattlePosition.GetTerra().GetMoves()[availableMoveIndicies[i]].GetCurrentPP() <= 0)
+                availableMoveIndicies.RemoveAt(i);
+        }
+        foreach (int index in eventArgs.GetDisabledMoveIndicies())
+            availableMoveIndicies.Remove(index);
+
+        if (availableMoveIndicies.Count == 0) {
+            TerraMove struggle = new TerraMove(SODatabase.GetInstance().GetTerraMoveByName("Struggle"));
+            //Initializes the selected attack and add the new TerraAttack to the TerraAttackList
+            TerraAttack terraAttack = new TerraAttack(
+                battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0],
+                battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0],
+                struggle);
+            battleActionManager.GetTerraAttackList().Add(terraAttack);
+
+            battleActionManager.AddReadyBattlePosition();
+            //Check if all battle positions are ready. If so, switch to combat state.
+            if (battleActionManager.IsAllBattlePositionsReady())
+                EndActionSelection();
+        }
+        else
+            battleHUD.OpenMoveSelectionUI(moveList, eventArgs.GetDisabledMoveIndicies());
     }
 
     public void MoveSelectionAction(int moveIndex)
@@ -122,7 +158,7 @@ public class BattleSystem : MonoBehaviour
         if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
             return;
 
-        TerraMove selectedMove = battlefield.GetPrimaryBattleSide().GetTerraBattlePosition().GetTerra().GetMoves()[moveIndex];
+        TerraMove selectedMove = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0].GetTerra().GetMoves()[moveIndex];
         if (selectedMove == null) {
             Debug.LogError("The move at index " + moveIndex + " is null");
             return;
@@ -132,15 +168,28 @@ public class BattleSystem : MonoBehaviour
             return;
         }
 
+        //TODO Change the decrementing of the move's PP to when the move is executed
         //Decrement the selected mvoes PP
         selectedMove.SetCurrentPP(selectedMove.GetCurrentPP() - 1);
         //Initializes the selected attack and add the new TerraAttack to the TerraAttackList
-        TerraAttack selectedTerraAttack = new TerraAttack(
-            battlefield.GetPrimaryBattleSide().GetTerraBattlePosition(),
-            battlefield.GetSecondaryBattleSide().GetTerraBattlePosition(),
+        TerraAttack terraAttack = new TerraAttack(
+            battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0],
+            battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0],
             selectedMove);
-        selectedMove.GetMoveBase().AttackSelectionInit(selectedTerraAttack, this);
-        battleActionManager.GetTerraAttackList().Add(selectedTerraAttack);
+        battleActionManager.GetTerraAttackList().Add(terraAttack);
+        //Add the selected moves battle actions into the event system
+        terraAttack.GetTerraMoveAction()?.AddBattleActions(this);
+
+        battleActionManager.AddReadyBattlePosition();
+        //Check if all battle positions are ready. If so, switch to combat state.
+        if (battleActionManager.IsAllBattlePositionsReady())
+            EndActionSelection();
+    }
+
+    public void EndActionSelection()
+    {
+        if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
+            return;
 
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
@@ -183,57 +232,95 @@ public class BattleSystem : MonoBehaviour
         SceneManager.LoadScene("GameScene");
     }
 
-    public void InvokeOnEnteringStartTurnState()
+    public BattleEventArgs InvokeOnStartOfTurn()
     {
-        OnEnteringStartTurnState?.Invoke(this, new BattleEventArgs(this));
+        BattleEventArgs eventArgs = new BattleEventArgs(this);
+        OnStartOfTurn?.Invoke(this, eventArgs);
+
+        return eventArgs;
     }
 
-    public void InvokeOnEnteringActionSelectionState()
+    public EnteringActionSelectionEventArgs InvokeOnEnteringActionSelection(TerraBattlePosition terraBattlePosition)
     {
-        OnEnteringActionSelectionState?.Invoke(this, new BattleEventArgs(this));
+        EnteringActionSelectionEventArgs eventArgs = new EnteringActionSelectionEventArgs(terraBattlePosition, this);
+        OnEnteringActionSelection?.Invoke(this, eventArgs);
+
+        return eventArgs;
     }
 
-    public void InvokeOnActionSelection()
+    public OpeningMoveSelectionUIEventArgs InvokeOnOpeningMoveSelectionUI(TerraBattlePosition terraBattlePosition)
     {
-        OnActionSelection?.Invoke(this, new BattleEventArgs(this));
+        OpeningMoveSelectionUIEventArgs eventArgs = new OpeningMoveSelectionUIEventArgs(terraBattlePosition, this);
+        OnOpeningMoveSelectionUI?.Invoke(this, eventArgs);
+
+        return eventArgs;
     }
 
-    public void InvokeOnEnteringCombatState()
+    public BattleEventArgs InvokeOnActionSelection()
     {
-        OnEnteringCombatState?.Invoke(this, new BattleEventArgs(this));
+        BattleEventArgs eventArgs = new BattleEventArgs(this);
+        OnActionSelection?.Invoke(this, eventArgs);
+
+        return eventArgs;
     }
 
-    public void InvokeOnTerraSwitch()
+    public BattleEventArgs InvokeOnEnteringCombatState()
     {
-        OnTerraSwitch?.Invoke(this, new BattleEventArgs(this));
+        BattleEventArgs eventArgs = new BattleEventArgs(this);
+        OnEnteringCombatState?.Invoke(this, eventArgs);
+
+        return eventArgs;
     }
 
-    public void InvokeOnPlayerAttemptEscape()
+    public BattleEventArgs InvokeOnTerraSwitch()
     {
-        OnPlayerAttemptEscape?.Invoke(this, new BattleEventArgs(this));
+        BattleEventArgs eventArgs = new BattleEventArgs(this);
+        OnTerraSwitch?.Invoke(this, eventArgs);
+
+        return eventArgs;
     }
 
-    public void InvokeOnTerraUseHeldItem()
+    public BattleEventArgs InvokeOnPlayerAttemptEscape()
     {
-        OnTerraUseHeldItem?.Invoke(this, new BattleEventArgs(this));
+        BattleEventArgs eventArgs = new BattleEventArgs(this);
+        OnPlayerAttemptEscape?.Invoke(this, eventArgs);
+
+        return eventArgs;
     }
 
-    public void InvokeOnStartingCombat()
+    public BattleEventArgs InvokeOnTerraUseHeldItem()
     {
-        OnStartingCombat?.Invoke(this, new BattleEventArgs(this));
+        BattleEventArgs eventArgs = new BattleEventArgs(this);
+        OnTerraUseHeldItem?.Invoke(this, eventArgs);
+
+        return eventArgs;
     }
 
-    public void InvokeOnTerraAttackDeclaration(TerraAttack terraAttack)
+    public AttackDeclarationEventArgs InvokeOnAttackDeclaration(TerraAttack terraAttack)
     {
-        OnTerraAttackDeclaration?.Invoke(this, new TerraAttackDeclarationEventArgs(terraAttack, this));
+        AttackDeclarationEventArgs eventArgs = new AttackDeclarationEventArgs(terraAttack, this);
+        OnAttackDeclaration?.Invoke(this, eventArgs);
+
+        return eventArgs;
     }
 
-    public void InvokeOnTerraDirectAttack(TerraAttackParams terraAttackParams)
+    public DirectAttackEventArgs InvokeOnDirectAttack(DirectAttackParams directAttackParams)
     {
-        OnTerraDirectAttack?.Invoke(this, new TerraAttackParamsEventArgs(terraAttackParams, this));
+        DirectAttackEventArgs eventArgs = new DirectAttackEventArgs(directAttackParams, this);
+        OnDirectAttack?.Invoke(this, eventArgs);
+
+        return eventArgs;
     }
 
-    public TerraDamageByTerraEventArgs InvokeOnTerraDamageByTerra(TerraAttack terraAttack, TerraAttackLog terraAttackLog, int? damage)
+    public DirectAttackLogEventArgs InvokeOnAttackMissed(DirectAttackLog directAttackLog)
+    {
+        DirectAttackLogEventArgs eventArgs = new DirectAttackLogEventArgs(directAttackLog, this);
+        OnAttackMissed?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public TerraDamageByTerraEventArgs InvokeOnTerraDamageByTerra(TerraAttack terraAttack, DirectAttackLog terraAttackLog, int? damage)
     {
         TerraDamageByTerraEventArgs eventArgs = new TerraDamageByTerraEventArgs(terraAttack, terraAttackLog, damage, this);
         OnTerraDamageByTerra?.Invoke(this, eventArgs);
@@ -241,14 +328,21 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
-    public void InvokeOnEnteringEndTurnState()
+    public BattleEventArgs InvokeOnEndOfTurn()
     {
-        OnEnteringEndTurnState?.Invoke(this, new BattleEventArgs(this));
+        BattleEventArgs eventArgs = new BattleEventArgs(this);
+        OnEndOfTurn?.Invoke(this, eventArgs);
+
+        return eventArgs;
     }
 
     public BattleHUD GetBattleHUD() { return battleHUD; }
 
     public BattleType GetBattleType() { return battleType; }
+
+    public BattleAI GetPrimarySideAI() { return primarySideAI; }
+
+    public BattleAI GetSecondarySideAI() { return secondarySideAI; }
 
     public Battlefield GetBattlefield() { return battlefield; }
 

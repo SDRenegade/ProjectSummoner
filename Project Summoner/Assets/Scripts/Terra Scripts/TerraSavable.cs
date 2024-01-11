@@ -20,8 +20,8 @@ public class TerraSavable
         savableMoves = new List<TerraMoveSavable>();
         for(int i = 0; i < terra.GetMoves().Count; i++)
             savableMoves.Add(new TerraMoveSavable(terra.GetMoves()[i]));
-        if(terra.GetStatusEffect().GetStatusEffectBase() != null)
-            statusEffectBaseName = terra.GetStatusEffect().GetStatusEffectBase().GetStatusName();
+        if(terra.GetStatusEffectWrapper().GetStatusEffectBase() != null)
+            statusEffectBaseName = terra.GetStatusEffectWrapper().GetStatusEffectBase().GetStatusName();
         currentHP = terra.GetCurrentHP();
     }
 

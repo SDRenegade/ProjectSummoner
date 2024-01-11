@@ -5,14 +5,41 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Crab Hammer")]
 public class CrabHammerBase : TerraMoveBase
 {
+    public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
+    {
+        return new CrabHammerAction(terraAttack);
+    }
+}
+
+public class CrabHammerAction : TerraMoveAction
+{
     private static readonly float CRIT_MODIFIER = 1.2f;
 
-    public override void AttackSelectionInit(TerraAttack terraAttack, BattleSystem battleSystem) {}
+    private TerraAttack terraAttack;
 
-    public override void PreAttackEffect(TerraAttackParams terraAttackParams, BattleSystem battleSystem)
+    public CrabHammerAction(TerraAttack terraAttack)
     {
-        terraAttackParams.SetCritModifier(terraAttackParams.GetCritModifier() * CRIT_MODIFIER);
+        this.terraAttack = terraAttack;
     }
 
-    public override void PostAttackEffect(List<TerraAttackLog> terraAttackTerraList, BattleSystem battleSystem) {}
+    public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem) {}
+
+    public void AddBattleActions(BattleSystem battleSystem)
+    {
+        battleSystem.OnDirectAttack += AddCritModifier;
+    }
+
+    public void RemoveBattleActions(BattleSystem battleSystem)
+    {
+        battleSystem.OnDirectAttack -= AddCritModifier;
+    }
+
+    private void AddCritModifier(object sender, DirectAttackEventArgs eventArgs)
+    {
+        if (terraAttack.GetMove() != eventArgs.GetDirectAttackParams().GetMove())
+            return;
+
+        eventArgs.GetDirectAttackParams().SetCritModifier(eventArgs.GetDirectAttackParams().GetCritModifier() * CRIT_MODIFIER);
+        eventArgs.GetBattleSystem().OnDirectAttack -= AddCritModifier;
+    }
 }

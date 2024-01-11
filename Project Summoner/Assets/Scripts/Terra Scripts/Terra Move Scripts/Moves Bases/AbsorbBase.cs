@@ -5,18 +5,29 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Absorb")]
 public class AbsorbBase : TerraMoveBase
 {
-    public override void AttackSelectionInit(TerraAttack terraAttack, BattleSystem battleSystem) {}
-
-    public override void PreAttackEffect(TerraAttackParams terraAttackParams, BattleSystem battleSystem) {}
-
-    public override void PostAttackEffect(List<TerraAttackLog> terraAttackLogList, BattleSystem battleSystem)
+    public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
     {
-        Terra attacker = terraAttackLogList[0].GetAttackerPosition().GetTerra();
+        return new AbsorbAction();
+    }
+}
 
-        if(terraAttackLogList[0].GetDamage() != null) {
-            int healthAbsorbed = (int)Mathf.Ceil((int)terraAttackLogList[0].GetDamage() / 2f);
+public class AbsorbAction : TerraMoveAction
+{
+
+    public AbsorbAction() {}
+
+    public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
+    {
+        Terra attacker = directAttackLog.GetAttackerPosition().GetTerra();
+
+        if (directAttackLog.GetDamage() != null) {
+            int healthAbsorbed = (int)Mathf.Ceil((int)directAttackLog.GetDamage() / 2f);
             attacker.SetCurrentHP(attacker.GetCurrentHP() + healthAbsorbed);
             Debug.Log(BattleDialog.HealthHealedMsg(attacker, healthAbsorbed));
         }
     }
+
+    public void AddBattleActions(BattleSystem battleSystem) {}
+
+    public void RemoveBattleActions(BattleSystem battleSystem) {}
 }

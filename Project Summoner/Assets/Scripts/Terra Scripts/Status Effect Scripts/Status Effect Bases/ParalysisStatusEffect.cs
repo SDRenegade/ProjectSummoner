@@ -5,49 +5,45 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "StatusEffect", menuName = "StatusEffect/Paralysis")]
 public class ParalysisStatusEffect : StatusEffectBase
 {
-    public ParalysisStatusEffect()
-    {
-        statusName = "Paralysis";
-        description = "Inflicted Terra have a chance of being unable to attack each turn";
-    }
+    public ParalysisStatusEffect() {}
 
     public override BattleAction CreateBattleAction(Terra terra)
     {
-        return new ParalysisStatusEffectBattleAction(terra);
+        return new ParalysisStatusEffectAction(terra);
     }
 }
 
-public class ParalysisStatusEffectBattleAction : BattleAction
+public class ParalysisStatusEffectAction : BattleAction
 {
     private static readonly float PARALYSIS_CHANCE = 0.50f;
 
     private Terra terra;
 
-    public ParalysisStatusEffectBattleAction(Terra terra)
+    public ParalysisStatusEffectAction(Terra terra)
     {
         this.terra = terra;
     }
 
-    public void AddBattleAction(BattleSystem battleSystem)
+    public void AddBattleActions(BattleSystem battleSystem)
     {
-        battleSystem.OnTerraAttackDeclaration += ParalysisActive;
+        battleSystem.OnAttackDeclaration += ParalysisActive;
     }
 
-    public void RemoveBattleAction(BattleSystem battleSystem)
+    public void RemoveBattleActions(BattleSystem battleSystem)
     {
-        battleSystem.OnTerraAttackDeclaration -= ParalysisActive;
+        battleSystem.OnAttackDeclaration -= ParalysisActive;
     }
 
-    private void ParalysisActive(object sender, TerraAttackDeclarationEventArgs terraAttackDeclaration)
+    private void ParalysisActive(object sender, AttackDeclarationEventArgs eventArgs)
     {
-        if (terraAttackDeclaration.GetTerraAttack().GetAttackerPosition().GetTerra() != terra)
+        if (eventArgs.GetTerraAttack().GetAttackerPosition().GetTerra() != terra)
             return;
 
         bool isParalyzed = PARALYSIS_CHANCE >= Random.Range(0f, 1f);
         if (isParalyzed) {
-            terraAttackDeclaration.GetTerraAttack().SetIsCanceled(true);
+            eventArgs.GetTerraAttack().SetCanceled(true);
             Debug.Log(BattleDialog.ParalysisProkedMsg(terra));
-            terraAttackDeclaration.GetBattleSystem().UpdateTerraStatusBars();
+            eventArgs.GetBattleSystem().UpdateTerraStatusBars();
         }
     }
 }

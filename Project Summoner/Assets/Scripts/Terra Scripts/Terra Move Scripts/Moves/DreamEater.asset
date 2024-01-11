@@ -15,7 +15,7 @@ MonoBehaviour:
   moveName: Dream Eater
   description: If the opponent is sleeping, deal damage and absorb a portion of the
     damage dealt
-  moveType: 10
+  moveType: 11
   damageType: 1
   baseMovePriority: 0
   baseDamage:

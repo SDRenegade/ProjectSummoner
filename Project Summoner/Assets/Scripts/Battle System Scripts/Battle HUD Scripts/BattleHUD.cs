@@ -12,8 +12,8 @@ public class BattleHUD : MonoBehaviour
 
     public void UpdateTerraStatusBars(Battlefield battlefield)
     {
-        playerTerraStatusBar.UpdateStatusBar(battlefield.GetPrimaryBattleSide().GetTerraBattlePosition().GetTerra());
-        opponentTerraStatusBar.UpdateStatusBar(battlefield.GetSecondaryBattleSide().GetTerraBattlePosition().GetTerra());
+        playerTerraStatusBar.UpdateStatusBar(battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0].GetTerra());
+        opponentTerraStatusBar.UpdateStatusBar(battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0].GetTerra());
     }
 
     public void OpenMenuSelectionUI()
@@ -22,7 +22,7 @@ public class BattleHUD : MonoBehaviour
         menuSelectionObject.SetActive(true);
     }
 
-    public void OpenMoveSelectionUI(List<TerraMove> terraMoves)
+    public void OpenMoveSelectionUI(List<TerraMove> terraMoves, List<int> disabledMoves)
     {
         menuSelectionObject.SetActive(false);
 
@@ -35,6 +35,11 @@ public class BattleHUD : MonoBehaviour
             if (i < terraMoves.Count && terraMoves[i] != null)
                 moveBtnName = terraMoves[i] + " " + terraMoves[i].GetCurrentPP() + "/" + terraMoves[i].GetMaxPP();
             moveSelectionUI.GetMoveBtns()[i].GetComponentInChildren<TextMeshProUGUI>().SetText(moveBtnName);
+
+            if(i >= terraMoves.Count || terraMoves[i] == null || disabledMoves.Contains(i))
+                moveSelectionUI.GetMoveBtns()[i].interactable = false;
+            else
+                moveSelectionUI.GetMoveBtns()[i].interactable = true;
         }
         moveSelectionObject.SetActive(true);
     }

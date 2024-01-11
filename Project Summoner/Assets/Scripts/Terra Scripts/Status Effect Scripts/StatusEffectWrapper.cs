@@ -13,18 +13,18 @@ public class StatusEffectWrapper
         SetStatusEffectBase(statusEffectBase, terra);
     }
 
-    public void AddStatusEffectBattleActoin(BattleSystem battleSystem, Terra terra)
+    public void AddStatusEffectBattleAction(Terra terra, BattleSystem battleSystem)
     {
         if (statusEffectBase == null)
             return;
 
         battleAction = statusEffectBase.CreateBattleAction(terra);
-        battleAction.AddBattleAction(battleSystem);
+        battleAction.AddBattleActions(battleSystem);
     }
 
     public void RemoveStatusEffectBattleAction(BattleSystem battleSystem)
     {
-        battleAction?.RemoveBattleAction(battleSystem);
+        battleAction?.RemoveBattleActions(battleSystem);
     }
 
     public StatusEffectBase GetStatusEffectBase() { return statusEffectBase; }
@@ -33,5 +33,16 @@ public class StatusEffectWrapper
     {
         this.statusEffectBase = statusEffectBase;
         battleAction = (statusEffectBase != null) ? statusEffectBase.CreateBattleAction(terra) : null;
+    }
+
+    public void SetStatusEffectBase(StatusEffectBase statusEffectBase, Terra terra, BattleSystem battleSystem)
+    {
+        if (battleAction != null)
+            RemoveStatusEffectBattleAction(battleSystem);
+
+        this.statusEffectBase = statusEffectBase;
+        battleAction = (statusEffectBase != null) ? statusEffectBase.CreateBattleAction(terra) : null;
+
+        AddStatusEffectBattleAction(terra, battleSystem);
     }
 }

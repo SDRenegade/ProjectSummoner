@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Water Gun
   description: A torrent of water is propelled at the opponenet
-  moveType: 2
+  moveType: 3
   damageType: 1
+  baseMovePriority: 0
   baseDamage:
     value: 50
     isNull: 0

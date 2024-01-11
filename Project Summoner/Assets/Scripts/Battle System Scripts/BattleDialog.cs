@@ -12,6 +12,8 @@ public static class BattleDialog
     public static readonly string ATTACK_MISSED = "The attack missed.";
     public static readonly string ATTACK_FAILED = "But it failed.";
     public static readonly string CRITICAL_HIT = "It was a critical hit!";
+    public static readonly string HYPER_BEAM_RECHARGE = "Hyper Beam is recharging.";
+    public static readonly string SOLAR_BEAM_CHARGE = "Solar Beam is charging.";
 
     // ================== Combat Messages ==================
     public static string AttackUsedMsg(Terra attackingTerra, TerraMove move) {
@@ -96,7 +98,6 @@ public static class BattleDialog
 
     public static string FreezeProkedMsg(Terra terra) {
         return terra + " is frozen and unable to move this turn.";
-
     }
 
     public static string TerraThawedMsg(Terra terra) {
@@ -107,16 +108,62 @@ public static class BattleDialog
         return terra + " has been inflicted by blight for " + blightDamage + " damage.";
     }
 
+    public static string ConfusionInflictedMsg(Terra terra) {
+        return terra + " has been been confused.";
+    }
+
+    public static string TerraIsConfusedMsg(Terra terra) {
+        return terra + " is confused.";
+    }
+
+    public static string ConfusionProkedMsg(Terra terra, int damage) {
+        return terra + " hit themself for " + damage + " damage.";
+    }
+
+    public static string TerraSnappedOutOfConfusionMsg(Terra terra) {
+        return terra + " has snapped out of confusion.";
+    }
+
     public static string FlinchedMsg(Terra terra) {
         return terra + " has flinched.";
     }
 
     public static string MultiHitMsg(Terra terra, int numHits) {
-        return terra + " has landed " + numHits + " hits";
+        return terra + " has landed " + numHits + " hits.";
     }
 
     public static string RecoilDamageMsg(Terra terra, int recoilDamage) {
         return terra + " has taken " + recoilDamage + " recoil damage.";
+    }
+
+    public static string ProtectActiveMsg(Terra terra) {
+        return terra + " was unaffected due to Protect.";
+    }
+
+    public static string ProtectCooldownMsg(Terra terra) {
+        return terra + " was unable to use protect.";
+    }
+
+    public static string BindDamageMsg(Terra terra, int bindDamage) {
+        return terra + " has taken " + bindDamage + " damage from bind.";
+    }
+
+    public static string HighJumpKickMissedMsg(Terra terra, int recoilDamage) {
+        return "High Jump Kick missed and " + terra + " has taken " + recoilDamage + " recoil damage.";
+    }
+
+    public static string LightScreenExpiredMsg(Terra terra) {
+        return "Light screen has went down for " + terra + ".";
+    }
+
+    public static string DisableActiveMsg(Terra terra)
+    {
+        return terra + " has had a move disabled.";
+    }
+
+    public static string MetronomeMoveMsg(TerraMove move)
+    {
+        return "Metronome has turned into the move " + move;
     }
 
     // ================== UI Selection Messages ==================

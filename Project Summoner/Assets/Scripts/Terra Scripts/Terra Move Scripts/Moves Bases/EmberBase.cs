@@ -6,21 +6,30 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Ember")]
 public class EmberBase : TerraMoveBase
 {
+    public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
+    {
+        return new EmberAction();
+    }
+}
+
+public class EmberAction : TerraMoveAction
+{
     private static readonly int BURN_CHANCE = 20;
 
-    public override void AttackSelectionInit(TerraAttack terraAttack, BattleSystem battleSystem) {}
+    public EmberAction() {}
 
-    public override void PreAttackEffect(TerraAttackParams terraAttackParams, BattleSystem battleSystem) { }
-
-    public override void PostAttackEffect(List<TerraAttackLog> terraAttackTerraList, BattleSystem battleSystem)
+    public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
-        TerraBattlePosition defenderPosition = terraAttackTerraList[0].GetDefenderPosition();
+        TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
 
-        bool isBurned = BURN_CHANCE >= Random.Range(0, 100);
-        if (defenderPosition.GetTerra().GetStatusEffect().GetStatusEffectBase() == null && isBurned) {
-            defenderPosition.GetTerra().GetStatusEffect().SetStatusEffectBase(SODatabase.GetInstance().GetStatusEffectByName("Burn"), defenderPosition.GetTerra());
-            defenderPosition.GetTerra().GetStatusEffect().AddStatusEffectBattleActoin(battleSystem, defenderPosition.GetTerra());
-            BattleDialog.BurnInflictedMsg(defenderPosition.GetTerra());
+        bool isBurned = BURN_CHANCE > Random.Range(0, 100);
+        if (!defenderPosition.GetTerra().HasStatusEffect() && isBurned) {
+            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Burn"), battleSystem);
+            Debug.Log(BattleDialog.BurnInflictedMsg(defenderPosition.GetTerra()));
         }
     }
+
+    public void AddBattleActions(BattleSystem battleSystem) {}
+
+    public void RemoveBattleActions(BattleSystem battleSystem) {}
 }

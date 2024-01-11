@@ -5,34 +5,40 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Dragon Rage")]
 public class DragonRageBase : TerraMoveBase
 {
-    public override void AttackSelectionInit(TerraAttack terraAttack, BattleSystem battleSystem)
+    public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
     {
-        new DragonRageAction(terraAttack, battleSystem);
+        return new DragonRageAction(terraAttack);
     }
-
-    public override void PreAttackEffect(TerraAttackParams terraAttackParams, BattleSystem battleSystem) {}
-
-    public override void PostAttackEffect(List<TerraAttackLog> terraAttackLogList, BattleSystem battleSystem) {}
 }
 
-public class DragonRageAction
+public class DragonRageAction : TerraMoveAction
 {
-    readonly int ATTACK_DAMAGE = 5;
+    private static readonly int ATTACK_DAMAGE = 5;
 
-    private TerraAttack thisTerraAttack;
+    private TerraAttack terraAttack;
 
-    public DragonRageAction(TerraAttack terraAttack, BattleSystem battleSystem)
+    public DragonRageAction(TerraAttack terraAttack)
     {
-        thisTerraAttack = terraAttack;
+        this.terraAttack = terraAttack;
+    }
+
+    public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem) {}
+
+    public void AddBattleActions(BattleSystem battleSystem)
+    {
         battleSystem.OnTerraDamageByTerra += SetDragonRageDamage;
+    }
+
+    public void RemoveBattleActions(BattleSystem battleSystem)
+    {
+        battleSystem.OnTerraDamageByTerra -= SetDragonRageDamage;
     }
 
     private void SetDragonRageDamage(object sender, TerraDamageByTerraEventArgs eventArgs)
     {
-        if (thisTerraAttack != eventArgs.GetTerraAttack())
+        if (terraAttack != eventArgs.GetTerraAttack())
             return;
 
         eventArgs.SetDamage(ATTACK_DAMAGE);
     }
-
 }
