@@ -8,7 +8,7 @@ public class DisabledVolatileStatusEffect : VolatileStatusEffectBase
 {
     public override BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition)
     {
-        return new DisabledVolatileStatusEffectAction(terraBattlePosition);
+        return new DisabledVolatileStatusEffectAction(terraBattlePosition, this);
     }
 }
 
@@ -17,12 +17,14 @@ public class DisabledVolatileStatusEffectAction : BattleAction
     private static readonly int TURN_DURATION = 5;
 
     private TerraBattlePosition terraBattlePosition;
+    private VolatileStatusEffectBase vStatusEffect;
     private int? disabledMoveIndex;
     private int turnCounter;
 
-    public DisabledVolatileStatusEffectAction(TerraBattlePosition terraBattlePosition)
+    public DisabledVolatileStatusEffectAction(TerraBattlePosition terraBattlePosition, VolatileStatusEffectBase vStatusEffect)
     {
         this.terraBattlePosition = terraBattlePosition;
+        this.vStatusEffect = vStatusEffect;
         disabledMoveIndex = null;
         turnCounter = 0;
     }
@@ -45,6 +47,7 @@ public class DisabledVolatileStatusEffectAction : BattleAction
         battleSystem.OnEnteringActionSelection -= EnteringActionSelectionAction;
         battleSystem.OnOpeningMoveSelectionUI -= OpeningMoveSelectionUIAction;
         battleSystem.OnEndOfTurn -= EndOfTurnIncrement;
+        terraBattlePosition.RemoveVolatileStatusEffect(vStatusEffect);
     }
 
     private void EnteringActionSelectionAction(object sender, EnteringActionSelectionEventArgs eventArgs)

@@ -31,10 +31,10 @@ public static class StatStagesExtension
     {
         StatStages newStage;
         int currentStageIndex = (int)statStage;
-        if (!typeof(StatStages).IsEnumDefined(currentStageIndex - numStages))
+        if (!typeof(StatStages).IsEnumDefined(currentStageIndex + numStages))
             newStage = (numStages > 0) ? StatStages.STAGE_THREE : StatStages.STAGE_NEG_THREE;
         else
-            newStage = (StatStages)(currentStageIndex - numStages);
+            newStage = (StatStages)(currentStageIndex + numStages);
 
         return newStage;
     }

@@ -7,18 +7,13 @@ public class BindBase : TerraMoveBase
 {
     public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
     {
-        return new BindAction(terraAttack);
+        return new BindAction();
     }
 }
 
 public class BindAction : TerraMoveAction
 {
-    private TerraAttack terraAttack;
-
-    public BindAction(TerraAttack terraAttack)
-    {
-        this.terraAttack = terraAttack;
-    }
+    public BindAction() {}
 
     public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {

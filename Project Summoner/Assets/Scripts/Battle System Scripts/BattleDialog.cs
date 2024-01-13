@@ -32,24 +32,22 @@ public static class BattleDialog
         return terra + " has healed for " + healAmt;
     }
 
-    public static string StatStageIncrementMsg(Terra terra, StatStages currentStatStage, int statAdjustment)
+    public static string StatStageChangeMsg(Terra terra, Stats stat, StatStages currentStatStage, int modification)
     {
-        if(statAdjustment == 0)
-            return terra + "'s stat can no longer be increased.";
-
-        string statAdjustmentDescription = (statAdjustment == 1) ? "rose" : "sharply rose";
-
-        return terra + "'s stat has " + statAdjustmentDescription + " to " + currentStatStage;
-    }
-
-    public static string StatStageDecrementMsg(Terra terra, StatStages currentStatStage, int statAdjustment)
-    {
-        if (statAdjustment == 0)
-            return terra + "'s stat can no longer be decreased.";
-
-        string statAdjustmentDescription = (statAdjustment == 1) ? "lowered" : "sharply lowered";
-
-        return terra + "'s stat has " + statAdjustmentDescription + " to " + currentStatStage;
+        if (modification == 0)
+            return terra + "'s " + stat + " has not changed.";
+        else if(modification > 0) {
+            if(modification == 1)
+                return terra + "'s " + stat + " has rose to " + currentStatStage;
+            else
+                return terra + "'s " + stat + " has sharply rose to " + currentStatStage;
+        }
+        else {
+            if (modification == -1)
+                return terra + "'s " + stat + " has lowerd to " + currentStatStage;
+            else
+                return terra + "'s " + stat + " has sharply lowered to " + currentStatStage;
+        }
     }
 
     public static string ResetStatStagesMsg(Terra terra) {
@@ -156,14 +154,20 @@ public static class BattleDialog
         return "Light screen has went down for " + terra + ".";
     }
 
-    public static string DisableActiveMsg(Terra terra)
-    {
+    public static string DisableActiveMsg(Terra terra) {
         return terra + " has had a move disabled.";
     }
 
-    public static string MetronomeMoveMsg(TerraMove move)
-    {
+    public static string MetronomeMoveMsg(TerraMove move) {
         return "Metronome has turned into the move " + move;
+    }
+
+    public static string SubstituteExpired(Terra terra) {
+        return "The substitute on " + terra + " has disappeared.";
+    }
+
+    public static string MistProkedMsg(Terra terra) {
+        return terra + " is immune to stat changes with mist active";
     }
 
     // ================== UI Selection Messages ==================

@@ -12,16 +12,7 @@ public class VolatileStatusEffectWrapper
         SetVolatileStatusEffectBase(vStatusEffectBase, terraBattlePosition);
     }
 
-    public void AddVolatileStatusEffectBattleAction(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
-    {
-        if (vStatusEffectBase == null)
-            return;
-
-        battleAction = vStatusEffectBase.CreateBattleAction(terraBattlePosition);
-        battleAction.AddBattleActions(battleSystem);
-    }
-
-    public void RemoveVolatileStatusEffectBattleAction(BattleSystem battleSystem)
+    public void RemoveVolatileStatusEffectBattleActions(BattleSystem battleSystem)
     {
         battleAction?.RemoveBattleActions(battleSystem);
     }
@@ -33,4 +24,6 @@ public class VolatileStatusEffectWrapper
         this.vStatusEffectBase = vStatusEffectBase;
         battleAction = (vStatusEffectBase != null) ? vStatusEffectBase.CreateBattleAction(terraBattlePosition) : null;
     }
+
+    public BattleAction GetBattleAction() {  return battleAction; }
 }

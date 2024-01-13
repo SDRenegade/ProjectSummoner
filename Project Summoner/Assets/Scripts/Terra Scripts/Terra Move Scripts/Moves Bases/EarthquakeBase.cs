@@ -13,6 +13,8 @@ public class EarthquakeBase : TerraMoveBase
 
 public class EarthquakeAction : TerraMoveAction
 {
+    private static readonly float DAMAGE_MULTIPLIER = 2f;
+
     private TerraAttack terraAttack;
 
     public EarthquakeAction(TerraAttack terraAttack)
@@ -39,6 +41,6 @@ public class EarthquakeAction : TerraMoveAction
         if (eventArgs.GetDirectAttackLog().GetDefenderPosition().GetBattlePositionState() != BattlePositionState.DIGGING)
             return;
 
-        eventArgs.SetDamage(eventArgs.GetDamage() * 2);
+        eventArgs.SetDamage((int)(eventArgs.GetDamage() * DAMAGE_MULTIPLIER));
     }
 }

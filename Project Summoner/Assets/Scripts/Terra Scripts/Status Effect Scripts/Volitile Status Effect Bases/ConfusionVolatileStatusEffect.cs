@@ -7,7 +7,7 @@ public class ConfusionVolatileStatusEffect : VolatileStatusEffectBase
 {
     public override BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition)
     {
-        return new ConfusionVolatileStatusEffectAction(terraBattlePosition);
+        return new ConfusionVolatileStatusEffectAction(terraBattlePosition, this);
     }
 }
 
@@ -18,12 +18,14 @@ public class ConfusionVolatileStatusEffectAction : BattleAction
     private static readonly int RECOIL_POWER = 40;
 
     private TerraBattlePosition terraBattlePosition;
+    private VolatileStatusEffectBase vStatusEffect;
     private int turnDuration;
     private int turnCounter;
 
-    public ConfusionVolatileStatusEffectAction(TerraBattlePosition terraBattlePosition)
+    public ConfusionVolatileStatusEffectAction(TerraBattlePosition terraBattlePosition, VolatileStatusEffectBase vStatusEffect)
     {
         this.terraBattlePosition = terraBattlePosition;
+        this.vStatusEffect = vStatusEffect;
         turnDuration = Random.Range(MIN_TURN_DURATION, MAX_TURN_DURATION + 1);
         turnCounter = 0;
     }
@@ -38,6 +40,7 @@ public class ConfusionVolatileStatusEffectAction : BattleAction
     {
         battleSystem.OnAttackDeclaration -= TerraAttackConfusionActive;
         battleSystem.OnEndOfTurn -= EndOfTurnCounterIncrement;
+        terraBattlePosition.RemoveVolatileStatusEffect(vStatusEffect);
     }
 
     private void TerraAttackConfusionActive(object sender, AttackDeclarationEventArgs eventArgs)

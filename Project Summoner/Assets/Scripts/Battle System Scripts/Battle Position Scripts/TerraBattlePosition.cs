@@ -1,7 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
+
+public enum Stats
+{
+    ATK,
+    DEF,
+    SP_ATK,
+    SP_DEF,
+    SPD,
+    ACC,
+    EVA
+}
 
 public enum BattlePositionState
 {
@@ -14,13 +24,7 @@ public class TerraBattlePosition
 {
     private BattleSide battleSide;
     private Terra terra;
-    private StatStages attackStage;
-    private StatStages defenceStage;
-    private StatStages spAttackStage;
-    private StatStages spDefenceStage;
-    private StatStages speedStage;
-    private StatStages accuracyStage;
-    private StatStages evasivenessStage;
+    private Dictionary<Stats, StatStages> statStagesMap;
     private BattlePositionState battlePositionState;
     private List<VolatileStatusEffectWrapper> vStatusEffectList;
 
@@ -28,7 +32,15 @@ public class TerraBattlePosition
     {
         terra = null;
         this.battleSide = battleSide;
-        ResetStatStages();
+        statStagesMap = new Dictionary<Stats, StatStages> {
+            { Stats.ATK, StatStages.NEUTRAL },
+            { Stats.DEF, StatStages.NEUTRAL },
+            { Stats.SP_ATK, StatStages.NEUTRAL },
+            { Stats.SP_DEF, StatStages.NEUTRAL },
+            { Stats.SPD, StatStages.NEUTRAL },
+            { Stats.ACC, StatStages.NEUTRAL },
+            { Stats.EVA, StatStages.NEUTRAL }
+        };
         battlePositionState = BattlePositionState.NORMAL;
         vStatusEffectList = new List<VolatileStatusEffectWrapper>();
     }
@@ -37,20 +49,23 @@ public class TerraBattlePosition
     {
         this.terra = terra;
         this.battleSide = battleSide;
-        ResetStatStages();
+        statStagesMap = new Dictionary<Stats, StatStages> {
+            { Stats.ATK, StatStages.NEUTRAL },
+            { Stats.DEF, StatStages.NEUTRAL },
+            { Stats.SP_ATK, StatStages.NEUTRAL },
+            { Stats.SP_DEF, StatStages.NEUTRAL },
+            { Stats.SPD, StatStages.NEUTRAL },
+            { Stats.ACC, StatStages.NEUTRAL },
+            { Stats.EVA, StatStages.NEUTRAL }
+        };
         battlePositionState = BattlePositionState.NORMAL;
         vStatusEffectList = new List<VolatileStatusEffectWrapper>();
     }
 
     public void ResetStatStages()
     {
-        attackStage = StatStages.NEUTRAL;
-        defenceStage = StatStages.NEUTRAL;
-        spAttackStage = StatStages.NEUTRAL;
-        spDefenceStage = StatStages.NEUTRAL;
-        speedStage = StatStages.NEUTRAL;
-        accuracyStage = StatStages.NEUTRAL;
-        evasivenessStage = StatStages.NEUTRAL;
+        foreach(KeyValuePair<Stats, StatStages> entry in statStagesMap)
+            statStagesMap[entry.Key] = StatStages.NEUTRAL;
     }
 
     public Terra GetTerra() { return terra; }
@@ -61,33 +76,9 @@ public class TerraBattlePosition
 
     public void SetBattleSide(BattleSide battleSide) { this.battleSide = battleSide; }
 
-    public StatStages GetAttackStage() { return attackStage; }
+    public StatStages GetStatStage(Stats stat) { return statStagesMap[stat]; }
 
-    public void SetAttackStage(StatStages statStage) { attackStage = statStage; }
-
-    public StatStages GetDefenceStage() { return defenceStage; }
-
-    public void SetDefenceStage(StatStages statStage) { defenceStage = statStage; }
-
-    public StatStages GetSpAttackStage() { return spAttackStage; }
-
-    public void SetSpAttackStage(StatStages statStage) { spAttackStage = statStage; }
-
-    public StatStages GetSpDefenceStage() { return spDefenceStage; }
-
-    public void SetSpDefenceStage(StatStages statStage) { spDefenceStage = statStage; }
-
-    public StatStages GetSpeedStage() { return speedStage; }
-
-    public void SetSpeedStage(StatStages statStage) { speedStage = statStage; }
-
-    public StatStages GetAccuracyStage() { return accuracyStage; }
-
-    public void SetAccuracyStage(StatStages statStage) {  accuracyStage = statStage; }
-
-    public StatStages GetEvasivenessStage() { return evasivenessStage; }
-
-    public void SetEvasivenessStage(StatStages statStage) {  evasivenessStage = statStage; }
+    public void SetStatStage(Stats stat, StatStages statStage) { statStagesMap[stat] = statStage; }
 
     public BattlePositionState GetBattlePositionState() { return battlePositionState; }
 
@@ -102,9 +93,9 @@ public class TerraBattlePosition
                 return false;
         }
 
-        VolatileStatusEffectWrapper newVolatileStatusEffectWrapper = new VolatileStatusEffectWrapper(vStatusEffectBase, this);
-        vStatusEffectList.Add(new VolatileStatusEffectWrapper(vStatusEffectBase, this));
-        newVolatileStatusEffectWrapper.AddVolatileStatusEffectBattleAction(this, battleSystem);
+        VolatileStatusEffectWrapper vStatusEffectW = new VolatileStatusEffectWrapper(vStatusEffectBase, this);
+        vStatusEffectList.Add(vStatusEffectW);
+        vStatusEffectW.GetBattleAction()?.AddBattleActions(battleSystem);
 
         return true;
     }

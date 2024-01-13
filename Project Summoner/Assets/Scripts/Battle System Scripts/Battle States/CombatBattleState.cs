@@ -70,9 +70,11 @@ public class CombatBattleState : BattleState
         //If the attack is canceled, continue to the next attack
         if (terraAttack.IsCanceled()) {
             terraAttack.GetTerraMoveAction()?.RemoveBattleActions(battleSystem);
-            Debug.Log(BattleDialog.ATTACK_FAILED);
             return;
         }
+
+        //Decrement the PP of the move being used
+        terraAttack.GetMove().SetCurrentPP(terraAttack.GetMove().GetCurrentPP() - 1);
 
         //Iterate over all defending positions that the current attack is targeting
         List<DirectAttackLog> directAttackLogList = new List<DirectAttackLog>();
@@ -96,12 +98,13 @@ public class CombatBattleState : BattleState
                 Debug.Log(BattleDialog.ATTACK_MISSED);
                 //*** Attack Missed Event ***
                 battleSystem.InvokeOnAttackMissed(directAttackLogList[i]);
+
                 continue;
             }
 
             directAttackLogList[i].SetSuccessfulHit(true);
 
-            ApplyDamage(directAttackLogList[i]);
+            ApplyDamage(directAttackLogList[i], battleSystem);
 
             //After damage is calculated and applied we activate the move's post attack effect
             terraAttack.GetTerraMoveAction()?.PostAttackEffect(directAttackLogList[i], battleSystem);
@@ -138,12 +141,15 @@ public class CombatBattleState : BattleState
     }
 
     //If the damage from the DirectAttackLog is not null, then we apply the damage
-    private void ApplyDamage(DirectAttackLog directAttackLog)
+    private void ApplyDamage(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
-        if (directAttackLog.GetDamage() == null)
+        //*** Terra Damaged Event ***
+        TerraDamagedEventArgs terraDamagedEventArgs = battleSystem.InvokeOnTerraDamaged(directAttackLog.GetDefenderPosition(), directAttackLog.GetDamage());
+        
+        if (terraDamagedEventArgs.GetDamage() == null)
             return;
 
-        directAttackLog.GetDefenderPosition().GetTerra().TakeDamage((int)directAttackLog.GetDamage());
+        directAttackLog.GetDefenderPosition().GetTerra().TakeDamage((int)terraDamagedEventArgs.GetDamage());
 
         if (directAttackLog.IsCrit())
             Debug.Log(BattleDialog.CRITICAL_HIT);

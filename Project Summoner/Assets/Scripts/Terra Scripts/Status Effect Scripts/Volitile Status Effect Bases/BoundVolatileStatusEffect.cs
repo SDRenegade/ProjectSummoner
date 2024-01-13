@@ -7,7 +7,7 @@ public class BoundVolatileStatusEffect : VolatileStatusEffectBase
 {
     public override BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition)
     {
-        return new BoundVolatileStatusEffectAction(terraBattlePosition);
+        return new BoundVolatileStatusEffectAction(terraBattlePosition, this);
     }
 }
 
@@ -18,12 +18,14 @@ public class BoundVolatileStatusEffectAction : BattleAction
     private readonly int MAX_TURN_DURATION = 5;
 
     private TerraBattlePosition terraBattlePosition;
+    private VolatileStatusEffectBase vStatusEffect;
     private int turnDuration;
     private int turnCounter;
 
-    public BoundVolatileStatusEffectAction(TerraBattlePosition terraBattlePosition)
+    public BoundVolatileStatusEffectAction(TerraBattlePosition terraBattlePosition, VolatileStatusEffectBase vStatusEffect)
     {
         this.terraBattlePosition = terraBattlePosition;
+        this.vStatusEffect = vStatusEffect;
         turnDuration = Random.Range(MIN_TURN_DURATION, MAX_TURN_DURATION + 1);
         turnCounter = 0;
     }
@@ -36,6 +38,7 @@ public class BoundVolatileStatusEffectAction : BattleAction
     public void RemoveBattleActions(BattleSystem battleSystem)
     {
         battleSystem.OnEndOfTurn -= EndOfTurnDamage;
+        terraBattlePosition.RemoveVolatileStatusEffect(vStatusEffect);
     }
 
     private void EndOfTurnDamage(object sender, BattleEventArgs eventArgs)

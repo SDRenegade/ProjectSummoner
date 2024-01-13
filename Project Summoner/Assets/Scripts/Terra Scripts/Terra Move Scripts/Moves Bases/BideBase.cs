@@ -14,6 +14,8 @@ public class BideBase : TerraMoveBase
 
 public class BideAction : TerraMoveAction
 {
+    private static readonly float DAMAGE_MULTIPLIER = 2f;
+
     private TerraAttack terraAttack;
     private int totalDamageRecieved;
     private int turnCounter;
@@ -32,6 +34,7 @@ public class BideAction : TerraMoveAction
         terraAttack.SetPersistent(true);
         battleSystem.OnTerraDamageByTerra += AccumulateDamage;
         battleSystem.OnEnteringActionSelection += QueueNextAttack;
+        battleSystem.OnAttackMissed += AttackMissedAction;
     }
 
     public void RemoveBattleActions(BattleSystem battleSystem)
@@ -40,6 +43,7 @@ public class BideAction : TerraMoveAction
         battleSystem.OnTerraDamageByTerra -= AccumulateDamage;
         battleSystem.OnEnteringActionSelection -= QueueNextAttack;
         battleSystem.OnTerraDamageByTerra -= UnleashDamage;
+        battleSystem.OnAttackMissed -= AttackMissedAction;
     }
 
     private void QueueNextAttack(object sender, EnteringActionSelectionEventArgs eventArgs)
@@ -71,10 +75,16 @@ public class BideAction : TerraMoveAction
         if (terraAttack != eventArgs.GetTerraAttack())
             return;
 
-        eventArgs.SetDamage(totalDamageRecieved * 2);
+        eventArgs.SetDamage((int)(totalDamageRecieved * DAMAGE_MULTIPLIER));
 
-        terraAttack.SetPersistent(false);
-        eventArgs.GetBattleSystem().OnTerraDamageByTerra -= AccumulateDamage;
-        eventArgs.GetBattleSystem().OnTerraDamageByTerra -= UnleashDamage;
+        RemoveBattleActions(eventArgs.GetBattleSystem());
+    }
+
+    private void AttackMissedAction(object sender, DirectAttackLogEventArgs eventArgs)
+    {
+        if (eventArgs.GetDirectAttackLog().GetAttackerPosition() != terraAttack.GetAttackerPosition())
+            return;
+
+        RemoveBattleActions(eventArgs.GetBattleSystem());
     }
 }

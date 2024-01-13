@@ -27,6 +27,7 @@ public class FlyAction : TerraMoveAction
         terraAttack.SetPersistent(true);
         battleSystem.OnDirectAttack += FirstTurnAction;
         battleSystem.OnEnteringActionSelection += QueueSecondAttack;
+        battleSystem.OnAttackMissed += AttackMissedAction;
     }
 
     public void RemoveBattleActions(BattleSystem battleSystem)
@@ -35,6 +36,7 @@ public class FlyAction : TerraMoveAction
         battleSystem.OnEnteringActionSelection -= QueueSecondAttack;
         battleSystem.OnDirectAttack -= FirstTurnAction;
         battleSystem.OnDirectAttack -= SecondTurnAction;
+        battleSystem.OnAttackMissed -= AttackMissedAction;
     }
 
     private void FirstTurnAction(object sender, DirectAttackEventArgs eventArgs)
@@ -68,5 +70,13 @@ public class FlyAction : TerraMoveAction
         eventArgs.GetDirectAttackParams().GetAttackerPosition().SetBattlePositionState(BattlePositionState.NORMAL);
 
         eventArgs.GetBattleSystem().OnDirectAttack -= SecondTurnAction;
+    }
+
+    private void AttackMissedAction(object sender, DirectAttackLogEventArgs eventArgs)
+    {
+        if (eventArgs.GetDirectAttackLog().GetAttackerPosition() != terraAttack.GetAttackerPosition())
+            return;
+
+        RemoveBattleActions(eventArgs.GetBattleSystem());
     }
 }

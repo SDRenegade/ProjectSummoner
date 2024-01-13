@@ -7,7 +7,7 @@ public class SpecialBarrierVolatileStatusEffect : VolatileStatusEffectBase
 {
     public override BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition)
     {
-        return new SpecialBarrierVolatileStatusEffectAction(terraBattlePosition);
+        return new SpecialBarrierVolatileStatusEffectAction(terraBattlePosition, this);
     }
 }
 
@@ -16,11 +16,13 @@ public class SpecialBarrierVolatileStatusEffectAction : BattleAction
     private static readonly int TURN_DURATION = 5;
 
     private TerraBattlePosition terraBattlePosition;
+    private VolatileStatusEffectBase vStatusEffect;
     private int turnCounter;
 
-    public SpecialBarrierVolatileStatusEffectAction(TerraBattlePosition terraBattlePosition)
+    public SpecialBarrierVolatileStatusEffectAction(TerraBattlePosition terraBattlePosition, VolatileStatusEffectBase vStatusEffect)
     {
         this.terraBattlePosition = terraBattlePosition;
+        this.vStatusEffect = vStatusEffect;
         turnCounter = 0;
     }
 
@@ -34,6 +36,7 @@ public class SpecialBarrierVolatileStatusEffectAction : BattleAction
     {
         battleSystem.OnTerraDamageByTerra -= HalfIncommingSpecialDamage;
         battleSystem.OnEndOfTurn -= IncrementTurnCounter;
+        terraBattlePosition.RemoveVolatileStatusEffect(vStatusEffect);
     }
 
     private void HalfIncommingSpecialDamage(object sender, TerraDamageByTerraEventArgs eventArgs)
@@ -51,7 +54,6 @@ public class SpecialBarrierVolatileStatusEffectAction : BattleAction
         turnCounter++;
         if(turnCounter >= TURN_DURATION) {
             RemoveBattleActions(eventArgs.GetBattleSystem());
-            terraBattlePosition.RemoveVolatileStatusEffect(SODatabase.GetInstance().GetVolatileStatusEffectByName("Special Barrier"));
             Debug.Log(BattleDialog.LightScreenExpiredMsg(terraBattlePosition.GetTerra()));
         }
     }

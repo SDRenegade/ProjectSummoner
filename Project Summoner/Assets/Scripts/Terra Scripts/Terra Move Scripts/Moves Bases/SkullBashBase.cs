@@ -13,6 +13,8 @@ public class SkullBashBase : TerraMoveBase
 
 public class SkullBashAction : TerraMoveAction
 {
+    private static readonly int DEF_MODIFICATION = 1;
+
     private TerraAttack terraAttack;
 
     public SkullBashAction(TerraAttack terraAttack)
@@ -27,6 +29,7 @@ public class SkullBashAction : TerraMoveAction
         terraAttack.SetPersistent(true);
         battleSystem.OnEnteringActionSelection += QueueNextAttack;
         battleSystem.OnDirectAttack += ChargeAction;
+        battleSystem.OnAttackMissed += AttackMissedAction;
     }
 
     public void RemoveBattleActions(BattleSystem battleSystem)
@@ -34,6 +37,7 @@ public class SkullBashAction : TerraMoveAction
         terraAttack.SetPersistent(false);
         battleSystem.OnEnteringActionSelection -= QueueNextAttack;
         battleSystem.OnDirectAttack -= ChargeAction;
+        battleSystem.OnAttackMissed -= AttackMissedAction;
     }
 
     private void QueueNextAttack(object sender, EnteringActionSelectionEventArgs eventArgs)
@@ -55,11 +59,23 @@ public class SkullBashAction : TerraMoveAction
         TerraBattlePosition attackerPosition = terraAttack.GetAttackerPosition();
 
         eventArgs.GetDirectAttackParams().SetDamageStepCanceled(true);
-        attackerPosition.SetDefenceStage(StatStagesExtension.IncrementStage(attackerPosition.GetDefenceStage()));
-        Debug.Log(BattleDialog.StatStageIncrementMsg(attackerPosition.GetTerra(), attackerPosition.GetDefenceStage(), 1));
+
+        //*** Stat Change Event ***
+        StatChangeEventArgs statChangeEventArgs = eventArgs.GetBattleSystem().InvokeOnStatChange(attackerPosition, Stats.DEF, DEF_MODIFICATION);
+
+        if (!statChangeEventArgs.IsCanceled()) {
+            attackerPosition.SetStatStage(Stats.DEF, StatStagesExtension.ChangeStatStage(attackerPosition.GetStatStage(Stats.DEF), statChangeEventArgs.GetModification()));
+            Debug.Log(BattleDialog.StatStageChangeMsg(attackerPosition.GetTerra(), Stats.DEF, attackerPosition.GetStatStage(Stats.DEF), statChangeEventArgs.GetModification()));
+        }
 
         eventArgs.GetBattleSystem().OnDirectAttack -= ChargeAction;
     }
 
+    private void AttackMissedAction(object sender, DirectAttackLogEventArgs eventArgs)
+    {
+        if (eventArgs.GetDirectAttackLog().GetAttackerPosition() != terraAttack.GetAttackerPosition())
+            return;
 
+        RemoveBattleActions(eventArgs.GetBattleSystem());
+    }
 }

@@ -13,6 +13,8 @@ public class GustBase : TerraMoveBase
 
 public class GustAction : TerraMoveAction
 {
+    private static readonly float DAMAGE_MULTIPLIER = 2f;
+
     private TerraAttack terraAttack;
 
     public GustAction(TerraAttack terraAttack)
@@ -39,6 +41,6 @@ public class GustAction : TerraMoveAction
         if (eventArgs.GetDirectAttackLog().GetDefenderPosition().GetBattlePositionState() != BattlePositionState.FLYING)
             return;
 
-        eventArgs.SetDamage(eventArgs.GetDamage() * 2);
+        eventArgs.SetDamage((int)(eventArgs.GetDamage() * DAMAGE_MULTIPLIER));
     }
 }

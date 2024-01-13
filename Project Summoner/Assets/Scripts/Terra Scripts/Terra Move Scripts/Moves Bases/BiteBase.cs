@@ -13,7 +13,7 @@ public class BiteBase : TerraMoveBase
 
 public class BiteAction : TerraMoveAction
 {
-    private static readonly float FLINCH_CHANCE = 1/4f;
+    private static readonly float FLINCH_CHANCE = 1/5f;
 
     public BiteAction() {}
 

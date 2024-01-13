@@ -29,6 +29,7 @@ public class SolarBeamAction : TerraMoveAction
         terraAttack.SetPersistent(true);
         battleSystem.OnEnteringActionSelection += QueueNextAttack;
         battleSystem.OnDirectAttack += ChargeAction;
+        battleSystem.OnAttackMissed += AttackMissedAction;
     }
 
     public void RemoveBattleActions(BattleSystem battleSystem)
@@ -36,6 +37,7 @@ public class SolarBeamAction : TerraMoveAction
         terraAttack.SetPersistent(false);
         battleSystem.OnEnteringActionSelection -= QueueNextAttack;
         battleSystem.OnDirectAttack -= ChargeAction;
+        battleSystem.OnAttackMissed -= AttackMissedAction;
     }
 
     private void QueueNextAttack(object sender, EnteringActionSelectionEventArgs eventArgs)
@@ -61,5 +63,13 @@ public class SolarBeamAction : TerraMoveAction
         Debug.Log(BattleDialog.SOLAR_BEAM_CHARGE);
 
         eventArgs.GetBattleSystem().OnDirectAttack -= ChargeAction;
+    }
+
+    private void AttackMissedAction(object sender, DirectAttackLogEventArgs eventArgs)
+    {
+        if (eventArgs.GetDirectAttackLog().GetAttackerPosition() != terraAttack.GetAttackerPosition())
+            return;
+
+        RemoveBattleActions(eventArgs.GetBattleSystem());
     }
 }

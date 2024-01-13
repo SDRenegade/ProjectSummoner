@@ -15,6 +15,8 @@ public class CounterBase : TerraMoveBase
 
 public class CounterAction : TerraMoveAction
 {
+    private static readonly float DAMAGE_MULTIPLIER = 2f;
+
     private TerraAttack terraAttack;
     private int physicalDamageRecieved;
 
@@ -58,9 +60,8 @@ public class CounterAction : TerraMoveAction
         if(physicalDamageRecieved <= 0)
             eventArgs.SetDamage(null);
         else
-            eventArgs.SetDamage(physicalDamageRecieved * 2);
+            eventArgs.SetDamage((int)(physicalDamageRecieved * DAMAGE_MULTIPLIER));
 
-        eventArgs.GetBattleSystem().OnTerraDamageByTerra -= AccumulateDamage;
-        eventArgs.GetBattleSystem().OnTerraDamageByTerra -= UnleashDamage;
+        RemoveBattleActions(eventArgs.GetBattleSystem());
     }
 }

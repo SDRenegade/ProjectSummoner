@@ -30,6 +30,7 @@ public class HyperBeamAction : TerraMoveAction
         terraAttack.SetPersistent(true);
         battleSystem.OnEnteringActionSelection += QueueNextAttack;
         battleSystem.OnDirectAttack += RechargeAction;
+        battleSystem.OnAttackMissed += AttackMissedAction;
     }
 
     public void RemoveBattleActions(BattleSystem battleSystem)
@@ -37,6 +38,7 @@ public class HyperBeamAction : TerraMoveAction
         terraAttack.SetPersistent(false);
         battleSystem.OnEnteringActionSelection -= QueueNextAttack;
         battleSystem.OnDirectAttack -= RechargeAction;
+        battleSystem.OnAttackMissed -= AttackMissedAction;
     }
 
     private void QueueNextAttack(object sender, EnteringActionSelectionEventArgs eventArgs)
@@ -62,5 +64,13 @@ public class HyperBeamAction : TerraMoveAction
         Debug.Log(BattleDialog.HYPER_BEAM_RECHARGE);
 
         eventArgs.GetBattleSystem().OnDirectAttack -= RechargeAction;
+    }
+
+    private void AttackMissedAction(object sender, DirectAttackLogEventArgs eventArgs)
+    {
+        if (eventArgs.GetDirectAttackLog().GetAttackerPosition() != terraAttack.GetAttackerPosition())
+            return;
+
+        RemoveBattleActions(eventArgs.GetBattleSystem());
     }
 }

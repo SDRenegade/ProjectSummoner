@@ -24,6 +24,8 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<DirectAttackEventArgs> OnDirectAttack;
     public event EventHandler<DirectAttackLogEventArgs> OnAttackMissed;
     public event EventHandler<TerraDamageByTerraEventArgs> OnTerraDamageByTerra;
+    public event EventHandler<TerraDamagedEventArgs> OnTerraDamaged;
+    public event EventHandler<StatChangeEventArgs> OnStatChange;
     public event EventHandler<BattleEventArgs> OnEndOfTurn;
 
     [SerializeField] private BattleHUD battleHUD;
@@ -159,18 +161,13 @@ public class BattleSystem : MonoBehaviour
             return;
 
         TerraMove selectedMove = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0].GetTerra().GetMoves()[moveIndex];
-        if (selectedMove == null) {
-            Debug.LogError("The move at index " + moveIndex + " is null");
+        if (selectedMove == null)
             return;
-        }
         if (selectedMove.GetCurrentPP() <= 0) {
             Debug.Log(BattleDialog.NoMovePowerPointsLeftMsg(selectedMove));
             return;
         }
 
-        //TODO Change the decrementing of the move's PP to when the move is executed
-        //Decrement the selected mvoes PP
-        selectedMove.SetCurrentPP(selectedMove.GetCurrentPP() - 1);
         //Initializes the selected attack and add the new TerraAttack to the TerraAttackList
         TerraAttack terraAttack = new TerraAttack(
             battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0],
@@ -324,6 +321,22 @@ public class BattleSystem : MonoBehaviour
     {
         TerraDamageByTerraEventArgs eventArgs = new TerraDamageByTerraEventArgs(terraAttack, terraAttackLog, damage, this);
         OnTerraDamageByTerra?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public TerraDamagedEventArgs InvokeOnTerraDamaged(TerraBattlePosition terraBattlePosition, int? damage)
+    {
+        TerraDamagedEventArgs eventArgs = new TerraDamagedEventArgs(terraBattlePosition, damage, this);
+        OnTerraDamaged?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public StatChangeEventArgs InvokeOnStatChange(TerraBattlePosition terraBattlePosition, Stats stat, int modification)
+    {
+        StatChangeEventArgs eventArgs = new StatChangeEventArgs(terraBattlePosition, stat, modification, this);
+        OnStatChange?.Invoke(this, eventArgs);
 
         return eventArgs;
     }

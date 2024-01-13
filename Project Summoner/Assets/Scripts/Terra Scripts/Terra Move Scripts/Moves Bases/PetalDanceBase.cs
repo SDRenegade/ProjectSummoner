@@ -46,6 +46,7 @@ public class PetalDanceAction : TerraMoveAction
         terraAttack.SetPersistent(true);
         battleSystem.OnEnteringActionSelection += QueueNextAttack;
         battleSystem.OnEndOfTurn += EndOfTurnCounterIncrement;
+        battleSystem.OnAttackMissed += AttackMissedAction;
     }
 
     public void RemoveBattleActions(BattleSystem battleSystem)
@@ -53,6 +54,7 @@ public class PetalDanceAction : TerraMoveAction
         terraAttack.SetPersistent(false);
         battleSystem.OnEnteringActionSelection -= QueueNextAttack;
         battleSystem.OnEndOfTurn -= EndOfTurnCounterIncrement;
+        battleSystem.OnAttackMissed -= AttackMissedAction;
     }
 
     private void QueueNextAttack(object sender, EnteringActionSelectionEventArgs eventArgs)
@@ -66,5 +68,13 @@ public class PetalDanceAction : TerraMoveAction
     private void EndOfTurnCounterIncrement(object sender, BattleEventArgs eventArgs)
     {
         turnCounter++;
+    }
+
+    private void AttackMissedAction(object sender, DirectAttackLogEventArgs eventArgs)
+    {
+        if (eventArgs.GetDirectAttackLog().GetAttackerPosition() != terraAttack.GetAttackerPosition())
+            return;
+
+        RemoveBattleActions(eventArgs.GetBattleSystem());
     }
 }

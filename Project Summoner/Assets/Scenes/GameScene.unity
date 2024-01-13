@@ -558,14 +558,11 @@ MonoBehaviour:
   terra:
     terraBase: {fileID: 11400000, guid: 4423df2580197fe468e0df8e1d363e6d, type: 2}
     terraNickname: 
-    level: 8
+    level: 20
     moves:
     - moveBase: {fileID: 11400000, guid: bbab58efed0be3d4493ef2893699d3fd, type: 2}
       maxPP: 30
       currentPP: 30
-    - moveBase: {fileID: 11400000, guid: f7a9f8f0e8fe2dd4a95a4adfba7076f1, type: 2}
-      maxPP: 20
-      currentPP: 20
     statusEffectWrapper:
       statusEffectBase: {fileID: 0}
     currentHP: 20
@@ -2806,7 +2803,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 19.28
+      value: 10.72
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.y

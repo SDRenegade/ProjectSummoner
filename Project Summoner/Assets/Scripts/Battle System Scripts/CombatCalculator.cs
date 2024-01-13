@@ -25,7 +25,7 @@ public static class CombatCalculator
             return false;
 
         int randomHitIndex = Random.Range(0, 100);
-        int attackAccuracyIndex = (int)(directAttackParams.GetMove().GetMoveBase().GetBaseAccuracy().GetValue() / StatStagesExtension.GetStatStageMultiplier(directAttackParams.GetDefenderPosition().GetEvasivenessStage()) * directAttackParams.GetAccuracyModifier());
+        int attackAccuracyIndex = (int)(directAttackParams.GetMove().GetMoveBase().GetBaseAccuracy().GetValue() / StatStagesExtension.GetStatStageMultiplier(directAttackParams.GetDefenderPosition().GetStatStage(Stats.EVA)) * directAttackParams.GetAccuracyModifier());
 
         return directAttackParams.GetMove().GetMoveBase().GetBaseAccuracy().IsNull() || attackAccuracyIndex > randomHitIndex;
     }
@@ -79,8 +79,8 @@ public static class CombatCalculator
 
         int attackingStat = (damageType == DamageType.PHYSICAL) ? attackerPosition.GetTerra().GetAttack() : attackerPosition.GetTerra().GetSpAttack();
         int defendingStat = (damageType == DamageType.PHYSICAL) ? defenderPosition.GetTerra().GetDefence() : defenderPosition.GetTerra().GetSpDefence();
-        StatStages attackStage = (damageType == DamageType.PHYSICAL) ? attackerPosition.GetAttackStage() : attackerPosition.GetSpAttackStage();
-        StatStages defenceStage = (damageType == DamageType.PHYSICAL) ? defenderPosition.GetDefenceStage() : defenderPosition.GetSpDefenceStage();
+        StatStages attackStage = (damageType == DamageType.PHYSICAL) ? attackerPosition.GetStatStage(Stats.ATK) : attackerPosition.GetStatStage(Stats.ATK);
+        StatStages defenceStage = (damageType == DamageType.PHYSICAL) ? defenderPosition.GetStatStage(Stats.DEF) : defenderPosition.GetStatStage(Stats.DEF);
 
         int damage = (int)(((2 * attackerPosition.GetTerra().GetLevel() / 5f) + 2) * terraMoveBase.GetBaseDamage().GetValue() * (attackingStat * attackStage.GetStatStageMultiplier() / (defendingStat * defenceStage.GetStatStageMultiplier())) / 50f + 2);
 
@@ -96,8 +96,8 @@ public static class CombatCalculator
 
         int attackingStat = attackerPosition.GetTerra().GetAttack();
         int defendingStat = defenderPosition.GetTerra().GetDefence();
-        StatStages attackStage = attackerPosition.GetAttackStage();
-        StatStages defenceStage = defenderPosition.GetDefenceStage();
+        StatStages attackStage = attackerPosition.GetStatStage(Stats.ATK);
+        StatStages defenceStage = defenderPosition.GetStatStage(Stats.DEF);
 
         int damage = (int)(((2 * attackerPosition.GetTerra().GetLevel() / 5f) + 2) * baseDamage * (attackingStat * attackStage.GetStatStageMultiplier() / (defendingStat * defenceStage.GetStatStageMultiplier())) / 50f + 2);
 
