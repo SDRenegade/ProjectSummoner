@@ -46,8 +46,8 @@ public class BoundVolatileStatusEffectAction : BattleAction
         Terra defendingTerra = terraBattlePosition.GetTerra();
         int boundDamage = (int)(defendingTerra.GetMaxHP() * PERCENT_HEALTH_DAMAGE);
 
-        defendingTerra.TakeDamage(boundDamage);
         Debug.Log(BattleDialog.BindDamageMsg(defendingTerra, boundDamage));
+        eventArgs.GetBattleSystem().DamageTerra(terraBattlePosition, boundDamage);
 
         turnCounter++;
         if (turnCounter >= turnDuration) {

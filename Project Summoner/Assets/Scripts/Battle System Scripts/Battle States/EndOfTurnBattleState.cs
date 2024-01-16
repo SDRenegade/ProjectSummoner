@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EndTurnBattleState : BattleState
+public class EndOfTurnBattleState : BattleState
 {
     public void EnterState(BattleStateManager battleManager)
     {
@@ -10,6 +10,8 @@ public class EndTurnBattleState : BattleState
 
         //*** End of Turn Event ***
         battleSystem.InvokeOnEndOfTurn();
+
+        battleSystem.UpdateTerraStatusBars();
 
         Debug.Log("============== Entered End of Turn Battle State ==============");
         battleSystem.GetBattleActionManager().ResetActions();

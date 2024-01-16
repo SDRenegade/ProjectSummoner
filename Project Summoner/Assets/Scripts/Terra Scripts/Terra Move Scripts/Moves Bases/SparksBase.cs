@@ -23,7 +23,7 @@ public class SparksAction : TerraMoveAction
 
         bool isParalyzed = PARALYZE_CHANCE >= Random.Range(0, 100);
         if (!defenderPosition.GetTerra().HasStatusEffect() && isParalyzed) {
-            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Paralysis"), battleSystem);
+            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Paralysis"), defenderPosition, battleSystem);
             Debug.Log(BattleDialog.ParalysisInflictedMsg(defenderPosition.GetTerra()));
         }
     }

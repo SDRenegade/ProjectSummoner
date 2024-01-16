@@ -24,8 +24,8 @@ public static class BattleDialog
         return terraAttack.GetAttackerPosition().GetTerra() + " has used " + terraAttack.GetMove();
     }
 
-    public static string DamageDealtMsg(Terra attackingTerra, Terra defendingTerra, int damage) {
-        return attackingTerra + " has dealt " + damage + " to " + defendingTerra;
+    public static string DamageDealtMsg(Terra terra, int damage) {
+        return terra + " has taken " + damage + ".";
     }
 
     public static string HealthHealedMsg(Terra terra, int healAmt) {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,7 +15,6 @@ public class SubstitutedVolatileStatusEffect : VolatileStatusEffectBase
 public class SubstitutedVolatileStatusEffectAction : BattleAction
 {
     private static readonly float PERCENT_MAX_HEALTH_SUBSTITUTE = 1/2f;
-    private static readonly float PERCENT_MAX_HEALTH_RECOIL = 1/8f;
 
     private TerraBattlePosition terraBattlePosition;
     private VolatileStatusEffectBase vStatusEffect;
@@ -24,11 +24,7 @@ public class SubstitutedVolatileStatusEffectAction : BattleAction
     {
         this.terraBattlePosition = terraBattlePosition;
         this.vStatusEffect = vStatusEffect;
-
-        Terra terra = terraBattlePosition.GetTerra();
-        terra.TakeDamage((int)(terra.GetMaxHP() * PERCENT_MAX_HEALTH_RECOIL));
-
-        substituteCurrentHealth = (int)(terra.GetMaxHP() * PERCENT_MAX_HEALTH_SUBSTITUTE);
+        substituteCurrentHealth = (int)(terraBattlePosition.GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_SUBSTITUTE);
     }
 
     public void AddBattleActions(BattleSystem battleSystem)

@@ -10,7 +10,7 @@ public abstract class StatusEffectBase : ScriptableObject
 
     public StatusEffectBase() {}
 
-    public abstract BattleAction CreateBattleAction(Terra terra);
+    public abstract BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition);
 
     public string GetStatusName() { return statusName; }
 

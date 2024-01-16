@@ -39,6 +39,6 @@ public class DragonRageAction : TerraMoveAction
         if (terraAttack != eventArgs.GetTerraAttack())
             return;
 
-        eventArgs.SetDamage(ATTACK_DAMAGE);
+        eventArgs.GetDirectAttackLog().SetDamage(ATTACK_DAMAGE);
     }
 }

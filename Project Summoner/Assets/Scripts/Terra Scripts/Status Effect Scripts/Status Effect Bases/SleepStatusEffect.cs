@@ -7,9 +7,9 @@ public class SleepStatusEffect : StatusEffectBase
 {
     public SleepStatusEffect() {}
 
-    public override BattleAction CreateBattleAction(Terra terra)
+    public override BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition)
     {
-        return new SleepStatusEffectAction(terra);
+        return new SleepStatusEffectAction(terraBattlePosition);
     }
 }
 
@@ -18,13 +18,13 @@ public class SleepStatusEffectAction : BattleAction
     private static readonly int MIN_TURNS_SLEEP = 2;
     private static readonly int MAX_TURNS_SLEEP = 5;
 
-    private Terra terra;
+    private TerraBattlePosition terraBattlePosition;
     private int numTurnsSleep;
     private int turnCounter;
 
-    public SleepStatusEffectAction(Terra terra)
+    public SleepStatusEffectAction(TerraBattlePosition terraBattlePosition)
     {
-        this.terra = terra;
+        this.terraBattlePosition = terraBattlePosition;
         numTurnsSleep = Random.Range(MIN_TURNS_SLEEP, MAX_TURNS_SLEEP + 1);
         turnCounter = 0;
     }
@@ -41,19 +41,18 @@ public class SleepStatusEffectAction : BattleAction
 
     private void SleepActive(object sender, AttackDeclarationEventArgs eventArgs)
     {
-        if (eventArgs.GetTerraAttack().GetAttackerPosition().GetTerra() != terra)
+        if (eventArgs.GetTerraAttack().GetAttackerPosition() != terraBattlePosition)
             return;
 
         turnCounter++;
         if (turnCounter <= numTurnsSleep) {
+            Debug.Log(BattleDialog.SleepProkedMsg(terraBattlePosition.GetTerra()));
             eventArgs.GetTerraAttack().SetCanceled(true);
-            Debug.Log(BattleDialog.SleepProkedMsg(terra));
-            eventArgs.GetBattleSystem().UpdateTerraStatusBars();
         }
         else {
-            terra.SetStatusEffect(null);
-            eventArgs.GetBattleSystem().OnAttackDeclaration -= SleepActive;
-            Debug.Log(BattleDialog.TerraWokeUpMsg(terra));
+            Debug.Log(BattleDialog.TerraWokeUpMsg(terraBattlePosition.GetTerra()));
+            terraBattlePosition.GetTerra().SetStatusEffect(null);
+            RemoveBattleActions(eventArgs.GetBattleSystem());
         }
     }
 }

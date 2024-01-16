@@ -46,7 +46,7 @@ public class SpecialBarrierVolatileStatusEffectAction : BattleAction
         if (eventArgs.GetTerraAttack().GetMove().GetMoveBase().GetDamageType() != DamageType.SPECIAL)
             return;
 
-        eventArgs.SetDamage(eventArgs.GetDamage() / 2);
+        eventArgs.GetDirectAttackLog().SetDamage(eventArgs.GetDirectAttackLog().GetDamage() / 2);
     }
 
     private void IncrementTurnCounter(object sender, BattleEventArgs eventArgs)

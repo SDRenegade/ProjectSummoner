@@ -40,6 +40,5 @@ public class CrabHammerAction : TerraMoveAction
             return;
 
         eventArgs.GetDirectAttackParams().SetCritModifier(eventArgs.GetDirectAttackParams().GetCritModifier() * CRIT_MODIFIER);
-        eventArgs.GetBattleSystem().OnDirectAttack -= AddCritModifier;
     }
 }

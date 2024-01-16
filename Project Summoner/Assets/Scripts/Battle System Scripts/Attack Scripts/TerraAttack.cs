@@ -10,7 +10,6 @@ public class TerraAttack
     private TerraMoveAction terraMoveAction;
     private MovePriority movePriority;
     private bool isPersistent;
-    private bool isFlinched;
     private bool isCanceled;
 
     public TerraAttack(TerraBattlePosition attackerPosition, TerraBattlePosition defenderPosition, TerraMove move)
@@ -21,7 +20,6 @@ public class TerraAttack
         terraMoveAction = move.GetMoveBase().CreateTerraMoveAction(this);
         movePriority = move.GetMoveBase().GetBaseMovePriority();
         isPersistent = false;
-        isFlinched = false;
         isCanceled = false;
     }
 
@@ -33,7 +31,6 @@ public class TerraAttack
         terraMoveAction = move.GetMoveBase().CreateTerraMoveAction(this);
         movePriority = move.GetMoveBase().GetBaseMovePriority();
         isPersistent = false;
-        isFlinched = false;
         isCanceled = false;
     }
 
@@ -59,10 +56,6 @@ public class TerraAttack
     public bool IsPersistent() { return isPersistent; }
 
     public void SetPersistent(bool isPersistent) { this.isPersistent = isPersistent; }
-
-    public bool IsFlinched() { return isFlinched; }
-
-    public void SetFlinched(bool isFlinched) { this.isFlinched = isFlinched; }
 
     public bool IsCanceled() { return isCanceled; }
 

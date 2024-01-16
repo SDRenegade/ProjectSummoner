@@ -18,7 +18,7 @@ MonoBehaviour:
   damageType: 0
   baseMovePriority: 0
   baseDamage:
-    value: 50
+    value: 40
     isNull: 0
   baseAccuracy:
     value: 100

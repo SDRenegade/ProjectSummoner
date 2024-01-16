@@ -22,7 +22,7 @@ public class Terra
         level = 1;
         moves = new List<TerraMove>();
         GenerateNaturalMoveSet();
-        statusEffectWrapper = new StatusEffectWrapper(null, this);
+        statusEffectWrapper = new StatusEffectWrapper(null);
         currentHP = GetMaxHP();
     }
 
@@ -33,7 +33,7 @@ public class Terra
         this.level = level;
         moves = new List<TerraMove>();
         GenerateNaturalMoveSet();
-        statusEffectWrapper = new StatusEffectWrapper(null, this);
+        statusEffectWrapper = new StatusEffectWrapper(null);
         currentHP = GetMaxHP();
     }
 
@@ -46,7 +46,7 @@ public class Terra
         for(int i = 0; i < terraSavable.GetSavableMoves().Count; i++)
             moves.Add(new TerraMove(terraSavable.GetSavableMoves()[i]));
         StatusEffectBase savedStatusEffect = SODatabase.GetInstance().GetStatusEffectByName(terraSavable.GetStatusEffectBaseName());
-        statusEffectWrapper = (savedStatusEffect != null) ? new StatusEffectWrapper(savedStatusEffect, this) : new StatusEffectWrapper(null, this);
+        statusEffectWrapper = (savedStatusEffect != null) ? new StatusEffectWrapper(savedStatusEffect) : new StatusEffectWrapper(null);
         currentHP = terraSavable.GetCurrentHP();
     }
 
@@ -135,16 +135,16 @@ public class Terra
 
     public StatusEffectWrapper GetStatusEffectWrapper() { return statusEffectWrapper; }
 
-    //Sets the status effect without adding/removing battle system events
+    //Sets the status effect WITHOUT adding battle actions. Used for applying status effects out of battle.
     public void SetStatusEffect(StatusEffectBase statusEffectBase)
     {
-        statusEffectWrapper.SetStatusEffectBase(statusEffectBase, this);
+        statusEffectWrapper.SetStatusEffectBase(statusEffectBase);
     }
 
-    //Sets the status effect and adds/removes battle system events
-    public void SetStatusEffect(StatusEffectBase statusEffectBase, BattleSystem battleSystem)
+    //Sets the status effect and adds battle actions. Used during a battle.
+    public void SetStatusEffect(StatusEffectBase statusEffectBase, TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
-        statusEffectWrapper.SetStatusEffectBase(statusEffectBase, this, battleSystem);
+        statusEffectWrapper.SetStatusEffectBase(statusEffectBase, terraBattlePosition, battleSystem);
     }
 
     public bool HasStatusEffect() { return statusEffectWrapper.GetStatusEffectBase() != null; }

@@ -19,10 +19,16 @@ public class CombatBattleState : BattleState
         SortTerraAttackList(queuedTerraAttackList);
 
         //Loops through and executes all the attacks in the sorted list
-        for (int i = 0; i < queuedTerraAttackList.Count; i++)
+        for (int i = 0; i < queuedTerraAttackList.Count; i++) {
             ProcessTerraAttack(queuedTerraAttackList[i], battleSystem);
+            if (battleSystem.IsMatchFinished())
+                break;
+        }
 
-        battleManager.SwitchState(battleManager.GetEndTurnState());
+        if(battleSystem.IsMatchFinished())
+            battleManager.SwitchState(battleManager.GetFinishedMatchBattleState());
+        else
+            battleManager.SwitchState(battleManager.GetEndTurnState());
     }
     
     /*private void PlayerEscapeCheck(BattleSystem battleSystem)
@@ -61,17 +67,9 @@ public class CombatBattleState : BattleState
         //*** Terra Attack Declaration Event ***
         battleSystem.InvokeOnAttackDeclaration(terraAttack);
 
-        //If flinched, continue to the next attack
-        if (terraAttack.IsFlinched()) {
-            terraAttack.GetTerraMoveAction()?.RemoveBattleActions(battleSystem);
-            Debug.Log(BattleDialog.FlinchedMsg(terraAttack.GetAttackerPosition().GetTerra()));
-            return;
-        }
         //If the attack is canceled, continue to the next attack
-        if (terraAttack.IsCanceled()) {
+        if (terraAttack.IsCanceled())
             terraAttack.GetTerraMoveAction()?.RemoveBattleActions(battleSystem);
-            return;
-        }
 
         //Decrement the PP of the move being used
         terraAttack.GetMove().SetCurrentPP(terraAttack.GetMove().GetCurrentPP() - 1);
@@ -91,77 +89,51 @@ public class CombatBattleState : BattleState
             if(directAttackEventArgs.IsCanceled())
                 continue;
 
-            DamageCalculation(terraAttack, directAttackLogList[i], battleSystem);
-
             //Accuracy Check. If false, the move misses and we continue to the next defending battle position.
             if (!CombatCalculator.HitCheck(directAttackLogList[i].GetDirectAttackParams())) {
                 Debug.Log(BattleDialog.ATTACK_MISSED);
                 //*** Attack Missed Event ***
                 battleSystem.InvokeOnAttackMissed(directAttackLogList[i]);
 
+                if (directAttackLogList[i].GetDirectAttackParams().GetHitCount() > 1)
+                    Debug.Log(BattleDialog.MultiHitMsg(
+                        directAttackLogList[i].GetDirectAttackParams().GetAttackerPosition().GetTerra(),
+                        directAttackLogList[i].GetDirectAttackParams().GetHitCount()));
+
                 continue;
             }
 
             directAttackLogList[i].SetSuccessfulHit(true);
 
-            ApplyDamage(directAttackLogList[i], battleSystem);
+            for (int j = 0; j < directAttackLogList[i].GetDirectAttackParams().GetHitCount(); j++)
+                DamageStep(terraAttack, directAttackLogList[i], battleSystem);
 
             //After damage is calculated and applied we activate the move's post attack effect
             terraAttack.GetTerraMoveAction()?.PostAttackEffect(directAttackLogList[i], battleSystem);
 
-            battleSystem.UpdateTerraStatusBars();
+            if (directAttackLogList[i].GetDirectAttackParams().GetHitCount() > 1)
+                Debug.Log(BattleDialog.MultiHitMsg(
+                    directAttackLogList[i].GetDirectAttackParams().GetAttackerPosition().GetTerra(),
+                    directAttackLogList[i].GetDirectAttackParams().GetHitCount()));
 
-            //--- (Temp) Checks if the defending terra has fainted. If so, the game ends. ---
-            if (defenderPosition.GetTerra().GetCurrentHP() <= 0) {
-                Debug.Log(BattleDialog.TerraFaintedMsg(defenderPosition.GetTerra()));
-                battleSystem.EndBattle();
-                return;
-            }
+            battleSystem.UpdateTerraStatusBars();
         }
     }
 
     //If the move used is not a status move and the damage step is not canceled, we calculate the damage dealt
-    private void DamageCalculation(TerraAttack terraAttack, DirectAttackLog directAttackLog, BattleSystem battleSystem)
+    private void DamageStep(TerraAttack terraAttack, DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
         if (terraAttack.GetMove().GetMoveBase().GetDamageType() == DamageType.STATUS || directAttackLog.GetDirectAttackParams().IsDamageStepCanceled())
             return;
 
-        for (int i = 0; i < directAttackLog.GetDirectAttackParams().GetHitCount(); i++) {
-            directAttackLog.SetCrit(CombatCalculator.CriticalHitCheck(directAttackLog.GetDirectAttackParams()));
+        directAttackLog.SetCrit(CombatCalculator.CriticalHitCheck(directAttackLog.GetDirectAttackParams()));
+        directAttackLog.SetDamage(CombatCalculator.CalculateDamage(directAttackLog.GetDirectAttackParams(), directAttackLog.IsCrit()));
 
-            int? damage = CombatCalculator.CalculateDamage(directAttackLog.GetDirectAttackParams(), directAttackLog.IsCrit());
-
-            //*** Terra Damage by Terra Event ***
-            TerraDamageByTerraEventArgs eventArgs = battleSystem.InvokeOnTerraDamageByTerra(terraAttack, directAttackLog, damage);
-            damage = eventArgs.GetDamage();
-
-            if (damage != null)
-                directAttackLog.AddDamage(damage);
-        }
-    }
-
-    //If the damage from the DirectAttackLog is not null, then we apply the damage
-    private void ApplyDamage(DirectAttackLog directAttackLog, BattleSystem battleSystem)
-    {
-        //*** Terra Damaged Event ***
-        TerraDamagedEventArgs terraDamagedEventArgs = battleSystem.InvokeOnTerraDamaged(directAttackLog.GetDefenderPosition(), directAttackLog.GetDamage());
-        
-        if (terraDamagedEventArgs.GetDamage() == null)
-            return;
-
-        directAttackLog.GetDefenderPosition().GetTerra().TakeDamage((int)terraDamagedEventArgs.GetDamage());
+        //*** Terra Damage by Terra Event ***
+        battleSystem.InvokeOnTerraDamageByTerra(terraAttack, directAttackLog);
 
         if (directAttackLog.IsCrit())
             Debug.Log(BattleDialog.CRITICAL_HIT);
-
-        if (directAttackLog.GetDirectAttackParams().GetHitCount() > 1)
-            Debug.Log(BattleDialog.MultiHitMsg(
-                directAttackLog.GetDirectAttackParams().GetAttackerPosition().GetTerra(),
-                directAttackLog.GetDirectAttackParams().GetHitCount()));
-
-        Debug.Log(BattleDialog.DamageDealtMsg(
-            directAttackLog.GetAttackerPosition().GetTerra(),
-            directAttackLog.GetDefenderPosition().GetTerra(),
-            (int)directAttackLog.GetDamage()));
+        battleSystem.DamageTerra(directAttackLog.GetDefenderPosition(), directAttackLog.GetDamage());
     }
 }

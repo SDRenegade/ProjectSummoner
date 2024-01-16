@@ -13,17 +13,17 @@ public class TakeDownBase : TerraMoveBase
 
 public class TakeDownAction : TerraMoveAction
 {
-    public static readonly float RECOIL_DAMAGE_PERCENT = 1/10f;
+    public static readonly float PERCENT_MAX_HEALTH_RECOIL = 1/10f;
 
     public TakeDownAction() {}
 
     public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
-        Terra attacker = directAttackLog.GetAttackerPosition().GetTerra();
+        TerraBattlePosition terraBattlePosition = directAttackLog.GetAttackerPosition();
 
-        int recoilDamage = (int)(attacker.GetMaxHP() * RECOIL_DAMAGE_PERCENT);
-        attacker.TakeDamage(recoilDamage);
-        Debug.Log(BattleDialog.RecoilDamageMsg(attacker, recoilDamage));
+        int recoilDamage = (int)(terraBattlePosition.GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_RECOIL);
+        Debug.Log(BattleDialog.RecoilDamageMsg(terraBattlePosition.GetTerra(), recoilDamage));
+        battleSystem.DamageTerra(terraBattlePosition, recoilDamage);
     }
 
     public void AddBattleActions(BattleSystem battleSystem) {}

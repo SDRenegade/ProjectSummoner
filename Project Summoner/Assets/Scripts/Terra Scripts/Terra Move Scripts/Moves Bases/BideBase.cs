@@ -64,10 +64,10 @@ public class BideAction : TerraMoveAction
     {
         if (eventArgs.GetDirectAttackLog().GetDefenderPosition() != terraAttack.GetAttackerPosition())
             return;
-        if (eventArgs.GetDamage() == null)
+        if (eventArgs.GetDirectAttackLog().GetDamage() == null)
             return;
 
-        totalDamageRecieved += (int)eventArgs.GetDamage();
+        totalDamageRecieved += (int)eventArgs.GetDirectAttackLog().GetDamage();
     }
 
     private void UnleashDamage(object sender, TerraDamageByTerraEventArgs eventArgs)
@@ -75,7 +75,7 @@ public class BideAction : TerraMoveAction
         if (terraAttack != eventArgs.GetTerraAttack())
             return;
 
-        eventArgs.SetDamage((int)(totalDamageRecieved * DAMAGE_MULTIPLIER));
+        eventArgs.GetDirectAttackLog().SetDamage((int)(totalDamageRecieved * DAMAGE_MULTIPLIER));
 
         RemoveBattleActions(eventArgs.GetBattleSystem());
     }

@@ -23,7 +23,7 @@ public class FlashFreezeAction : TerraMoveAction
 
         bool hasFreezeProked = FREEZE_CHANCE >= Random.Range(0f, 1f);
         if (!defenderPosition.GetTerra().HasStatusEffect() && hasFreezeProked) {
-            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Freeze"), battleSystem);
+            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Freeze"), defenderPosition, battleSystem);
             BattleDialog.FreezeInflictedMsg(defenderPosition.GetTerra());
         }
     }

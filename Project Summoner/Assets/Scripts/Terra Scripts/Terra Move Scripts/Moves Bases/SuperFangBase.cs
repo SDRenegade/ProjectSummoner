@@ -40,6 +40,6 @@ public class SuperFangAction : TerraMoveAction
             return;
 
         Terra defendingTerra = eventArgs.GetDirectAttackLog().GetDefenderPosition().GetTerra();
-        eventArgs.SetDamage((int)(defendingTerra.GetCurrentHP() * PERCENT_HEALTH_DAMAGE));
+        eventArgs.GetDirectAttackLog().SetDamage((int)(defendingTerra.GetCurrentHP() * PERCENT_HEALTH_DAMAGE));
     }
 }

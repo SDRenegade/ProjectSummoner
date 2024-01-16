@@ -22,12 +22,7 @@ public class BiteAction : TerraMoveAction
         if (Random.Range(0f, 1f) > FLINCH_CHANCE)
             return;
 
-        TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
-        foreach (TerraAttack terraAttack in battleSystem.GetBattleActionManager().GetTerraAttackList()) {
-            if (terraAttack.GetAttackerPosition() == defenderPosition) {
-                terraAttack.SetFlinched(true);
-            }
-        }
+        directAttackLog.GetDefenderPosition().AddVolatileStatusEffect(SODatabase.GetInstance().GetVolatileStatusEffectByName("Flinched"), battleSystem);
     }
 
     public void AddBattleActions(BattleSystem battleSystem) {}

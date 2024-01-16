@@ -41,6 +41,6 @@ public class EarthquakeAction : TerraMoveAction
         if (eventArgs.GetDirectAttackLog().GetDefenderPosition().GetBattlePositionState() != BattlePositionState.DIGGING)
             return;
 
-        eventArgs.SetDamage((int)(eventArgs.GetDamage() * DAMAGE_MULTIPLIER));
+        eventArgs.GetDirectAttackLog().SetDamage((int)(eventArgs.GetDirectAttackLog().GetDamage() * DAMAGE_MULTIPLIER));
     }
 }

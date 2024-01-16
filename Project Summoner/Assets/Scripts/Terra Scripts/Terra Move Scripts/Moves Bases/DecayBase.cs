@@ -20,7 +20,7 @@ public class DecayAction : TerraMoveAction
         TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
 
         if (!defenderPosition.GetTerra().HasStatusEffect()) {
-            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Blight"), battleSystem);
+            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Blight"), defenderPosition, battleSystem);
             Debug.Log(BattleDialog.BlightInflictedMsg(defenderPosition.GetTerra()));
         }
     }

@@ -20,14 +20,7 @@ public class GrowlAction : TerraMoveAction
     public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
         TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
-
-        //*** Stat Change Event ***
-        StatChangeEventArgs statChangeEventArgs = battleSystem.InvokeOnStatChange(defenderPosition, Stats.ATK, ATK_MODIFICATION);
-
-        if(!statChangeEventArgs.IsCanceled()) {
-            defenderPosition.SetStatStage(Stats.ATK, StatStagesExtension.ChangeStatStage(defenderPosition.GetStatStage(Stats.ATK), statChangeEventArgs.GetModification()));
-            Debug.Log(BattleDialog.StatStageChangeMsg(defenderPosition.GetTerra(), Stats.ATK, defenderPosition.GetStatStage(Stats.ATK), statChangeEventArgs.GetModification()));
-        }
+        battleSystem.TerraStatChanage(defenderPosition, Stats.ATK, ATK_MODIFICATION);
     }
 
     public void AddBattleActions(BattleSystem battleSystem) {}

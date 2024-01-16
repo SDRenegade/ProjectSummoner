@@ -3,13 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StartTurnBattleState : BattleState
+public class StartOfTurnBattleState : BattleState
 {
-
     public void EnterState(BattleStateManager battleManager)
     {
-        //*** Entering Start Turn State Event ***
-        battleManager.GetBattleSystem().InvokeOnStartOfTurn();
+        BattleSystem battleSystem = battleManager.GetBattleSystem();
+
+        //*** Start of Turn Event ***
+        battleSystem.InvokeOnStartOfTurn();
+
+        battleSystem.UpdateTerraStatusBars();
 
         Debug.Log("============== Entered Start of Turn Battle State ==============");
         //TODO Set main camera to start moving along track

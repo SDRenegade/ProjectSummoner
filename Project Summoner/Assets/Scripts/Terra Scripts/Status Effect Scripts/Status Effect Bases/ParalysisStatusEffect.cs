@@ -7,21 +7,21 @@ public class ParalysisStatusEffect : StatusEffectBase
 {
     public ParalysisStatusEffect() {}
 
-    public override BattleAction CreateBattleAction(Terra terra)
+    public override BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition)
     {
-        return new ParalysisStatusEffectAction(terra);
+        return new ParalysisStatusEffectAction(terraBattlePosition);
     }
 }
 
 public class ParalysisStatusEffectAction : BattleAction
 {
-    private static readonly float PARALYSIS_CHANCE = 0.50f;
+    private static readonly float PARALYSIS_CHANCE = 0.5f;
 
-    private Terra terra;
+    private TerraBattlePosition terraBattlePosition;
 
-    public ParalysisStatusEffectAction(Terra terra)
+    public ParalysisStatusEffectAction(TerraBattlePosition terraBattlePosition)
     {
-        this.terra = terra;
+        this.terraBattlePosition = terraBattlePosition;
     }
 
     public void AddBattleActions(BattleSystem battleSystem)
@@ -36,14 +36,13 @@ public class ParalysisStatusEffectAction : BattleAction
 
     private void ParalysisActive(object sender, AttackDeclarationEventArgs eventArgs)
     {
-        if (eventArgs.GetTerraAttack().GetAttackerPosition().GetTerra() != terra)
+        if (eventArgs.GetTerraAttack().GetAttackerPosition() != terraBattlePosition)
             return;
 
         bool isParalyzed = PARALYSIS_CHANCE >= Random.Range(0f, 1f);
         if (isParalyzed) {
             eventArgs.GetTerraAttack().SetCanceled(true);
-            Debug.Log(BattleDialog.ParalysisProkedMsg(terra));
-            eventArgs.GetBattleSystem().UpdateTerraStatusBars();
+            Debug.Log(BattleDialog.ParalysisProkedMsg(terraBattlePosition.GetTerra()));
         }
     }
 }

@@ -7,9 +7,9 @@ public class BurnStatusEffect : StatusEffectBase
 {
     public BurnStatusEffect() {}
 
-    public override BattleAction CreateBattleAction(Terra terra)
+    public override BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition)
     {
-        return new BurnStatusEffectAction(terra);
+        return new BurnStatusEffectAction(terraBattlePosition);
     }
 }
 
@@ -18,11 +18,11 @@ class BurnStatusEffectAction : BattleAction
     private static readonly float PERCENT_MAX_HEALTH_BURN = 1/8f;
     private static readonly float DAMAGE_REDUCTION = 0.8f;
 
-    private Terra terra;
+    private TerraBattlePosition terraBattlePosition;
 
-    public BurnStatusEffectAction(Terra terra)
+    public BurnStatusEffectAction(TerraBattlePosition terraBattlePosition)
     {
-        this.terra = terra;
+        this.terraBattlePosition = terraBattlePosition;
     }
 
     public void AddBattleActions(BattleSystem battleSystem)
@@ -39,10 +39,9 @@ class BurnStatusEffectAction : BattleAction
 
     private void BurnActive(object sender, BattleEventArgs eventArgs)
     {
-        int burnDamage = (int)(terra.GetMaxHP() * PERCENT_MAX_HEALTH_BURN);
-        terra.TakeDamage(burnDamage);
-        Debug.Log(BattleDialog.BurnProkedMsg(terra, burnDamage));
-        eventArgs.GetBattleSystem().UpdateTerraStatusBars();
+        int burnDamage = (int)(terraBattlePosition.GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_BURN);
+        Debug.Log(BattleDialog.BurnProkedMsg(terraBattlePosition.GetTerra(), burnDamage));
+        eventArgs.GetBattleSystem().DamageTerra(terraBattlePosition, burnDamage);
     }
 
     private void AttackReductionActive(object sender, DirectAttackEventArgs eventArgs)

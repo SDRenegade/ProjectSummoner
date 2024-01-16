@@ -7,9 +7,9 @@ public class BlightStatusEffect : StatusEffectBase
 {
     public BlightStatusEffect() {}
 
-    public override BattleAction CreateBattleAction(Terra terra)
+    public override BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition)
     {
-        return new BlightStatusEffectAction(terra);
+        return new BlightStatusEffectAction(terraBattlePosition);
     }
 }
 
@@ -19,12 +19,12 @@ public class BlightStatusEffectAction : BattleAction
         1/12f, 1/8f, 1/6f, 1/4f, 1/3f
     };
 
-    private Terra terra;
+    private TerraBattlePosition terraBattlePosition;
     private int blightCounter;
 
-    public BlightStatusEffectAction(Terra terra)
+    public BlightStatusEffectAction(TerraBattlePosition terraBattlePosition)
     {
-        this.terra = terra;
+        this.terraBattlePosition = terraBattlePosition;
         blightCounter = 0;
     }
 
@@ -40,7 +40,7 @@ public class BlightStatusEffectAction : BattleAction
         battleSystem.OnEndOfTurn -= BlightActive;
     }
 
-    private void BlightActive(object sender, BattleEventArgs battlesArgs)
+    private void BlightActive(object sender, BattleEventArgs eventArgs)
     {
         //Check that blightCounter is within a valid range
         if (blightCounter > BLIGHT_DAMAGE_LIST.Length)
@@ -51,9 +51,8 @@ public class BlightStatusEffectAction : BattleAction
         if (blightCounter < BLIGHT_DAMAGE_LIST.Length)
             blightCounter++;
 
-        int blightDamage = (int)(terra.GetMaxHP() * BLIGHT_DAMAGE_LIST[blightCounter - 1]);
-        terra.TakeDamage(blightDamage);
-        Debug.Log(BattleDialog.BlightProkedMsg(terra, blightDamage));
-        battlesArgs.GetBattleSystem().UpdateTerraStatusBars();
+        int blightDamage = (int)(terraBattlePosition.GetTerra().GetMaxHP() * BLIGHT_DAMAGE_LIST[blightCounter - 1]);
+        Debug.Log(BattleDialog.BlightProkedMsg(terraBattlePosition.GetTerra(), blightDamage));
+        eventArgs.GetBattleSystem().DamageTerra(terraBattlePosition, blightDamage);
     }
 }

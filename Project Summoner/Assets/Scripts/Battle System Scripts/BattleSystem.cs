@@ -26,6 +26,7 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<TerraDamageByTerraEventArgs> OnTerraDamageByTerra;
     public event EventHandler<TerraDamagedEventArgs> OnTerraDamaged;
     public event EventHandler<StatChangeEventArgs> OnStatChange;
+    public event EventHandler<TerraFaintEventArgs> OnTerraFaint;
     public event EventHandler<BattleEventArgs> OnEndOfTurn;
 
     [SerializeField] private BattleHUD battleHUD;
@@ -39,7 +40,7 @@ public class BattleSystem : MonoBehaviour
     //Player & opposing summoner prefabs
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private GameObject opponentPrefab;
-
+    
     //Player & opposing summoner gameobject's
     private GameObject playerBattleObject;
     //private GameObject opponentBattleObject
@@ -47,6 +48,7 @@ public class BattleSystem : MonoBehaviour
     private TerraBattleObject playerLeadingTerra;
     private TerraBattleObject wildTerra;
 
+    private bool isMatchFinished;
     private BattleType battleType;
     private BattleAI primarySideAI; // Might move BattleAI to the BattleSide classes
     private BattleAI secondarySideAI;
@@ -54,21 +56,23 @@ public class BattleSystem : MonoBehaviour
     private BattleStateManager battleStateManager;
     private BattleActionManager battleActionManager;
 
+
     public void Start()
     {
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
+        isMatchFinished = false;
         battleType = BattleLoader.GetInstance().GetBattleType();
 
         SetupBattleScene();
 
         battlefield = new Battlefield(playerBattleObject.GetComponent<TerraParty>(), wildTerra.GetTerra());
         //Initialize the existing status conditions on the terra in the event system
-        Terra playerLeadingTerra = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0].GetTerra();
-        Terra opponentLeadingTerra = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0].GetTerra();
-        playerLeadingTerra.GetStatusEffectWrapper()?.AddStatusEffectBattleAction(playerLeadingTerra, this);
-        opponentLeadingTerra.GetStatusEffectWrapper()?.AddStatusEffectBattleAction(opponentLeadingTerra, this);
+        TerraBattlePosition primarySideTerraBattlePosition = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0];
+        TerraBattlePosition secondarySideTerraBattlePosition = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0];
+        primarySideTerraBattlePosition.GetTerra().GetStatusEffectWrapper()?.AddStatusEffectBattleAction(primarySideTerraBattlePosition, this);
+        secondarySideTerraBattlePosition.GetTerra().GetStatusEffectWrapper()?.AddStatusEffectBattleAction(secondarySideTerraBattlePosition, this);
 
         UpdateTerraStatusBars();
 
@@ -191,6 +195,19 @@ public class BattleSystem : MonoBehaviour
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 
+    public void AttemptEscapeAction()
+    {
+        if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
+            return;
+        if(battleType != BattleType.WILD) {
+            Debug.Log(BattleDialog.ATTEMPT_ESCAPE_SUMMONER_BATTLE);
+            return;
+        }
+
+        //Escape Logic
+        battleStateManager.SwitchState(battleStateManager.GetCombatState());
+    }
+
     public void UseSelectedItemAction(int itemIndex)
     {
         if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
@@ -211,17 +228,36 @@ public class BattleSystem : MonoBehaviour
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 
-    public void AttemptEscapeAction()
+    public int? DamageTerra(TerraBattlePosition terraBattlePosition, int? damage)
     {
-        if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
-            return;
-        if(battleType != BattleType.WILD) {
-            Debug.Log(BattleDialog.ATTEMPT_ESCAPE_SUMMONER_BATTLE);
-            return;
+        //*** Terra Damaged Event ***
+        TerraDamagedEventArgs terraDamagedEventArgs = InvokeOnTerraDamaged(terraBattlePosition, damage);
+
+        if (terraDamagedEventArgs.GetDamage() != null) {
+            Debug.Log(BattleDialog.DamageDealtMsg(terraBattlePosition.GetTerra(), (int)damage));
+            terraBattlePosition.GetTerra().TakeDamage((int)terraDamagedEventArgs.GetDamage());
+
+            if (terraBattlePosition.GetTerra().GetCurrentHP() <= 0) {
+                Debug.Log(BattleDialog.TerraFaintedMsg(terraBattlePosition.GetTerra()));
+                //*** Terra Faint Event ***
+                InvokeOnTerraFaint(terraBattlePosition);
+                //--- (Temp) Match ends once a single terra faints, until parties are added ---
+                isMatchFinished = true;
+            }
         }
 
-        //Escape Logic
-        battleStateManager.SwitchState(battleStateManager.GetCombatState());
+        return terraDamagedEventArgs.GetDamage();
+    }
+
+    public void TerraStatChanage(TerraBattlePosition terraBattlePosition, Stats stat, int modification)
+    {
+        //*** Stat Change Event ***
+        StatChangeEventArgs statChangeEventArgs = InvokeOnStatChange(terraBattlePosition, stat, modification);
+
+        if (!statChangeEventArgs.IsCanceled()) {
+            terraBattlePosition.SetStatStage(stat, StatStagesExtension.ChangeStatStage(terraBattlePosition.GetStatStage(stat), statChangeEventArgs.GetModification()));
+            Debug.Log(BattleDialog.StatStageChangeMsg(terraBattlePosition.GetTerra(), stat, terraBattlePosition.GetStatStage(stat), statChangeEventArgs.GetModification()));
+        }
     }
 
     public void EndBattle()
@@ -317,9 +353,9 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
-    public TerraDamageByTerraEventArgs InvokeOnTerraDamageByTerra(TerraAttack terraAttack, DirectAttackLog terraAttackLog, int? damage)
+    public TerraDamageByTerraEventArgs InvokeOnTerraDamageByTerra(TerraAttack terraAttack, DirectAttackLog terraAttackLog)
     {
-        TerraDamageByTerraEventArgs eventArgs = new TerraDamageByTerraEventArgs(terraAttack, terraAttackLog, damage, this);
+        TerraDamageByTerraEventArgs eventArgs = new TerraDamageByTerraEventArgs(terraAttack, terraAttackLog, this);
         OnTerraDamageByTerra?.Invoke(this, eventArgs);
 
         return eventArgs;
@@ -341,6 +377,14 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
+    public TerraFaintEventArgs InvokeOnTerraFaint(TerraBattlePosition terraBattlePosition)
+    {
+        TerraFaintEventArgs eventArgs = new TerraFaintEventArgs(terraBattlePosition, this);
+        OnTerraFaint?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
     public BattleEventArgs InvokeOnEndOfTurn()
     {
         BattleEventArgs eventArgs = new BattleEventArgs(this);
@@ -348,6 +392,10 @@ public class BattleSystem : MonoBehaviour
 
         return eventArgs;
     }
+
+    public bool IsMatchFinished() { return isMatchFinished; }
+
+    public void SetMatchFinished(bool isMatchFinished) { this.isMatchFinished = isMatchFinished; }
 
     public BattleHUD GetBattleHUD() { return battleHUD; }
 

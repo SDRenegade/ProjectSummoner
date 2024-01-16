@@ -13,6 +13,8 @@ public class HighJumpKickBase : TerraMoveBase
 
 public class HighJumpKickAction : TerraMoveAction
 {
+    private static readonly float DAMAGE_MULTIPLIER = 2f;
+
     private TerraAttack terraAttack;
 
     public HighJumpKickAction(TerraAttack terraAttack)
@@ -36,16 +38,25 @@ public class HighJumpKickAction : TerraMoveAction
     {
         if (terraAttack.GetMove() != eventArgs.GetDirectAttackLog().GetDirectAttackParams().GetMove())
             return;
-        if (eventArgs.GetDirectAttackLog().GetDamage() == null)
-            return;
 
-        Terra terra = eventArgs.GetDirectAttackLog().GetAttackerPosition().GetTerra();
-        if (!eventArgs.GetDirectAttackLog().IsSuccessfulHit()) {
-            int recoilDamage = (int)eventArgs.GetDirectAttackLog().GetDamage() * 2;
-            terra.TakeDamage(recoilDamage);
-            Debug.Log(BattleDialog.HighJumpKickMissedMsg(terra, recoilDamage));
-        }
+        DirectAttackLog directAttackLog = eventArgs.GetDirectAttackLog();
+        directAttackLog.SetCrit(CombatCalculator.CriticalHitCheck(directAttackLog.GetDirectAttackParams()));
+        directAttackLog.SetDamage(CombatCalculator.CalculateDamage(directAttackLog.GetDirectAttackParams(), directAttackLog.IsCrit()));
 
-        eventArgs.GetBattleSystem().OnAttackMissed -= MissedAttackRecoil;
+        //*** Terra Damage by Terra Event ***
+        eventArgs.GetBattleSystem().InvokeOnTerraDamageByTerra(terraAttack, directAttackLog);
+
+        if(directAttackLog.GetDamage() != null)
+            directAttackLog.SetDamage((int)(directAttackLog.GetDamage() * DAMAGE_MULTIPLIER));
+
+        TerraBattlePosition attackerPosition = terraAttack.GetAttackerPosition();
+        eventArgs.GetBattleSystem().DamageTerra(attackerPosition, directAttackLog.GetDamage());
+
+        if (directAttackLog.IsCrit())
+            Debug.Log(BattleDialog.CRITICAL_HIT);
+        if (directAttackLog.GetDamage() != null)
+            Debug.Log(BattleDialog.HighJumpKickMissedMsg(attackerPosition.GetTerra(), (int)directAttackLog.GetDamage()));
+
+        RemoveBattleActions(eventArgs.GetBattleSystem());
     }
 }

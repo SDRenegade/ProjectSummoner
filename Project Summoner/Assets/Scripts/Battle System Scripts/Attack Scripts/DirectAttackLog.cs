@@ -45,12 +45,4 @@ public class DirectAttackLog
     public int? GetDamage() {  return damage; }
 
     public void SetDamage(int? damage) { this.damage = damage; }
-
-    public void AddDamage(int? damage)
-    {
-        if (damage == null)
-            return;
-
-        this.damage = (this.damage == null) ? damage : this.damage + damage;
-    }
 }

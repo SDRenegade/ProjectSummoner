@@ -44,12 +44,12 @@ public class CounterAction : TerraMoveAction
     {
         if (eventArgs.GetDirectAttackLog().GetDefenderPosition() != terraAttack.GetAttackerPosition())
             return;
-        if (eventArgs.GetDamage() == null)
+        if (eventArgs.GetDirectAttackLog().GetDamage() == null)
             return;
         if (eventArgs.GetTerraAttack().GetMove().GetMoveBase().GetDamageType() != DamageType.PHYSICAL)
             return;
 
-        physicalDamageRecieved += (int)eventArgs.GetDamage();
+        physicalDamageRecieved += (int)eventArgs.GetDirectAttackLog().GetDamage();
     }
 
     public void UnleashDamage(object sender, TerraDamageByTerraEventArgs eventArgs)
@@ -58,9 +58,9 @@ public class CounterAction : TerraMoveAction
             return;
 
         if(physicalDamageRecieved <= 0)
-            eventArgs.SetDamage(null);
+            eventArgs.GetDirectAttackLog().SetDamage(null);
         else
-            eventArgs.SetDamage((int)(physicalDamageRecieved * DAMAGE_MULTIPLIER));
+            eventArgs.GetDirectAttackLog().SetDamage((int)(physicalDamageRecieved * DAMAGE_MULTIPLIER));
 
         RemoveBattleActions(eventArgs.GetBattleSystem());
     }
