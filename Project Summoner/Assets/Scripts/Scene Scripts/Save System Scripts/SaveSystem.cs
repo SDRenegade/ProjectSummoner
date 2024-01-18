@@ -34,15 +34,13 @@ public class SaveSystem : MonoBehaviour
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
-        SceneManager.sceneUnloaded += OnSceneUnloaded;
     }
 
-    //Subscribes to the OnSceneLoaded and OnSceneUnloaded delegates when the game object this script is
+    //Unsubscribes from the OnSceneLoaded and OnSceneUnloaded delegates when the game object this script is
     //attached to is disabled
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
-        SceneManager.sceneUnloaded -= OnSceneUnloaded;
     }
 
     //Saves the game data when the game is closed
@@ -56,12 +54,6 @@ public class SaveSystem : MonoBehaviour
     {
         persistentDataObjects = FindAllSaveDataObjects();
         LoadGame();
-    }
-
-    //Saves the scene data when a scene is unloaded
-    public void OnSceneUnloaded(Scene scene)
-    {
-        SaveGame();
     }
 
     public void NewGame()

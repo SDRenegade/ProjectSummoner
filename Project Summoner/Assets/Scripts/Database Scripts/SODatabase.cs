@@ -9,6 +9,9 @@ public class SODatabase : MonoBehaviour
     private static SODatabase instance;
     [SerializeField] private TerraDatabase terraDatabase;
     [SerializeField] private TerraMoveDatabase terraMoveDatabase;
+    [SerializeField] private StatusEffectDatabase statusEffectDatabase;
+    [SerializeField] private VolatileStatusEffectDatabase volatileStatusEffectDatabase;
+    [SerializeField] private MetronomeMovesDatabase metronomeMovesDatabase;
 
     private void Awake()
     {
@@ -43,23 +46,73 @@ public class SODatabase : MonoBehaviour
 
     public TerraMoveBase GetTerraMoveByID(int id)
     {
-        if (id >= terraMoveDatabase.GetTerraMoves().Count)
+        if (id >= terraMoveDatabase.GetTerraMoveList().Count)
             return null;
 
-        return terraMoveDatabase.GetTerraMoves()[id];
+        return terraMoveDatabase.GetTerraMoveList()[id];
     }
 
-    public TerraMoveBase GetTerraMoveByName(string moveName)
+    public TerraMoveBase GetTerraMoveByName(string name)
     {
         TerraMoveBase terraMove = null;
-        foreach (TerraMoveBase terraMoveBase in terraMoveDatabase.GetTerraMoves()) {
-            if (terraMoveBase.GetMoveName() == moveName) {
+        foreach (TerraMoveBase terraMoveBase in terraMoveDatabase.GetTerraMoveList()) {
+            if (terraMoveBase.GetMoveName() == name) {
                 terraMove = terraMoveBase;
                 break;
             }
         }
 
         return terraMove;
+    }
+
+    public StatusEffectBase GetStatusEffectByID(int id)
+    {
+        if (id >= statusEffectDatabase.GetStatusEffectList().Count)
+            return null;
+
+        return statusEffectDatabase.GetStatusEffectList()[id];
+    }
+
+    public StatusEffectBase GetStatusEffectByName(string name)
+    {
+        StatusEffectBase effect = null;
+        foreach (StatusEffectBase statusEffect in statusEffectDatabase.GetStatusEffectList()) {
+            if (statusEffect.GetStatusName() == name) {
+                effect = statusEffect;
+                break;
+            }
+        }
+
+        return effect;
+    }
+
+    public VolatileStatusEffectBase GetVolatileStatusEffectByID(int id)
+    {
+        if (id >= statusEffectDatabase.GetStatusEffectList().Count)
+            return null;
+
+        return volatileStatusEffectDatabase.GetVolatileStatusEffectList()[id];
+    }
+
+    public VolatileStatusEffectBase GetVolatileStatusEffectByName(string name)
+    {
+        VolatileStatusEffectBase effect = null;
+        foreach (VolatileStatusEffectBase vStatusEffect in volatileStatusEffectDatabase.GetVolatileStatusEffectList()) {
+            if (vStatusEffect.GetStatusName() == name) {
+                effect = vStatusEffect;
+                break;
+            }
+        }
+
+        return effect;
+    }
+
+    public TerraMoveBase GetRandomMetronomeMove()
+    {
+        if (metronomeMovesDatabase.GetMetronomeMoveList().Count == 0)
+            return null;
+
+        return metronomeMovesDatabase.GetMetronomeMoveList()[Random.Range(0, metronomeMovesDatabase.GetMetronomeMoveList().Count - 1)];
     }
 
     public static SODatabase GetInstance() { return instance; }
