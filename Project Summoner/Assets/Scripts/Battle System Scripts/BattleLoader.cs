@@ -7,29 +7,29 @@ using UnityEngine.SceneManagement;
 public class BattleLoader : MonoBehaviour
 {
     private static BattleLoader instance;
-    private List<Terra> playerTerraList;
+    private GameObject player;
     private Terra wildTerra;
     private BattleType battleType;
 
     private void Awake()
     {
-        if(instance != null) {
-            Destroy(gameObject);
-            return;
+        if (instance == null) {
+            instance = this;
+            DontDestroyOnLoad(this.gameObject);
         }
-
-        instance = this;
-        DontDestroyOnLoad(gameObject);
+        else if(instance != this)
+            Destroy(this.gameObject);
     }
 
-    public void LoadWildBattle(List<Terra> playerTerraList, Terra wildTerra)
+    public void LoadWildBattle(GameObject player, Terra wildTerra)
     {
-        this.playerTerraList = playerTerraList;
+        this.player = player;
         this.wildTerra = wildTerra;
         battleType = BattleType.WILD;
 
-        //Save the player/scene data before loading into the battle scene
-        SaveSystem.GetInstance().SaveGame();
+        //StoreMainSceneData();
+
+        DontDestroyOnLoad(player);
 
         SceneLoader.Load(SceneEnum.BattleScene);
     }
@@ -38,13 +38,13 @@ public class BattleLoader : MonoBehaviour
 
     public void Clear()
     {
-        playerTerraList = null;
+        player = null;
         wildTerra = null;
     }
 
     public static BattleLoader GetInstance() { return instance; }
 
-    public List<Terra> GetPlayerTerraList() { return playerTerraList; }
+    public GameObject GetPlayer() { return player; }
 
     public Terra GetWildTerra() { return wildTerra; }
 

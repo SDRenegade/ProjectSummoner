@@ -5,14 +5,14 @@ using UnityEngine;
 [System.Serializable]
 public class Terra
 {
-    public static readonly int MOVE_SLOTS = 4;
-    private static readonly float BASE_STAT_MULTIPLIER = 0.033f;
+    public const int MOVE_SLOTS = 4;
+    private const float BASE_STAT_MULTIPLIER = 0.033f;
 
     [SerializeField] private TerraBase terraBase;
     [SerializeField] private string terraNickname;
     [SerializeField] [Range(1, 100)] private int level;
     [SerializeField] private List<TerraMove> moves;
-    [SerializeField] private StatusEffectWrapper statusEffectWrapper;
+    [SerializeField] private StatusEffect statusEffect;
     [SerializeField] [Min(0)] private int currentHP;
 
     public Terra(TerraBase terraBase)
@@ -22,7 +22,7 @@ public class Terra
         level = 1;
         moves = new List<TerraMove>();
         GenerateNaturalMoveSet();
-        statusEffectWrapper = new StatusEffectWrapper(null);
+        statusEffect = null;
         currentHP = GetMaxHP();
     }
 
@@ -33,7 +33,7 @@ public class Terra
         this.level = level;
         moves = new List<TerraMove>();
         GenerateNaturalMoveSet();
-        statusEffectWrapper = new StatusEffectWrapper(null);
+        statusEffect = null;
         currentHP = GetMaxHP();
     }
 
@@ -45,8 +45,7 @@ public class Terra
         moves = new List<TerraMove>();
         for(int i = 0; i < terraSavable.GetSavableMoves().Count; i++)
             moves.Add(new TerraMove(terraSavable.GetSavableMoves()[i]));
-        StatusEffectBase savedStatusEffect = SODatabase.GetInstance().GetStatusEffectByName(terraSavable.GetStatusEffectBaseName());
-        statusEffectWrapper = (savedStatusEffect != null) ? new StatusEffectWrapper(savedStatusEffect) : new StatusEffectWrapper(null);
+        statusEffect = terraSavable.GetStatusEffect();
         currentHP = terraSavable.GetCurrentHP();
     }
 
@@ -86,12 +85,11 @@ public class Terra
 
     public void TakeDamage(int damage)
     {
-        int hp;
-        hp = (currentHP - damage >= 0) ? currentHP - damage : 0;
-        if (hp > GetMaxHP())
-            hp = GetMaxHP();
-
-        currentHP = hp;
+        currentHP -= damage;
+        if (currentHP < 0)
+            currentHP = 0;
+        if (currentHP > GetMaxHP())
+            currentHP = GetMaxHP();
     }
 
     public override string ToString()
@@ -125,29 +123,14 @@ public class Terra
 
     public void SetCurrentHP(int currentHP)
     {
-        int hp;
-        hp = (currentHP >= 0) ? currentHP : 0;
+        this.currentHP = (currentHP >= 0) ? currentHP : 0;
         if (currentHP > GetMaxHP())
-            hp = GetMaxHP();
-
-        this.currentHP = hp;
+            this.currentHP = GetMaxHP();
     }
 
-    public StatusEffectWrapper GetStatusEffectWrapper() { return statusEffectWrapper; }
+    public StatusEffect GetStatusEffect() { return statusEffect; }
 
-    //Sets the status effect WITHOUT adding battle actions. Used for applying status effects out of battle.
-    public void SetStatusEffect(StatusEffectBase statusEffectBase)
-    {
-        statusEffectWrapper.SetStatusEffectBase(statusEffectBase);
-    }
-
-    //Sets the status effect and adds battle actions. Used during a battle.
-    public void SetStatusEffect(StatusEffectBase statusEffectBase, TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
-    {
-        statusEffectWrapper.SetStatusEffectBase(statusEffectBase, terraBattlePosition, battleSystem);
-    }
-
-    public bool HasStatusEffect() { return statusEffectWrapper.GetStatusEffectBase() != null; }
+    public void SetStatusEffect(StatusEffect statusEffect) { this.statusEffect = statusEffect; }
 
     public int GetMaxHP() { return Mathf.FloorToInt(level * terraBase.GetBaseHP() * BASE_STAT_MULTIPLIER + 10); }
 

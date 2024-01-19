@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "TerraDatabase", menuName = "Database/Terra Database")]
+[CreateAssetMenu(fileName = "Terra Database", menuName = "Database/Terra Database")]
 public class TerraDatabase : ScriptableObject
 {
-    [SerializeField] private List<TerraBase> terraBaseList;
+    [SerializeField] private List<TerraBase> terraBases;
 
-    public List<TerraBase> GetTerraBases() { return terraBaseList; }
+    public List<TerraBase> GetTerraBases() { return terraBases; }
 }

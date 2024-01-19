@@ -134,86 +134,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64024f9d891b54447bfba80082a2dfce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-<<<<<<< HEAD
-=======
-  characterController: {fileID: 12498}
-  cameraTransform: {fileID: 963194228}
-  turnSmoothTime: 0.06
-  walkSpeed: 8
-  runSpeed: 15
-  jumpVelocity: 16
-  gravity: -30
-  airborneSpeed: 8
-  airborneDeceleration: 12
-  isMovementEnabled: 1
---- !u!143 &12498
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 12496}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Height: 1.8
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!4 &12499
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 12496}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.38, y: 1.141, z: -34.7}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1229898326}
-  - {fileID: 1354372030}
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &12500
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 12496}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a00d2b55c5e49174782db77fd941ba39, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  terraList:
-  - terraBase: {fileID: 11400000, guid: 2f168a1530418724e8e4fd080557a192, type: 2}
-    terraNickname: 
-    level: 10
-    moves:
-    - moveBase: {fileID: 11400000, guid: f1545a69710d63e4196e278a50f65919, type: 2}
-      maxPP: 25
-      currentPP: 25
-    - moveBase: {fileID: 11400000, guid: 757428f5e0f077547a0b7a01a3c85a81, type: 2}
-      maxPP: 20
-      currentPP: 20
-    - moveBase: {fileID: 11400000, guid: 1957f409079d5d949ac0c8757d2e0418, type: 2}
-      maxPP: 20
-      currentPP: 20
-    - moveBase: {fileID: 11400000, guid: 625642123288b564ea27374ef0a2e221, type: 2}
-      maxPP: 20
-      currentPP: 20
-    statusEffectWrapper:
-      statusEffectBase: {fileID: 0}
-    currentHP: 24
->>>>>>> f33984921e3c11078751f7a4d86778271f01c530
 --- !u!1 &16921876
 GameObject:
   m_ObjectHideFlags: 0
@@ -541,13 +461,17 @@ MonoBehaviour:
   terra:
     terraBase: {fileID: 11400000, guid: 4423df2580197fe468e0df8e1d363e6d, type: 2}
     terraNickname: 
-    level: 20
+    level: 8
     moves:
-    - moveBase: {fileID: 11400000, guid: bbab58efed0be3d4493ef2893699d3fd, type: 2}
+    - terraMoveBase: {fileID: 11400000, guid: 5222ac2f0cf2d8a4a88aeb639082873b, type: 2}
       maxPP: 30
       currentPP: 30
-    statusEffectWrapper:
-      statusEffectBase: {fileID: 0}
+    - terraMoveBase: {fileID: 11400000, guid: 0bf5ec361dd45f94f939592e95a545e6, type: 2}
+      maxPP: 20
+      currentPP: 20
+    - terraMoveBase: {fileID: 11400000, guid: 63c8329594303df41b696d34dffb0e59, type: 2}
+      maxPP: 10
+      currentPP: 10
     currentHP: 20
 --- !u!1 &323260075
 GameObject:
@@ -1273,20 +1197,18 @@ MonoBehaviour:
     terraNickname: 
     level: 10
     moves:
-    - moveBase: {fileID: 0}
+    - terraMoveBase: {fileID: 11400000, guid: bd1aecb2193b359438b9e423cfd674c1, type: 2}
       maxPP: 20
       currentPP: 20
-    - moveBase: {fileID: 0}
+    - terraMoveBase: {fileID: 11400000, guid: bbab58efed0be3d4493ef2893699d3fd, type: 2}
       maxPP: 20
       currentPP: 20
-    - moveBase: {fileID: 0}
+    - terraMoveBase: {fileID: 11400000, guid: 7ed8d7368d09e0d468b3265e11f7fb48, type: 2}
       maxPP: 15
       currentPP: 15
-    - moveBase: {fileID: 0}
+    - terraMoveBase: {fileID: 0}
       maxPP: 0
       currentPP: 0
-    statusEffectWrapper:
-      statusEffectBase: {fileID: 0}
     currentHP: 20
 --- !u!135 &624831009
 SphereCollider:
@@ -1780,20 +1702,18 @@ MonoBehaviour:
     terraNickname: 
     level: 10
     moves:
-    - moveBase: {fileID: 0}
+    - terraMoveBase: {fileID: 11400000, guid: 5222ac2f0cf2d8a4a88aeb639082873b, type: 2}
       maxPP: 20
       currentPP: 20
-    - moveBase: {fileID: 0}
+    - terraMoveBase: {fileID: 11400000, guid: bbab58efed0be3d4493ef2893699d3fd, type: 2}
       maxPP: 30
       currentPP: 30
-    - moveBase: {fileID: 0}
+    - terraMoveBase: {fileID: 11400000, guid: 0a6c1492c35a3b84e913e4a8a54d9397, type: 2}
       maxPP: 15
       currentPP: 15
-    - moveBase: {fileID: 0}
+    - terraMoveBase: {fileID: 0}
       maxPP: 0
       currentPP: 0
-    statusEffectWrapper:
-      statusEffectBase: {fileID: 0}
     currentHP: 20
 --- !u!135 &788169155
 SphereCollider:
@@ -2244,9 +2164,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   terraDatabase: {fileID: 11400000, guid: 76e43666dcf6f244986ba497bd989545, type: 2}
   terraMoveDatabase: {fileID: 11400000, guid: ded2c76fbd0f6204696684742a5424ff, type: 2}
-  statusEffectDatabase: {fileID: 11400000, guid: f6a75da7ab9b85743ad2fa9c43c87113, type: 2}
-  volatileStatusEffectDatabase: {fileID: 11400000, guid: 5da54d3cf7b794a4da4862f1b4e33c38, type: 2}
-  metronomeMovesDatabase: {fileID: 11400000, guid: 1aed8a852b1bccb4c92ad6eb4a785de0, type: 2}
 --- !u!4 &1143186513
 Transform:
   m_ObjectHideFlags: 0
@@ -2659,7 +2576,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 10.72
+      value: 12.8
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3027,17 +2944,15 @@ MonoBehaviour:
     terraNickname: 
     level: 10
     moves:
-    - moveBase: {fileID: 0}
+    - terraMoveBase: {fileID: 11400000, guid: 5222ac2f0cf2d8a4a88aeb639082873b, type: 2}
       maxPP: 15
       currentPP: 15
-    - moveBase: {fileID: 0}
+    - terraMoveBase: {fileID: 11400000, guid: bbab58efed0be3d4493ef2893699d3fd, type: 2}
       maxPP: 20
       currentPP: 20
-    - moveBase: {fileID: 0}
+    - terraMoveBase: {fileID: 11400000, guid: 757428f5e0f077547a0b7a01a3c85a81, type: 2}
       maxPP: 15
       currentPP: 15
-    statusEffectWrapper:
-      statusEffectBase: {fileID: 0}
     currentHP: 20
 --- !u!135 &1672181197
 SphereCollider:

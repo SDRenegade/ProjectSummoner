@@ -889,8 +889,8 @@ RectTransform:
   - {fileID: 1968184561}
   - {fileID: 757449686}
   - {fileID: 2074837913}
-  m_Father: {fileID: 2078269422}
-  m_RootOrder: 0
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1272,8 +1272,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2078269421}
-        m_TargetAssemblyTypeName: BattleHUD, Assembly-CSharp
+      - m_Target: {fileID: 2145235993}
+        m_TargetAssemblyTypeName: BattleSystem, Assembly-CSharp
         m_MethodName: OpenMenuSelectionUI
         m_Mode: 1
         m_Arguments:
@@ -1805,6 +1805,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   progressImage: {fileID: 1635909028}
   backgroundImage: {fileID: 1285480192}
+  progressColor: {r: 1, g: 1, b: 1, a: 0}
+  backgroundColor: {r: 0.8207547, g: 0.8207547, b: 0.8207547, a: 0}
   progress: 0.164
 --- !u!1 &649768430
 GameObject:
@@ -5820,6 +5822,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   progressImage: {fileID: 678012237}
   backgroundImage: {fileID: 912359453}
+  progressColor: {r: 1, g: 1, b: 1, a: 0}
+  backgroundColor: {r: 0.81960785, g: 0.81960785, b: 0.81960785, a: 0}
   progress: 0.71
 --- !u!1 &2074837912
 GameObject:
@@ -5883,55 +5887,6 @@ MonoBehaviour:
   terraLevelTMP: {fileID: 1884194379}
   terraCurrentHealthTMP: {fileID: 1413447067}
   terraMaxHealthTMP: {fileID: 1927942350}
---- !u!1 &2078269420
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2078269422}
-  - component: {fileID: 2078269421}
-  m_Layer: 0
-  m_Name: BattleHUD
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2078269421
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2078269420}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01be67907353f744fa8f740cd75ecf05, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerTerraStatusBar: {fileID: 757449687}
-  opponentTerraStatusBar: {fileID: 2074837914}
-  menuSelectionObject: {fileID: 981711205}
-  moveSelectionObject: {fileID: 1968184560}
---- !u!4 &2078269422
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2078269420}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 146436535}
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2079892719
 GameObject:
   m_ObjectHideFlags: 0
@@ -6180,7 +6135,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e76a1570b16d1e459791496665c651e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  battleHUD: {fileID: 2078269421}
+  playerTerraStatusBar: {fileID: 757449687}
+  opponentTerraStatusBar: {fileID: 2074837914}
+  menuSelectionUIGO: {fileID: 981711205}
+  moveSelectionUIGO: {fileID: 1968184560}
   playerTransform: {fileID: 726405379}
   opponentTransform: {fileID: 1184613638}
   playerTerraTransform: {fileID: 1522903333}

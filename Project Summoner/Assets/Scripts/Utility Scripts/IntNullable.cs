@@ -12,7 +12,7 @@ public class IntNullable
 
     public void SetValue(int value) { this.value = value; }
 
-    public bool IsNull() { return isNull; }
+    public bool GetIsNull() { return isNull; }
     
-    public void SetNull(bool isNull) { this.isNull = isNull; }
+    public void SetIsNull(bool isNull) { this.isNull = isNull; }
 }
