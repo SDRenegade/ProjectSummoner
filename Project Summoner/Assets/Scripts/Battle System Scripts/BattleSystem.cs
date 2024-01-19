@@ -79,11 +79,18 @@ public class BattleSystem : MonoBehaviour
         primarySideAI = null;
         secondarySideAI = new WildTerraAI();
 
-        //-- (Temp) Giving leading terra leftovers ---
-        primarySideTerraBattlePosition.GetTerra().SetHeldItem(Instantiate(SODatabase.GetInstance().GetItemByName("Leftovers")));
-        primarySideTerraBattlePosition.GetTerra().GetHeldItem().AddBattleActions(primarySideTerraBattlePosition, this);
-        secondarySideTerraBattlePosition.GetTerra().SetHeldItem(Instantiate(SODatabase.GetInstance().GetItemByName("Leftovers")));
-        secondarySideTerraBattlePosition.GetTerra().GetHeldItem().AddBattleActions(secondarySideTerraBattlePosition, this);
+        //--- (Temp) Hard-coding the leading terra held item until new system is added ---
+        primarySideTerraBattlePosition.GetTerra().SetHeldItem(Instantiate(SODatabase.GetInstance().GetItemByName("Black Sludge")));
+        secondarySideTerraBattlePosition.GetTerra().SetHeldItem(Instantiate(SODatabase.GetInstance().GetItemByName("Black Sludge")));
+
+        primarySideTerraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(primarySideTerraBattlePosition, this);
+        secondarySideTerraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(secondarySideTerraBattlePosition, this);
+
+        //Logging the item that each leading terra is holding
+        if (primarySideTerraBattlePosition.GetTerra().GetHeldItem() != null)
+            Debug.Log("Primary Leading Terra Item: " + primarySideTerraBattlePosition.GetTerra().GetHeldItem().GetItemName());
+        if (secondarySideTerraBattlePosition.GetTerra().GetHeldItem() != null)
+            Debug.Log("Secondary Leading Terra Item: " + secondarySideTerraBattlePosition.GetTerra().GetHeldItem().GetItemName());
 
         //--- (Temp) Change second argument once more battle positions are added ---
         battleActionManager = new BattleActionManager(this, 2);

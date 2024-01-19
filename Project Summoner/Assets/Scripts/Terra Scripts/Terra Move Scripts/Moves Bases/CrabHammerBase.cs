@@ -39,6 +39,6 @@ public class CrabHammerAction : TerraMoveAction
         if (terraAttack.GetMove() != eventArgs.GetDirectAttackParams().GetMove())
             return;
 
-        eventArgs.GetDirectAttackParams().SetCritModifier(eventArgs.GetDirectAttackParams().GetCritModifier() * CRIT_MODIFIER);
+        eventArgs.GetDirectAttackParams().AddCritModifier(CRIT_MODIFIER);
     }
 }

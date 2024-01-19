@@ -169,8 +169,8 @@ public static class BattleDialog
     }
 
     // ================== Item Messages ==================
-    public static string LeftoversMsg(Terra terra, int healAmt) {
-        return "Leftovers has healed " + terra + " by " + healAmt;
+    public static string ItemProked(ItemBase item) {
+        return item.GetItemName() + " has proked";
     }
 
     // ================== UI Selection Messages ==================

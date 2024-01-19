@@ -43,6 +43,8 @@ public class DirectAttackParams
 
     public void SetAccuracyModifier(float accuracyModifier) { this.accuracyModifier = accuracyModifier; }
 
+    public void AddAccuracyModifier(float accuracyModifier) { this.accuracyModifier *= accuracyModifier; }
+
     public bool IsMustHit() { return isMustHit; }
 
     public void SetMustHit(bool isMustHit) { this.isMustHit = isMustHit; }
@@ -55,6 +57,8 @@ public class DirectAttackParams
 
     public void SetCritModifier(float critModifier) { this.critModifier = critModifier; }
 
+    public void AddCritModifier(float critModifier) { this.critModifier *= critModifier; }
+
     public bool IsCritable() { return isCritable; }
 
     public void SetCritable(bool isCritable) { this.isCritable = isCritable; }
@@ -62,4 +66,6 @@ public class DirectAttackParams
     public float GetDamageModifier() { return damageModifier; }
 
     public void SetDamageModifier(float damageModifier) { this.damageModifier = damageModifier; }
+
+    public void AddDamageModifier(float damageModifier) { this.damageModifier *= damageModifier; }
 }

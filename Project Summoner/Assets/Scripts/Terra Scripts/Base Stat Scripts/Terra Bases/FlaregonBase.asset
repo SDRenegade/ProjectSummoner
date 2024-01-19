@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speciesName: Flaregon
   logEntry: Fire Starter
-  terraTypes: 03000000
+  terraTypes: 08000000
   naturalMovePool:
   - movebase: {fileID: 11400000, guid: bd1aecb2193b359438b9e423cfd674c1, type: 2}
     levelLearned: 1

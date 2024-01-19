@@ -7,9 +7,9 @@ public abstract class ItemBase : ScriptableObject
     [SerializeField] private string itemName;
     [SerializeField] [TextArea] private string description;
 
-    public virtual void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem) {}
+    public abstract void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem);
 
-    public virtual void RemoveBattleActions(BattleSystem battleSystem) {}
+    public abstract void RemoveBattleActions(BattleSystem battleSystem);
 
     public abstract void OnOverworldUse();
 
