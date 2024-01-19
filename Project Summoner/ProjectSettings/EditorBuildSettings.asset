@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/BattleScene.unity
     guid: 01349fcf0209e0c428a7ef9fa1249a6d
+  - enabled: 1
+    path: Assets/Lowpoly Style/Alpine Woodland/DemoScene/AlpineWoodlandDemo.unity
+    guid: 44004d143d27cd84299593592c4f9a29
   m_configObjects: {}
