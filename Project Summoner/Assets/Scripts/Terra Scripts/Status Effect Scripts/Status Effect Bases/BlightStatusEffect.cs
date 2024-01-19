@@ -53,6 +53,6 @@ public class BlightStatusEffectAction : BattleAction
 
         int blightDamage = (int)(terraBattlePosition.GetTerra().GetMaxHP() * BLIGHT_DAMAGE_LIST[blightCounter - 1]);
         Debug.Log(BattleDialog.BlightProkedMsg(terraBattlePosition.GetTerra(), blightDamage));
-        eventArgs.GetBattleSystem().DamageTerra(terraBattlePosition, blightDamage);
+        eventArgs.GetBattleSystem().UpdateTerraHP(terraBattlePosition, blightDamage);
     }
 }

@@ -9,6 +9,7 @@ public class SODatabase : MonoBehaviour
     private static SODatabase instance;
     [SerializeField] private TerraDatabase terraDatabase;
     [SerializeField] private TerraMoveDatabase terraMoveDatabase;
+    [SerializeField] private ItemDatabase itemDatabase;
     [SerializeField] private StatusEffectDatabase statusEffectDatabase;
     [SerializeField] private VolatileStatusEffectDatabase volatileStatusEffectDatabase;
     [SerializeField] private MetronomeMovesDatabase metronomeMovesDatabase;
@@ -63,6 +64,27 @@ public class SODatabase : MonoBehaviour
         }
 
         return terraMove;
+    }
+
+    public ItemBase GetItemByID(int id)
+    {
+        if (id >= itemDatabase.GetItemList().Count)
+            return null;
+
+        return itemDatabase.GetItemList()[id];
+    }
+
+    public ItemBase GetItemByName(string name)
+    {
+        ItemBase item = null;
+        foreach (ItemBase itemBase in itemDatabase.GetItemList()) {
+            if (itemBase.GetItemName() == name) {
+                item = itemBase;
+                break;
+            }
+        }
+
+        return item;
     }
 
     public StatusEffectBase GetStatusEffectByID(int id)

@@ -68,8 +68,10 @@ public class CombatBattleState : BattleState
         battleSystem.InvokeOnAttackDeclaration(terraAttack);
 
         //If the attack is canceled, continue to the next attack
-        if (terraAttack.IsCanceled())
+        if (terraAttack.IsCanceled()) {
             terraAttack.GetTerraMoveAction()?.RemoveBattleActions(battleSystem);
+            return;
+        }
 
         //Decrement the PP of the move being used
         terraAttack.GetMove().SetCurrentPP(terraAttack.GetMove().GetCurrentPP() - 1);
@@ -134,6 +136,6 @@ public class CombatBattleState : BattleState
 
         if (directAttackLog.IsCrit())
             Debug.Log(BattleDialog.CRITICAL_HIT);
-        battleSystem.DamageTerra(directAttackLog.GetDefenderPosition(), directAttackLog.GetDamage());
+        battleSystem.UpdateTerraHP(directAttackLog.GetDefenderPosition(), -directAttackLog.GetDamage());
     }
 }

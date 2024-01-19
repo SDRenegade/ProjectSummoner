@@ -2357,6 +2357,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   terraDatabase: {fileID: 11400000, guid: 76e43666dcf6f244986ba497bd989545, type: 2}
   terraMoveDatabase: {fileID: 11400000, guid: ded2c76fbd0f6204696684742a5424ff, type: 2}
+  itemDatabase: {fileID: 11400000, guid: 4acb6d27c38aa8c4491b82df3a6b9430, type: 2}
   statusEffectDatabase: {fileID: 11400000, guid: f6a75da7ab9b85743ad2fa9c43c87113, type: 2}
   volatileStatusEffectDatabase: {fileID: 11400000, guid: 5da54d3cf7b794a4da4862f1b4e33c38, type: 2}
   metronomeMovesDatabase: {fileID: 11400000, guid: 1aed8a852b1bccb4c92ad6eb4a785de0, type: 2}

@@ -13,17 +13,15 @@ public class AbsorbBase : TerraMoveBase
 
 public class AbsorbAction : TerraMoveAction
 {
-
     public AbsorbAction() {}
 
     public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
-        Terra attacker = directAttackLog.GetAttackerPosition().GetTerra();
+        TerraBattlePosition attackerPosition = directAttackLog.GetAttackerPosition();
 
         if (directAttackLog.GetDamage() != null) {
             int healthAbsorbed = (int)Mathf.Ceil((int)directAttackLog.GetDamage() / 2f);
-            attacker.SetCurrentHP(attacker.GetCurrentHP() + healthAbsorbed);
-            Debug.Log(BattleDialog.HealthHealedMsg(attacker, healthAbsorbed));
+            battleSystem.UpdateTerraHP(attackerPosition, healthAbsorbed);
         }
     }
 

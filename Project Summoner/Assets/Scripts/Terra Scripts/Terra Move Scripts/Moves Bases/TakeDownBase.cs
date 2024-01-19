@@ -23,7 +23,7 @@ public class TakeDownAction : TerraMoveAction
 
         int recoilDamage = (int)(terraBattlePosition.GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_RECOIL);
         Debug.Log(BattleDialog.RecoilDamageMsg(terraBattlePosition.GetTerra(), recoilDamage));
-        battleSystem.DamageTerra(terraBattlePosition, recoilDamage);
+        battleSystem.UpdateTerraHP(terraBattlePosition, recoilDamage);
     }
 
     public void AddBattleActions(BattleSystem battleSystem) {}

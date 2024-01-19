@@ -12,6 +12,7 @@ public class Terra
     [SerializeField] private string terraNickname;
     [SerializeField] [Range(1, 100)] private int level;
     [SerializeField] private List<TerraMove> moves;
+    [SerializeField] private ItemBase heldItem;
     [SerializeField] private StatusEffectWrapper statusEffectWrapper;
     [SerializeField] [Min(0)] private int currentHP;
 
@@ -84,10 +85,10 @@ public class Terra
         return true;
     }
 
-    public void TakeDamage(int damage)
+    public void UpdateHP(int hpUpdate)
     {
         int hp;
-        hp = (currentHP - damage >= 0) ? currentHP - damage : 0;
+        hp = (currentHP + hpUpdate >= 0) ? currentHP + hpUpdate : 0;
         if (hp > GetMaxHP())
             hp = GetMaxHP();
 
@@ -120,6 +121,10 @@ public class Terra
         for(int i = 0; i < MOVE_SLOTS; i++)
             moves.Add(newMoves[i]);
     }
+
+    public ItemBase GetHeldItem() { return heldItem; }
+
+    public void SetHeldItem(ItemBase itemBase) { heldItem = itemBase; }
 
     public int GetCurrentHP() { return currentHP; }
 

@@ -54,7 +54,7 @@ public class ConfusionVolatileStatusEffectAction : BattleAction
             if(randConfusionRoll == 1) {
                 int recoilDamage = (int)CombatCalculator.InitiaAttackDamage(terraBattlePosition, terraBattlePosition, RECOIL_POWER);
                 Debug.Log(BattleDialog.ConfusionProkedMsg(terraBattlePosition.GetTerra(), recoilDamage));
-                eventArgs.GetBattleSystem().DamageTerra(terraBattlePosition, recoilDamage);
+                eventArgs.GetBattleSystem().UpdateTerraHP(terraBattlePosition, recoilDamage);
                 eventArgs.GetTerraAttack().SetCanceled(true);
             }
         }

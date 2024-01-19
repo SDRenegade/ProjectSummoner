@@ -24,16 +24,14 @@ public static class BattleDialog
         return terraAttack.GetAttackerPosition().GetTerra() + " has used " + terraAttack.GetMove();
     }
 
-    public static string DamageDealtMsg(Terra terra, int damage) {
-        return terra + " has taken " + damage + ".";
+    public static string TerraHealthUpdateMsg(Terra terra, int hpUpdate) {
+        if(hpUpdate <= 0)
+            return terra + " has taken " + -hpUpdate + " damage";
+        else
+            return terra + " has recovered " + hpUpdate + " health";
     }
 
-    public static string HealthHealedMsg(Terra terra, int healAmt) {
-        return terra + " has healed for " + healAmt;
-    }
-
-    public static string StatStageChangeMsg(Terra terra, Stats stat, StatStages currentStatStage, int modification)
-    {
+    public static string StatStageChangeMsg(Terra terra, Stats stat, StatStages currentStatStage, int modification) {
         if (modification == 0)
             return terra + "'s " + stat + " has not changed.";
         else if(modification > 0) {
@@ -168,6 +166,11 @@ public static class BattleDialog
 
     public static string MistProkedMsg(Terra terra) {
         return terra + " is immune to stat changes with mist active";
+    }
+
+    // ================== Item Messages ==================
+    public static string LeftoversMsg(Terra terra, int healAmt) {
+        return "Leftovers has healed " + terra + " by " + healAmt;
     }
 
     // ================== UI Selection Messages ==================
