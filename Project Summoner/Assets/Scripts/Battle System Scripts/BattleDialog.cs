@@ -24,11 +24,12 @@ public static class BattleDialog
         return terraAttack.GetAttackerPosition().GetTerra() + " has used " + terraAttack.GetMove();
     }
 
-    public static string TerraHealthUpdateMsg(Terra terra, int hpUpdate) {
-        if(hpUpdate <= 0)
-            return terra + " has taken " + -hpUpdate + " damage";
-        else
-            return terra + " has recovered " + hpUpdate + " health";
+    public static string TerraDamagedMsg(Terra terra, int damage) {
+            return terra + " has taken " + damage + " damage";
+    }
+
+    public static string TerraHealedMsg(Terra terra, int healAmt) {
+        return terra + " has recovered " + healAmt + " health";
     }
 
     public static string StatStageChangeMsg(Terra terra, Stats stat, StatStages currentStatStage, int modification) {

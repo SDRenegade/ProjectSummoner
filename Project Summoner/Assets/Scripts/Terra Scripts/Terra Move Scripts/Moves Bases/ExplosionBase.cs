@@ -18,7 +18,7 @@ public class ExplosionAction : TerraMoveAction
     public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
         TerraBattlePosition terraBattlePosition = directAttackLog.GetAttackerPosition();
-        battleSystem.UpdateTerraHP(terraBattlePosition, terraBattlePosition.GetTerra().GetCurrentHP());
+        battleSystem.DamageTerra(terraBattlePosition, terraBattlePosition.GetTerra().GetCurrentHP());
     }
 
     public void AddBattleActions(BattleSystem battleSystem) {}

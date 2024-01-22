@@ -28,6 +28,6 @@ public class LeftoversBase : ItemBase
 
         Terra terra = terraBattlePosition.GetTerra();
         int? healAmt = (int)(terra.GetMaxHP() * PERCENT_HEALTH_HEAL);
-        eventArgs.GetBattleSystem().UpdateTerraHP(terraBattlePosition, healAmt);
+        eventArgs.GetBattleSystem().HealTerra(terraBattlePosition, healAmt);
     }
 }

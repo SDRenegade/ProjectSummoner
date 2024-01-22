@@ -2,6 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum SpeedPriority
+{
+    LOW = 0,
+    NEUTRAL = 1,
+    HIGH = 2
+}
+
 public class TerraAttack
 {
     private TerraBattlePosition attackerPosition;
@@ -9,6 +16,7 @@ public class TerraAttack
     private TerraMove move;
     private TerraMoveAction terraMoveAction;
     private MovePriority movePriority;
+    private SpeedPriority speedPiority;
     private bool isPersistent;
     private bool isCanceled;
 
@@ -19,6 +27,7 @@ public class TerraAttack
         this.move = move;
         terraMoveAction = move.GetMoveBase().CreateTerraMoveAction(this);
         movePriority = move.GetMoveBase().GetBaseMovePriority();
+        speedPiority = SpeedPriority.NEUTRAL;
         isPersistent = false;
         isCanceled = false;
     }
@@ -52,6 +61,10 @@ public class TerraAttack
     public MovePriority GetMovePriority() {  return movePriority; }
 
     public void SetMovePriority(MovePriority movePriority) { this.movePriority = movePriority; }
+
+    public SpeedPriority GetSpeedPiority() { return speedPiority; }
+
+    public void SetSpeedPriority(SpeedPriority speedPiority) { this.speedPiority = speedPiority; }
 
     public bool IsPersistent() { return isPersistent; }
 

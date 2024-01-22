@@ -24,9 +24,11 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<DirectAttackEventArgs> OnDirectAttack;
     public event EventHandler<DirectAttackLogEventArgs> OnAttackMissed;
     public event EventHandler<TerraDamageByTerraEventArgs> OnTerraDamageByTerra;
-    public event EventHandler<TerraHealthUpdateEventArgs> OnTerraHealthUpdate;
+    public event EventHandler<TerraDamagedEventArgs> OnTerraDamaged;
+    public event EventHandler<TerraHealedEventArgs> OnTerraHealed;
     public event EventHandler<StatChangeEventArgs> OnStatChange;
     public event EventHandler<TerraFaintEventArgs> OnTerraFaint;
+    public event EventHandler<DirectAttackLogEventArgs> OnPostAttack;
     public event EventHandler<BattleEventArgs> OnEndOfTurn;
 
     [SerializeField] private BattleHUD battleHUD;
@@ -80,8 +82,8 @@ public class BattleSystem : MonoBehaviour
         secondarySideAI = new WildTerraAI();
 
         //--- (Temp) Hard-coding the leading terra held item until new system is added ---
-        primarySideTerraBattlePosition.GetTerra().SetHeldItem(Instantiate(SODatabase.GetInstance().GetItemByName("Black Sludge")));
-        secondarySideTerraBattlePosition.GetTerra().SetHeldItem(Instantiate(SODatabase.GetInstance().GetItemByName("Black Sludge")));
+        primarySideTerraBattlePosition.GetTerra().SetHeldItem(Instantiate(SODatabase.GetInstance().GetItemByName("Life Orb")));
+        secondarySideTerraBattlePosition.GetTerra().SetHeldItem(Instantiate(SODatabase.GetInstance().GetItemByName("Leftovers")));
 
         primarySideTerraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(primarySideTerraBattlePosition, this);
         secondarySideTerraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(secondarySideTerraBattlePosition, this);
@@ -241,17 +243,17 @@ public class BattleSystem : MonoBehaviour
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 
-    public int? UpdateTerraHP(TerraBattlePosition terraBattlePosition, int? hpUpdate)
+    public int? DamageTerra(TerraBattlePosition terraBattlePosition, int? damage)
     {
-        if (hpUpdate == null)
+        if (damage == null)
             return null;
 
-        //*** Terra Health Update Event ***
-        TerraHealthUpdateEventArgs terraHealthUpdateEventArgs = InvokeOnTerraHealthUpdate(terraBattlePosition, hpUpdate);
+        //*** Terra Damaged Event ***
+        TerraDamagedEventArgs terraDamagedEventArgs = InvokeOnTerraDamaged(terraBattlePosition, damage);
 
-        if (terraHealthUpdateEventArgs.GetHealthUpdate() != null) {
-            Debug.Log(BattleDialog.TerraHealthUpdateMsg(terraBattlePosition.GetTerra(), (int)hpUpdate));
-            terraBattlePosition.GetTerra().UpdateHP((int)terraHealthUpdateEventArgs.GetHealthUpdate());
+        if (terraDamagedEventArgs.GetDamage() != null) {
+            Debug.Log(BattleDialog.TerraDamagedMsg(terraBattlePosition.GetTerra(), (int)damage));
+            terraBattlePosition.GetTerra().TakeDamage((int)terraDamagedEventArgs.GetDamage());
 
             if (terraBattlePosition.GetTerra().GetCurrentHP() <= 0) {
                 Debug.Log(BattleDialog.TerraFaintedMsg(terraBattlePosition.GetTerra()));
@@ -262,7 +264,23 @@ public class BattleSystem : MonoBehaviour
             }
         }
 
-        return terraHealthUpdateEventArgs.GetHealthUpdate();
+        return terraDamagedEventArgs.GetDamage();
+    }
+
+    public int? HealTerra(TerraBattlePosition terraBattlePosition, int? healAmt)
+    {
+        if (healAmt == null)
+            return null;
+
+        //*** Terra Damaged Event ***
+        TerraHealedEventArgs terraHealedEventArgs = InvokeOnTerraHealed(terraBattlePosition, healAmt);
+
+        if (terraHealedEventArgs.GetHealAmt() != null) {
+            Debug.Log(BattleDialog.TerraHealedMsg(terraBattlePosition.GetTerra(), (int)healAmt));
+            terraBattlePosition.GetTerra().RecoverHP((int)terraHealedEventArgs.GetHealAmt());
+        }
+
+        return terraHealedEventArgs.GetHealAmt();
     }
 
     public void TerraStatChanage(TerraBattlePosition terraBattlePosition, Stats stat, int modification)
@@ -372,10 +390,18 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
-    public TerraHealthUpdateEventArgs InvokeOnTerraHealthUpdate(TerraBattlePosition terraBattlePosition, int? damage)
+    public TerraDamagedEventArgs InvokeOnTerraDamaged(TerraBattlePosition terraBattlePosition, int? damage)
     {
-        TerraHealthUpdateEventArgs eventArgs = new TerraHealthUpdateEventArgs(terraBattlePosition, damage, this);
-        OnTerraHealthUpdate?.Invoke(this, eventArgs);
+        TerraDamagedEventArgs eventArgs = new TerraDamagedEventArgs(terraBattlePosition, damage, this);
+        OnTerraDamaged?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public TerraHealedEventArgs InvokeOnTerraHealed(TerraBattlePosition terraBattlePosition, int? damage)
+    {
+        TerraHealedEventArgs eventArgs = new TerraHealedEventArgs(terraBattlePosition, damage, this);
+        OnTerraHealed?.Invoke(this, eventArgs);
 
         return eventArgs;
     }
@@ -392,6 +418,14 @@ public class BattleSystem : MonoBehaviour
     {
         TerraFaintEventArgs eventArgs = new TerraFaintEventArgs(terraBattlePosition, this);
         OnTerraFaint?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public DirectAttackLogEventArgs InvokeOnPostAttack(DirectAttackLog directAttackLog)
+    {
+        DirectAttackLogEventArgs eventArgs = new DirectAttackLogEventArgs(directAttackLog, this);
+        OnPostAttack?.Invoke(this, eventArgs);
 
         return eventArgs;
     }

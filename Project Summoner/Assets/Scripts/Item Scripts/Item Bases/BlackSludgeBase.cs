@@ -28,13 +28,18 @@ public class BlackSludgeBase : ItemBase
         Debug.Log(BattleDialog.ItemProked(this));
 
         Terra terra = terraBattlePosition.GetTerra();
-        int? hpUpdate = -(int)(terra.GetMaxHP() * PERCENT_MAX_HEALTH_UPDATE);
+        int? hpUpdate = (int)(terra.GetMaxHP() * PERCENT_MAX_HEALTH_UPDATE);
+        bool isCompatibleType = false;
         foreach(TerraType type in terra.GetTerraBase().GetTerraTypes()) {
             if(type == COMPATIBLE_TYPE) {
-                hpUpdate = -hpUpdate;
+                isCompatibleType = true;
                 break;
             }
         }
-        eventArgs.GetBattleSystem().UpdateTerraHP(terraBattlePosition, hpUpdate);
+
+        if(isCompatibleType)
+            eventArgs.GetBattleSystem().HealTerra(terraBattlePosition, hpUpdate);
+        else
+            eventArgs.GetBattleSystem().DamageTerra(terraBattlePosition, hpUpdate);
     }
 }

@@ -29,7 +29,7 @@ public class SubstituteAction : TerraMoveAction
             TerraBattlePosition terraBattlePosition = terraAttack.GetAttackerPosition();
             int recoilDamage = (int)(terraBattlePosition.GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_RECOIL);
             Debug.Log(BattleDialog.RecoilDamageMsg(terraBattlePosition.GetTerra(), recoilDamage));
-            battleSystem.UpdateTerraHP(terraBattlePosition, recoilDamage);
+            battleSystem.DamageTerra(terraBattlePosition, recoilDamage);
         }
             
         else

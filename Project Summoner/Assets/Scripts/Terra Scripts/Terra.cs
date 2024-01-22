@@ -85,14 +85,20 @@ public class Terra
         return true;
     }
 
-    public void UpdateHP(int hpUpdate)
+    public void TakeDamage(int damage)
     {
-        int hp;
-        hp = (currentHP + hpUpdate >= 0) ? currentHP + hpUpdate : 0;
-        if (hp > GetMaxHP())
-            hp = GetMaxHP();
+        if (damage <= 0)
+            return;
 
-        currentHP = hp;
+        currentHP = (currentHP - damage >= 0) ? currentHP - damage : 0;
+    }
+
+    public void RecoverHP(int healAmt)
+    {
+        if (healAmt <= 0)
+            return;
+
+        currentHP = (currentHP + healAmt <= GetMaxHP()) ? currentHP + healAmt : GetMaxHP();
     }
 
     public override string ToString()

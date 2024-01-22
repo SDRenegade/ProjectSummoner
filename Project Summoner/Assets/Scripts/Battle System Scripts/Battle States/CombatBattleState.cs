@@ -46,10 +46,17 @@ public class CombatBattleState : BattleState
         for (int i = 0; i < queuedTerraAttackList.Count - 1; i++) {
             int highestPriorityAttackIndex = i;
             for (int j = i + 1; j < queuedTerraAttackList.Count; j++) {
-                if (queuedTerraAttackList[highestPriorityAttackIndex].GetMovePriority() < queuedTerraAttackList[j].GetMovePriority()
-                    || queuedTerraAttackList[highestPriorityAttackIndex].GetMovePriority() == queuedTerraAttackList[j].GetMovePriority()
-                    && queuedTerraAttackList[highestPriorityAttackIndex].GetAttackerPosition().GetTerra().GetSpeed() < queuedTerraAttackList[j].GetAttackerPosition().GetTerra().GetSpeed())
-                    highestPriorityAttackIndex = j;
+                if (queuedTerraAttackList[highestPriorityAttackIndex].GetMovePriority() > queuedTerraAttackList[j].GetMovePriority())
+                    continue;
+                else if(queuedTerraAttackList[highestPriorityAttackIndex].GetMovePriority() == queuedTerraAttackList[j].GetMovePriority()) {
+                    if (queuedTerraAttackList[highestPriorityAttackIndex].GetSpeedPiority() > queuedTerraAttackList[j].GetSpeedPiority())
+                        continue;
+                    else if(queuedTerraAttackList[highestPriorityAttackIndex].GetSpeedPiority() == queuedTerraAttackList[j].GetSpeedPiority()
+                        && queuedTerraAttackList[highestPriorityAttackIndex].GetAttackerPosition().GetTerra().GetSpeed() >= queuedTerraAttackList[j].GetAttackerPosition().GetTerra().GetSpeed())
+                        continue;
+                }
+
+                highestPriorityAttackIndex = j;
             }
 
             if (highestPriorityAttackIndex != i) {
@@ -113,6 +120,9 @@ public class CombatBattleState : BattleState
             //After damage is calculated and applied we activate the move's post attack effect
             terraAttack.GetTerraMoveAction()?.PostAttackEffect(directAttackLogList[i], battleSystem);
 
+            //*** Post Attack Event ***
+            battleSystem.InvokeOnPostAttack(directAttackLogList[i]);
+
             if (directAttackLogList[i].GetDirectAttackParams().GetHitCount() > 1)
                 Debug.Log(BattleDialog.MultiHitMsg(
                     directAttackLogList[i].GetDirectAttackParams().GetAttackerPosition().GetTerra(),
@@ -136,6 +146,6 @@ public class CombatBattleState : BattleState
 
         if (directAttackLog.IsCrit())
             Debug.Log(BattleDialog.CRITICAL_HIT);
-        battleSystem.UpdateTerraHP(directAttackLog.GetDefenderPosition(), -directAttackLog.GetDamage());
+        battleSystem.DamageTerra(directAttackLog.GetDefenderPosition(), directAttackLog.GetDamage());
     }
 }

@@ -10,10 +10,11 @@ public class DirectAttackParams
     private int hitCount;
     private float accuracyModifier;
     private bool isMustHit;
-    private bool isDamageStepCanceled;
+    private float evasivenessModifier;
     private float critModifier;
     private bool isCritable;
     private float damageModifier;
+    private bool isDamageStepCanceled;
 
     public DirectAttackParams(TerraBattlePosition attackerPosition, TerraBattlePosition defenderPosition, TerraMove move)
     {
@@ -23,10 +24,11 @@ public class DirectAttackParams
         hitCount = 1;
         accuracyModifier = 1f;
         isMustHit = false;
-        isDamageStepCanceled = false;
+        evasivenessModifier = 1f;
         critModifier = 1f;
         isCritable = true;
         damageModifier = 1f;
+        isDamageStepCanceled = false;
     }
 
     public TerraBattlePosition GetAttackerPosition() { return attackerPosition; }
@@ -49,9 +51,11 @@ public class DirectAttackParams
 
     public void SetMustHit(bool isMustHit) { this.isMustHit = isMustHit; }
 
-    public bool IsDamageStepCanceled() {  return isDamageStepCanceled; }
+    public float GetEvasivenessModifier() { return evasivenessModifier; }
 
-    public void SetDamageStepCanceled(bool isDamageStepCanceled) { this.isDamageStepCanceled = isDamageStepCanceled; }
+    public void SetEvasivenessModifier(float evasivenessModifier) { this.evasivenessModifier = evasivenessModifier; }
+
+    public void AddEvasivenessModifier(float evasivenessModifier) { this.evasivenessModifier *= evasivenessModifier; }
 
     public float GetCritModifier() { return critModifier; }
 
@@ -68,4 +72,8 @@ public class DirectAttackParams
     public void SetDamageModifier(float damageModifier) { this.damageModifier = damageModifier; }
 
     public void AddDamageModifier(float damageModifier) { this.damageModifier *= damageModifier; }
+
+    public bool IsDamageStepCanceled() {  return isDamageStepCanceled; }
+
+    public void SetDamageStepCanceled(bool isDamageStepCanceled) { this.isDamageStepCanceled = isDamageStepCanceled; }
 }

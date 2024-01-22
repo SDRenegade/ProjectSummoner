@@ -39,7 +39,7 @@ class BurnStatusEffectAction : BattleAction
     {
         int burnDamage = (int)(terraBattlePosition.GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_BURN);
         Debug.Log(BattleDialog.BurnProkedMsg(terraBattlePosition.GetTerra(), burnDamage));
-        eventArgs.GetBattleSystem().UpdateTerraHP(terraBattlePosition, -burnDamage);
+        eventArgs.GetBattleSystem().DamageTerra(terraBattlePosition, burnDamage);
     }
 
     private void AttackReductionActive(object sender, DirectAttackEventArgs eventArgs)

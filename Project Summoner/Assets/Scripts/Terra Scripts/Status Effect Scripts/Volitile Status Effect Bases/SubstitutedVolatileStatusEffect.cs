@@ -29,24 +29,24 @@ public class SubstitutedVolatileStatusEffectAction : BattleAction
 
     public void AddBattleActions(BattleSystem battleSystem)
     {
-        battleSystem.OnTerraHealthUpdate += AbsorbDamage;
+        battleSystem.OnTerraDamaged += AbsorbDamage;
     }
 
     public void RemoveBattleActions(BattleSystem battleSystem)
     {
-        battleSystem.OnTerraHealthUpdate -= AbsorbDamage;
+        battleSystem.OnTerraDamaged -= AbsorbDamage;
         terraBattlePosition.RemoveVolatileStatusEffect(vStatusEffect);
     }
 
-    public void AbsorbDamage(object sender, TerraHealthUpdateEventArgs eventArgs)
+    public void AbsorbDamage(object sender, TerraDamagedEventArgs eventArgs)
     {
         if (eventArgs.GetTerraBattlePosition() != terraBattlePosition)
             return;
-        if (eventArgs.GetHealthUpdate() == null)
+        if (eventArgs.GetDamage() == null)
             return;
 
-        substituteCurrentHealth -= (int)eventArgs.GetHealthUpdate();
-        eventArgs.SetHealthUpdate(null);
+        substituteCurrentHealth -= (int)eventArgs.GetDamage();
+        eventArgs.SetDamage(null);
         if (substituteCurrentHealth <= 0) {
             RemoveBattleActions(eventArgs.GetBattleSystem());
             Debug.Log(BattleDialog.SubstituteExpired(terraBattlePosition.GetTerra()));

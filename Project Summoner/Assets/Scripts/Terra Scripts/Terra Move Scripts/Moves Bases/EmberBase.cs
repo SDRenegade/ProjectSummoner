@@ -24,8 +24,8 @@ public class EmberAction : TerraMoveAction
 
         bool isBurned = BURN_CHANCE > Random.Range(0, 1f);
         if (!defenderPosition.GetTerra().HasStatusEffect() && isBurned) {
-            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Burn"), defenderPosition, battleSystem);
             Debug.Log(BattleDialog.BurnInflictedMsg(defenderPosition.GetTerra()));
+            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Burn"), defenderPosition, battleSystem);
         }
     }
 

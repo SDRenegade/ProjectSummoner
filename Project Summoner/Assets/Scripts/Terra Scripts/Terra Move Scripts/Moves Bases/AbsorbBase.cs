@@ -21,7 +21,7 @@ public class AbsorbAction : TerraMoveAction
 
         if (directAttackLog.GetDamage() != null) {
             int healthAbsorbed = (int)Mathf.Ceil((int)directAttackLog.GetDamage() / 2f);
-            battleSystem.UpdateTerraHP(attackerPosition, healthAbsorbed);
+            battleSystem.HealTerra(attackerPosition, healthAbsorbed);
         }
     }
 
