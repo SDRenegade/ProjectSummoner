@@ -82,7 +82,7 @@ public class BattleSystem : MonoBehaviour
         secondarySideAI = new WildTerraAI();
 
         //--- (Temp) Hard-coding the leading terra held item until new system is added ---
-        primarySideTerraBattlePosition.GetTerra().SetHeldItem(Instantiate(SODatabase.GetInstance().GetItemByName("Life Orb")));
+        primarySideTerraBattlePosition.GetTerra().SetHeldItem(Instantiate(SODatabase.GetInstance().GetItemByName("Expert Belt")));
         secondarySideTerraBattlePosition.GetTerra().SetHeldItem(Instantiate(SODatabase.GetInstance().GetItemByName("Leftovers")));
 
         primarySideTerraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(primarySideTerraBattlePosition, this);

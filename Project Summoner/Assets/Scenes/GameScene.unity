@@ -561,7 +561,7 @@ MonoBehaviour:
     terraNickname: 
     level: 8
     moves:
-    - moveBase: {fileID: 11400000, guid: 7ed8d7368d09e0d468b3265e11f7fb48, type: 2}
+    - moveBase: {fileID: 11400000, guid: bd1aecb2193b359438b9e423cfd674c1, type: 2}
       maxPP: 30
       currentPP: 30
     - moveBase: {fileID: 11400000, guid: d7a286f898f71a0469bf0e2e23d714aa, type: 2}
@@ -2811,7 +2811,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.77
+      value: 9.54
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.y

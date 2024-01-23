@@ -47,7 +47,7 @@ public static class CombatCalculator
         TerraBattlePosition defenderPosition = directAttackParams.GetDefenderPosition();
         if (terraMoveBase.GetBaseDamage().IsNull() || damageType == DamageType.STATUS)
             return null;
-        float typeEffectivenessModifier = terraMoveBase.GetMoveType().GetTypeEffectiveness(defenderPosition.GetTerra().GetTerraBase().GetTerraTypes());
+        float typeEffectivenessModifier = terraMoveBase.GetMoveType().GetTypeEffectivenessModifier(defenderPosition.GetTerra().GetTerraBase().GetTerraTypes());
         if (typeEffectivenessModifier == 0)
             return null;
 

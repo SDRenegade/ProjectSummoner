@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "ItemBase", menuName = "Item/Leftovers")]
 public class LeftoversBase : ItemBase
 {
-    private static readonly float PERCENT_HEALTH_HEAL = 1/16f;
+    private static readonly float PERCENT_HEALTH_HEAL = 1/2f;
 
     private TerraBattlePosition terraBattlePosition;
 

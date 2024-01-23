@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Resources;
 using UnityEngine;
 
 public enum TerraType
@@ -20,35 +21,66 @@ public enum TerraType
     MYSTIC = 12
 }
 
+public enum EffectivenessTypes
+{
+    NEUTRAL,
+    SUPER,
+    NOT_VERY,
+    IMMUNE
+}
+
 public static class TerraTypeExtension
 {
-    private static readonly float[,] typeEffectivenessChart = new float[13, 13] {
-        {1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f},
-        {1f, 1f, 1f, 1f, 1f, 1f, 0.5f, 1f, 1f, 0.5f, 1f, 1f, 0.5f},
-        {1f, 1f, 0.5f, 2f, 0.5f, 1f, 2f, 1f, 0.5f, 0.5f, 0.5f, 1f, 1f},
-        {1f, 1f, 0.5f, 0.5f, 2f, 1f, 2f, 1f, 2f, 1f, 0.5f, 1f, 1f},
-        {1f, 1f, 2f, 0.5f, 0.5f, 1f, 0.5f, 1f, 2f, 2f, 2f, 1f, 1f},
-        {1f, 1f, 1f, 2f, 1f, 0.5f, 0f, 2f, 1f, 2f, 1f, 1f, 1f},
-        {1f, 1f, 0.5f, 1f, 2f, 2f, 1f, 0f, 2f, 2f, 1f, 1f, 1f},
-        {1f, 1f, 1f, 1f, 2f, 1f, 0.5f, 1f, 0f, 0.5f, 0.5f, 1f, 1f},
-        {1f, 1f, 2f, 2f, 1f, 1f, 1f, 1f, 0.5f, 0.5f, 1f, 2f, 1f},
-        {1f, 1f, 1f, 0.5f, 0.5f, 1f, 1f, 1f, 1f, 0.5f, 2f, 1f, 1f},
-        {1f, 1f, 2f, 1f, 0.5f, 1f, 1f, 2f, 1f, 0.5f, 0.5f, 1f, 1f},
-        {1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 0.5f, 1f, 1f, 0.5f, 2f},
-        {1f, 2f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 2f, 0.5f}
+    //These are set for convinence, so the entier TypeEffectiveness.VALUE doesn't need to be typed for the chart
+    private static readonly EffectivenessTypes NEUTRAL = EffectivenessTypes.NEUTRAL;
+    private static readonly EffectivenessTypes SUPER = EffectivenessTypes.SUPER;
+    private static readonly EffectivenessTypes NOT_VERY = EffectivenessTypes.NOT_VERY;
+    private static readonly EffectivenessTypes IMMUNE = EffectivenessTypes.IMMUNE;
+
+    private static readonly Dictionary<EffectivenessTypes, float> typeEffectivenessModifierMap = new Dictionary<EffectivenessTypes, float> {
+        {EffectivenessTypes.NEUTRAL, 1f},
+        {EffectivenessTypes.SUPER, 2f},
+        {EffectivenessTypes.NOT_VERY, 0.5f},
+        {EffectivenessTypes.IMMUNE, 0f}
     };
 
-    public static float GetTypeEffectiveness(this TerraType attackType, TerraType defendType)
+    private static readonly EffectivenessTypes[,] typeEffectivenessChart = new EffectivenessTypes[13, 13] {
+        {NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL},
+        {NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NOT_VERY, NEUTRAL,  NEUTRAL,  NOT_VERY},
+        {NEUTRAL,  NEUTRAL,  NOT_VERY, SUPER,    NOT_VERY, NEUTRAL,  SUPER,    NEUTRAL,  NOT_VERY, NOT_VERY, NOT_VERY, NEUTRAL,  NEUTRAL},
+        {NEUTRAL,  NEUTRAL,  NOT_VERY, NOT_VERY, SUPER,    NEUTRAL,  SUPER,    NEUTRAL,  SUPER,    NEUTRAL,  NOT_VERY, NEUTRAL,  NEUTRAL},
+        {NEUTRAL,  NEUTRAL,  SUPER,    NOT_VERY, NOT_VERY, NEUTRAL,  NOT_VERY, NEUTRAL,  SUPER,    SUPER,    SUPER,    NEUTRAL,  NEUTRAL},
+        {NEUTRAL,  NEUTRAL,  NEUTRAL,  SUPER,    NEUTRAL,  NOT_VERY, IMMUNE,   SUPER,    NEUTRAL,  SUPER,    NEUTRAL,  NEUTRAL,  NEUTRAL},
+        {NEUTRAL,  NEUTRAL,  NOT_VERY, NEUTRAL,  SUPER,    SUPER,    NEUTRAL,  IMMUNE,   SUPER,    SUPER,    NEUTRAL,  NEUTRAL,  NEUTRAL},
+        {NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  SUPER,    NEUTRAL,  NOT_VERY, NEUTRAL,  IMMUNE,   NOT_VERY, NOT_VERY, NEUTRAL,  NEUTRAL},
+        {NEUTRAL,  NEUTRAL,  SUPER,    SUPER,    NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NOT_VERY, NOT_VERY, NEUTRAL,  SUPER,    NEUTRAL},
+        {NEUTRAL,  NEUTRAL,  NEUTRAL,  NOT_VERY, NOT_VERY, NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NOT_VERY, SUPER,    NEUTRAL,  NEUTRAL},
+        {NEUTRAL,  NEUTRAL,  SUPER,    NEUTRAL,  NOT_VERY, NEUTRAL,  NEUTRAL,  SUPER,    NEUTRAL,  NOT_VERY, NOT_VERY, NEUTRAL,  NEUTRAL},
+        {NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NOT_VERY, NEUTRAL,  NEUTRAL,  NOT_VERY, SUPER},
+        {NEUTRAL,  SUPER,    NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  NEUTRAL,  SUPER,    NOT_VERY}
+    };
+
+    public static EffectivenessTypes GetTypeEffectiveness(this TerraType attackType, TerraType defendType)
     {
         return typeEffectivenessChart[(int)attackType, (int)defendType];
     }
 
-    public static float GetTypeEffectiveness(this TerraType attackType, List<TerraType> defendTypeList)
+    public static float GetTypeEffectivenessModifier(this TerraType attackType, TerraType defendType)
+    {
+        return typeEffectivenessModifierMap[typeEffectivenessChart[(int)attackType, (int)defendType]];
+    }
+
+    public static float GetTypeEffectivenessModifier(this TerraType attackType, List<TerraType> defendTypeList)
     {
         float effectivenessMultiplier = 1f;
         foreach(TerraType defendType in defendTypeList)
-            effectivenessMultiplier *= GetTypeEffectiveness(attackType, defendType);
+            effectivenessMultiplier *= GetTypeEffectivenessModifier(attackType, defendType);
 
         return effectivenessMultiplier;
+    }
+
+    public static float GetEffectivenessTypeValue(EffectivenessTypes effectivenessType)
+    {
+        return typeEffectivenessModifierMap[effectivenessType];
     }
 }

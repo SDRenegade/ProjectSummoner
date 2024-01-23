@@ -22,6 +22,7 @@ public class LifeOrbBase : ItemBase
     public override void RemoveBattleActions(BattleSystem battleSystem)
     {
         battleSystem.OnDirectAttack -= AddDamageModifier;
+        battleSystem.OnPostAttack -= ItemRecoilDamage;
     }
 
     public void AddDamageModifier(object sender, DirectAttackEventArgs eventArgs)
