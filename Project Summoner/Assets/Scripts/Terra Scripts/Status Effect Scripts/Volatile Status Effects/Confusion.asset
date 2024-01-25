@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: Confusion
   m_EditorClassIdentifier: 
   statusName: Confusion
-  description: A condition that has a chance for the user to hit themself every time
-    they attack.
+  description: Target terra has a chance of hitting themself when they attack.

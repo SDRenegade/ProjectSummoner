@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: BlackSludge
   m_EditorClassIdentifier: 
   itemName: Black Sludge
-  description: An Item that heals the holder at the end of each turn if they are
-    Blight-type; otherwise damages the holder at the end of each turn.
+  description: 

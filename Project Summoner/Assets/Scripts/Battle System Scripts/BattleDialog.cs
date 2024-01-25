@@ -171,7 +171,7 @@ public static class BattleDialog
 
     // ================== Item Messages ==================
     public static string ItemProked(ItemBase item) {
-        return item.GetItemName() + " has proked";
+        return item.GetItemSO().GetItemName() + " has proked";
     }
 
     // ================== UI Selection Messages ==================

@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: Bound
   m_EditorClassIdentifier: 
   statusName: Bound
-  description: Inflicted Terra take percent max health damage at the end of each
-    turn.
+  description: Target terra takes bind damage for a few turns.

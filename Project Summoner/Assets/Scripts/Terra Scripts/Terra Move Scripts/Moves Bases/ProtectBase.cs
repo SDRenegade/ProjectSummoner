@@ -17,7 +17,7 @@ public class ProtectAction : TerraMoveAction
 
     public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
-        if (!directAttackLog.GetAttackerPosition().AddVolatileStatusEffect(SODatabase.GetInstance().GetVolatileStatusEffectByName("Protected"), battleSystem))
+        if (!battleSystem.AddVolatileStatusEffect(directAttackLog.GetAttackerPosition(), SODatabase.GetInstance().GetVolatileStatusEffectByName("Protected")))
             Debug.Log(BattleDialog.ATTACK_FAILED);
     }
 

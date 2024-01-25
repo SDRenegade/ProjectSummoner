@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "VolatileStatusEffectDatabase", menuName = "Database/Volatile Status Effect Database")]
 public class VolatileStatusEffectDatabase : ScriptableObject
 {
-    [SerializeField] private List<VolatileStatusEffectBase> volatileStatusEffectList;
+    [SerializeField] private List<VolatileStatusEffectSO> volatileStatusEffectList;
 
-    public List<VolatileStatusEffectBase> GetVolatileStatusEffectList() { return volatileStatusEffectList; }
+    public List<VolatileStatusEffectSO> GetVolatileStatusEffectList() { return volatileStatusEffectList; }
 }

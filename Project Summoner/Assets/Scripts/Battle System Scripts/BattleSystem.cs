@@ -19,7 +19,6 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<BattleEventArgs> OnEnteringCombatState;
     public event EventHandler<BattleEventArgs> OnTerraSwitch; //Include BattleSide and the two Terra being switched
     public event EventHandler<BattleEventArgs> OnPlayerAttemptEscape; //Include Escape chance
-    public event EventHandler<BattleEventArgs> OnTerraUseHeldItem; //Include Terra and Item
     public event EventHandler<AttackDeclarationEventArgs> OnAttackDeclaration;
     public event EventHandler<DirectAttackEventArgs> OnDirectAttack;
     public event EventHandler<DirectAttackLogEventArgs> OnAttackMissed;
@@ -27,7 +26,8 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<TerraDamagedEventArgs> OnTerraDamaged;
     public event EventHandler<TerraHealedEventArgs> OnTerraHealed;
     public event EventHandler<StatChangeEventArgs> OnStatChange;
-    public event EventHandler<TerraFaintEventArgs> OnTerraFaint;
+    public event EventHandler<VolatileStatusEffectAddedEventArgs> OnVolatileStatusEffectAdded;
+    public event EventHandler<TerraFaintedEventArgs> OnTerraFainted;
     public event EventHandler<DirectAttackLogEventArgs> OnPostAttack;
     public event EventHandler<BattleEventArgs> OnEndOfTurn;
 
@@ -82,17 +82,17 @@ public class BattleSystem : MonoBehaviour
         secondarySideAI = new WildTerraAI();
 
         //--- (Temp) Hard-coding the leading terra held item until new system is added ---
-        primarySideTerraBattlePosition.GetTerra().SetHeldItem(Instantiate(SODatabase.GetInstance().GetItemByName("Expert Belt")));
-        secondarySideTerraBattlePosition.GetTerra().SetHeldItem(Instantiate(SODatabase.GetInstance().GetItemByName("Leftovers")));
+        primarySideTerraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Light Clay").CreateItemBase());
+        secondarySideTerraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Leftovers").CreateItemBase());
 
         primarySideTerraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(primarySideTerraBattlePosition, this);
         secondarySideTerraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(secondarySideTerraBattlePosition, this);
 
         //Logging the item that each leading terra is holding
         if (primarySideTerraBattlePosition.GetTerra().GetHeldItem() != null)
-            Debug.Log("Primary Leading Terra Item: " + primarySideTerraBattlePosition.GetTerra().GetHeldItem().GetItemName());
+            Debug.Log("Primary Leading Terra Item: " + primarySideTerraBattlePosition.GetTerra().GetHeldItem().GetItemSO().GetItemName());
         if (secondarySideTerraBattlePosition.GetTerra().GetHeldItem() != null)
-            Debug.Log("Secondary Leading Terra Item: " + secondarySideTerraBattlePosition.GetTerra().GetHeldItem().GetItemName());
+            Debug.Log("Secondary Leading Terra Item: " + secondarySideTerraBattlePosition.GetTerra().GetHeldItem().GetItemSO().GetItemName());
 
         //--- (Temp) Change second argument once more battle positions are added ---
         battleActionManager = new BattleActionManager(this, 2);
@@ -258,7 +258,7 @@ public class BattleSystem : MonoBehaviour
             if (terraBattlePosition.GetTerra().GetCurrentHP() <= 0) {
                 Debug.Log(BattleDialog.TerraFaintedMsg(terraBattlePosition.GetTerra()));
                 //*** Terra Faint Event ***
-                InvokeOnTerraFaint(terraBattlePosition);
+                InvokeOnTerraFainted(terraBattlePosition);
                 //--- (Temp) Match ends once a single terra faints, until parties are added ---
                 isMatchFinished = true;
             }
@@ -283,7 +283,7 @@ public class BattleSystem : MonoBehaviour
         return terraHealedEventArgs.GetHealAmt();
     }
 
-    public void TerraStatChanage(TerraBattlePosition terraBattlePosition, Stats stat, int modification)
+    public void ChanageTerraStat(TerraBattlePosition terraBattlePosition, Stats stat, int modification)
     {
         //*** Stat Change Event ***
         StatChangeEventArgs statChangeEventArgs = InvokeOnStatChange(terraBattlePosition, stat, modification);
@@ -292,6 +292,19 @@ public class BattleSystem : MonoBehaviour
             terraBattlePosition.SetStatStage(stat, StatStagesExtension.ChangeStatStage(terraBattlePosition.GetStatStage(stat), statChangeEventArgs.GetModification()));
             Debug.Log(BattleDialog.StatStageChangeMsg(terraBattlePosition.GetTerra(), stat, terraBattlePosition.GetStatStage(stat), statChangeEventArgs.GetModification()));
         }
+    }
+
+    public bool AddVolatileStatusEffect(TerraBattlePosition terraBattlePosition, VolatileStatusEffectSO vStatusEffectSO)
+    {
+        VolatileStatusEffectBase vStatusEffect = vStatusEffectSO.CreateVolatileStatusEffect(terraBattlePosition);
+
+        //*** Volatile Status Effect Added Event ***
+        VolatileStatusEffectAddedEventArgs vStatusEffectAddedEventArgs = InvokeOnVolatileStatusEffectAdded(terraBattlePosition, vStatusEffect);
+
+        if (vStatusEffectAddedEventArgs.IsCanceled())
+            return false;
+
+        return terraBattlePosition.AddVolatileStatusEffect(vStatusEffectAddedEventArgs.GetVolatileStatusEffect(), this);
     }
 
     public BattleEventArgs InvokeOnStartOfTurn()
@@ -346,14 +359,6 @@ public class BattleSystem : MonoBehaviour
     {
         BattleEventArgs eventArgs = new BattleEventArgs(this);
         OnPlayerAttemptEscape?.Invoke(this, eventArgs);
-
-        return eventArgs;
-    }
-
-    public BattleEventArgs InvokeOnTerraUseHeldItem()
-    {
-        BattleEventArgs eventArgs = new BattleEventArgs(this);
-        OnTerraUseHeldItem?.Invoke(this, eventArgs);
 
         return eventArgs;
     }
@@ -414,10 +419,18 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
-    public TerraFaintEventArgs InvokeOnTerraFaint(TerraBattlePosition terraBattlePosition)
+    public VolatileStatusEffectAddedEventArgs InvokeOnVolatileStatusEffectAdded(TerraBattlePosition terraBattlePosition, VolatileStatusEffectBase vStatusEffect)
     {
-        TerraFaintEventArgs eventArgs = new TerraFaintEventArgs(terraBattlePosition, this);
-        OnTerraFaint?.Invoke(this, eventArgs);
+        VolatileStatusEffectAddedEventArgs eventArgs = new VolatileStatusEffectAddedEventArgs(terraBattlePosition, vStatusEffect, this);
+        OnVolatileStatusEffectAdded?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public TerraFaintedEventArgs InvokeOnTerraFainted(TerraBattlePosition terraBattlePosition)
+    {
+        TerraFaintedEventArgs eventArgs = new TerraFaintedEventArgs(terraBattlePosition, this);
+        OnTerraFainted?.Invoke(this, eventArgs);
 
         return eventArgs;
     }

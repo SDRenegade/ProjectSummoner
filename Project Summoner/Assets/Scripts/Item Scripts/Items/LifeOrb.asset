@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: LifeOrb
   m_EditorClassIdentifier: 
   itemName: Life Orb
-  description: An item that increases the damage of the holders attacks but also
-    damageds the holder when they inflict damage on an opponent.
+  description: 

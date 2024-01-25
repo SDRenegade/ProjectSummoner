@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: Substituted
   m_EditorClassIdentifier: 
   statusName: Substituted
-  description: A move that creates a decoy that takes damage instead of the user
-    until the decoy runs out of health. The user takes recoil damage on use.
+  description: Target terra sets a decoy that takes damage for them.

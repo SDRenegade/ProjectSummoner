@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,7 +19,7 @@ public class BindAction : TerraMoveAction
     public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
         TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
-        bool isSuccessfullyAdded = defenderPosition.AddVolatileStatusEffect(SODatabase.GetInstance().GetVolatileStatusEffectByName("Bound"), battleSystem);
+        bool isSuccessfullyAdded = battleSystem.AddVolatileStatusEffect(defenderPosition, SODatabase.GetInstance().GetVolatileStatusEffectByName("Bound"));
         if (!isSuccessfullyAdded)
             Debug.Log(BattleDialog.ATTACK_FAILED);
     }

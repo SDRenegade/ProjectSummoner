@@ -25,13 +25,13 @@ public class SubstituteAction : TerraMoveAction
 
     public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
-        if (directAttackLog.GetAttackerPosition().AddVolatileStatusEffect(SODatabase.GetInstance().GetVolatileStatusEffectByName("Substituted"), battleSystem)) {
-            TerraBattlePosition terraBattlePosition = terraAttack.GetAttackerPosition();
+        TerraBattlePosition terraBattlePosition = terraAttack.GetAttackerPosition();
+        if (!terraBattlePosition.ContainsVolatileStatusEffect(SODatabase.GetInstance().GetVolatileStatusEffectByName("Substituted"))) {
             int recoilDamage = (int)(terraBattlePosition.GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_RECOIL);
             Debug.Log(BattleDialog.RecoilDamageMsg(terraBattlePosition.GetTerra(), recoilDamage));
             battleSystem.DamageTerra(terraBattlePosition, recoilDamage);
+            battleSystem.AddVolatileStatusEffect(directAttackLog.GetAttackerPosition(), SODatabase.GetInstance().GetVolatileStatusEffectByName("Substituted"));
         }
-            
         else
             Debug.Log(BattleDialog.ATTACK_FAILED);
     }

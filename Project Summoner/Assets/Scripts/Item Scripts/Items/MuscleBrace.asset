@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: MuscleBrace
   m_EditorClassIdentifier: 
   itemName: Muscle Brace
-  description: An item that increases the damage of physical attack.
+  description: 

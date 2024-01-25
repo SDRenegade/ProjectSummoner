@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: Protected
   m_EditorClassIdentifier: 
   statusName: Protected
-  description: The terra is protected form all attacks this turn. This volatile status
-    effect can not be applied two turns in a row.
+  description: Target terra can not be attacked this turn.

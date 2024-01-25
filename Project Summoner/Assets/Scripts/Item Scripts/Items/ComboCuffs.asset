@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: ComboCuffs
   m_EditorClassIdentifier: 
   itemName: Combo Cuffs
-  description: An items that increases the power of the holders attack the more turns
-    the attack is used in a row.
+  description: 

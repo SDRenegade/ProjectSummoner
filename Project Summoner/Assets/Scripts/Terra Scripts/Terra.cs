@@ -23,6 +23,7 @@ public class Terra
         level = 1;
         moves = new List<TerraMove>();
         GenerateNaturalMoveSet();
+        heldItem = null;
         statusEffectWrapper = new StatusEffectWrapper(null);
         currentHP = GetMaxHP();
     }
@@ -34,6 +35,7 @@ public class Terra
         this.level = level;
         moves = new List<TerraMove>();
         GenerateNaturalMoveSet();
+        heldItem = null;
         statusEffectWrapper = new StatusEffectWrapper(null);
         currentHP = GetMaxHP();
     }
@@ -46,6 +48,7 @@ public class Terra
         moves = new List<TerraMove>();
         for(int i = 0; i < terraSavable.GetSavableMoves().Count; i++)
             moves.Add(new TerraMove(terraSavable.GetSavableMoves()[i]));
+        heldItem = null;
         StatusEffectBase savedStatusEffect = SODatabase.GetInstance().GetStatusEffectByName(terraSavable.GetStatusEffectBaseName());
         statusEffectWrapper = (savedStatusEffect != null) ? new StatusEffectWrapper(savedStatusEffect) : new StatusEffectWrapper(null);
         currentHP = terraSavable.GetCurrentHP();

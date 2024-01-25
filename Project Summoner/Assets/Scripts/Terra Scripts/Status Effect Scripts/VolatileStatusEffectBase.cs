@@ -2,16 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class VolatileStatusEffectBase : ScriptableObject
+public abstract class VolatileStatusEffectBase
 {
-    [SerializeField] protected string statusName;
-    [SerializeField] [TextArea] protected string description;
+    protected TerraBattlePosition terraBattlePosition;
+    protected VolatileStatusEffectSO vStatusEffectSO;
 
-    public VolatileStatusEffectBase() {}
+    public VolatileStatusEffectBase(TerraBattlePosition terraBattlePosition, VolatileStatusEffectSO vStatusEffectSO)
+    {
+        this.terraBattlePosition = terraBattlePosition;
+        this.vStatusEffectSO = vStatusEffectSO;
+    }
 
-    public abstract BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition);
+    public abstract void AddBattleActions(BattleSystem battleSystem);
 
-    public string GetStatusName() { return statusName; }
+    public abstract void RemoveBattleActions(BattleSystem battleSystem);
 
-    public string GetDescription() { return description; }
+    public TerraBattlePosition GetTerraBattlePosition() { return terraBattlePosition; }
+
+    public VolatileStatusEffectSO GetVolatileStatusEffectSO() { return vStatusEffectSO; }
 }

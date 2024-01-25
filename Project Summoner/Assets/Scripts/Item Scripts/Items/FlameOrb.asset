@@ -13,5 +13,4 @@ MonoBehaviour:
   m_Name: FlameOrb
   m_EditorClassIdentifier: 
   itemName: Flame Orb
-  description: An item that inflicts burn on the holder during the first turn they
-    are on the field.
+  description: 

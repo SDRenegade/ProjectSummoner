@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Leftovers
   m_EditorClassIdentifier: 
   itemName: Leftovers
-  description: A held item that heals a portion of the holders health each turn.
+  description: 

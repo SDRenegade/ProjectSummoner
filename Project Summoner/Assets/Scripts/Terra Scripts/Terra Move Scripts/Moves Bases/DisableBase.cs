@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -18,8 +19,7 @@ public class DisableAction : TerraMoveAction
 
     public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
-        bool isAdded = directAttackLog.GetDefenderPosition().AddVolatileStatusEffect(SODatabase.GetInstance().GetVolatileStatusEffectByName("Disabled"), battleSystem);
-        if (isAdded)
+        if (battleSystem.AddVolatileStatusEffect(directAttackLog.GetDefenderPosition(), SODatabase.GetInstance().GetVolatileStatusEffectByName("Disabled")))
             Debug.Log(BattleDialog.DisableActiveMsg(directAttackLog.GetDefenderPosition().GetTerra()));
         else
             Debug.Log(BattleDialog.ATTACK_FAILED);

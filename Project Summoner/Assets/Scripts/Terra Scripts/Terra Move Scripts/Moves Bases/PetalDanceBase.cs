@@ -32,8 +32,7 @@ public class PetalDanceAction : TerraMoveAction
         if (turnCounter < turnDuration)
             return;
 
-        bool isAdded = terraAttack.GetAttackerPosition().AddVolatileStatusEffect(SODatabase.GetInstance().GetVolatileStatusEffectByName("Confusion"), battleSystem);
-        if (isAdded)
+        if (battleSystem.AddVolatileStatusEffect(directAttackLog.GetAttackerPosition(), SODatabase.GetInstance().GetVolatileStatusEffectByName("Confusion")))
             Debug.Log(BattleDialog.ConfusionInflictedMsg(terraAttack.GetAttackerPosition().GetTerra()));
         else
             Debug.Log(BattleDialog.ATTACK_FAILED);

@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: LaggingTail
   m_EditorClassIdentifier: 
   itemName: Lagging Tail
-  description: An item that has the holder always attack last in a contest of speed.
+  description: 

@@ -228,7 +228,6 @@ MonoBehaviour:
     - moveBase: {fileID: 11400000, guid: 625642123288b564ea27374ef0a2e221, type: 2}
       maxPP: 20
       currentPP: 20
-    heldItem: {fileID: 11400000, guid: db52b2212a2d5d846ac544d92abd5c3b, type: 2}
     statusEffectWrapper:
       statusEffectBase: {fileID: 0}
     currentHP: 24
@@ -559,15 +558,14 @@ MonoBehaviour:
   terra:
     terraBase: {fileID: 11400000, guid: 4423df2580197fe468e0df8e1d363e6d, type: 2}
     terraNickname: 
-    level: 8
+    level: 10
     moves:
     - moveBase: {fileID: 11400000, guid: bd1aecb2193b359438b9e423cfd674c1, type: 2}
       maxPP: 30
       currentPP: 30
-    - moveBase: {fileID: 11400000, guid: d7a286f898f71a0469bf0e2e23d714aa, type: 2}
+    - moveBase: {fileID: 11400000, guid: bbab58efed0be3d4493ef2893699d3fd, type: 2}
       maxPP: 30
       currentPP: 30
-    heldItem: {fileID: 0}
     statusEffectWrapper:
       statusEffectBase: {fileID: 0}
     currentHP: 20
@@ -1341,7 +1339,6 @@ MonoBehaviour:
     - moveBase: {fileID: 0}
       maxPP: 0
       currentPP: 0
-    heldItem: {fileID: 0}
     statusEffectWrapper:
       statusEffectBase: {fileID: 0}
     currentHP: 20
@@ -1911,7 +1908,6 @@ MonoBehaviour:
     - moveBase: {fileID: 0}
       maxPP: 0
       currentPP: 0
-    heldItem: {fileID: 0}
     statusEffectWrapper:
       statusEffectBase: {fileID: 0}
     currentHP: 20
@@ -2811,7 +2807,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 9.54
+      value: 9.67
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3188,7 +3184,6 @@ MonoBehaviour:
     - moveBase: {fileID: 0}
       maxPP: 15
       currentPP: 15
-    heldItem: {fileID: 0}
     statusEffectWrapper:
       statusEffectBase: {fileID: 0}
     currentHP: 20

@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: LaxIncense
   m_EditorClassIdentifier: 
   itemName: Lax Incense
-  description: An item that lowers enemies crit chance when they attack the holder.
+  description: 

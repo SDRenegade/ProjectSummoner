@@ -17,9 +17,7 @@ public class LightScreenAction : TerraMoveAction
 
     public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
-        TerraBattlePosition attackerPosition = directAttackLog.GetAttackerPosition();
-        bool isSuccessfullyAdded = attackerPosition.AddVolatileStatusEffect(SODatabase.GetInstance().GetVolatileStatusEffectByName("Special Barrier"), battleSystem);
-        if (!isSuccessfullyAdded)
+        if (!battleSystem.AddVolatileStatusEffect(directAttackLog.GetAttackerPosition(), SODatabase.GetInstance().GetVolatileStatusEffectByName("Special Barrier")))
             Debug.Log(BattleDialog.ATTACK_FAILED);
     }
 

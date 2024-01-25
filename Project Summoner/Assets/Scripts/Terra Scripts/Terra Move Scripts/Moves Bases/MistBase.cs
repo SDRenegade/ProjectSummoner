@@ -17,7 +17,7 @@ public class MistAction : TerraMoveAction
     
     public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
-        if (!directAttackLog.GetAttackerPosition().AddVolatileStatusEffect(SODatabase.GetInstance().GetVolatileStatusEffectByName("Stat Resistance"), battleSystem))
+        if (!battleSystem.AddVolatileStatusEffect(directAttackLog.GetAttackerPosition(), SODatabase.GetInstance().GetVolatileStatusEffectByName("Stat Resistance")))
             Debug.Log(BattleDialog.ATTACK_FAILED);
     }
 

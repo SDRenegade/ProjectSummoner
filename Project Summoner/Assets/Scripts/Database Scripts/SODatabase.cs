@@ -66,7 +66,7 @@ public class SODatabase : MonoBehaviour
         return terraMove;
     }
 
-    public ItemBase GetItemByID(int id)
+    public ItemSO GetItemByID(int id)
     {
         if (id >= itemDatabase.GetItemList().Count)
             return null;
@@ -74,12 +74,12 @@ public class SODatabase : MonoBehaviour
         return itemDatabase.GetItemList()[id];
     }
 
-    public ItemBase GetItemByName(string name)
+    public ItemSO GetItemByName(string itemName)
     {
-        ItemBase item = null;
-        foreach (ItemBase itemBase in itemDatabase.GetItemList()) {
-            if (itemBase.GetItemName() == name) {
-                item = itemBase;
+        ItemSO item = null;
+        foreach (ItemSO itemSO in itemDatabase.GetItemList()) {
+            if (itemSO.GetItemName() == itemName) {
+                item = itemSO;
                 break;
             }
         }
@@ -108,7 +108,7 @@ public class SODatabase : MonoBehaviour
         return effect;
     }
 
-    public VolatileStatusEffectBase GetVolatileStatusEffectByID(int id)
+    public VolatileStatusEffectSO GetVolatileStatusEffectByID(int id)
     {
         if (id >= statusEffectDatabase.GetStatusEffectList().Count)
             return null;
@@ -116,12 +116,12 @@ public class SODatabase : MonoBehaviour
         return volatileStatusEffectDatabase.GetVolatileStatusEffectList()[id];
     }
 
-    public VolatileStatusEffectBase GetVolatileStatusEffectByName(string name)
+    public VolatileStatusEffectSO GetVolatileStatusEffectByName(string name)
     {
-        VolatileStatusEffectBase effect = null;
-        foreach (VolatileStatusEffectBase vStatusEffect in volatileStatusEffectDatabase.GetVolatileStatusEffectList()) {
-            if (vStatusEffect.GetStatusName() == name) {
-                effect = vStatusEffect;
+        VolatileStatusEffectSO effect = null;
+        foreach (VolatileStatusEffectSO vStatusEffectSO in volatileStatusEffectDatabase.GetVolatileStatusEffectList()) {
+            if (vStatusEffectSO.GetStatusName() == name) {
+                effect = vStatusEffectSO;
                 break;
             }
         }

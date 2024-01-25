@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Flinched
   m_EditorClassIdentifier: 
   statusName: Flinched
-  description: The terra's next attack this turn will be canceled.
+  description: Target Terra can not attack this turn.

@@ -58,7 +58,7 @@ public class SkullBashAction : TerraMoveAction
 
         TerraBattlePosition attackerPosition = terraAttack.GetAttackerPosition();
         eventArgs.GetDirectAttackParams().SetDamageStepCanceled(true);
-        eventArgs.GetBattleSystem().TerraStatChanage(attackerPosition, Stats.ATK, DEF_MODIFICATION);
+        eventArgs.GetBattleSystem().ChanageTerraStat(attackerPosition, Stats.ATK, DEF_MODIFICATION);
 
         eventArgs.GetBattleSystem().OnDirectAttack -= ChargeAction;
     }

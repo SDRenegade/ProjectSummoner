@@ -26,7 +26,7 @@ public class TerraBattlePosition
     private Terra terra;
     private Dictionary<Stats, StatStages> statStagesMap;
     private BattlePositionState battlePositionState;
-    private List<VolatileStatusEffectWrapper> vStatusEffectList;
+    private List<VolatileStatusEffectBase> vStatusEffectList;
 
     public TerraBattlePosition(BattleSide battleSide)
     {
@@ -42,7 +42,7 @@ public class TerraBattlePosition
             { Stats.EVA, StatStages.NEUTRAL }
         };
         battlePositionState = BattlePositionState.NORMAL;
-        vStatusEffectList = new List<VolatileStatusEffectWrapper>();
+        vStatusEffectList = new List<VolatileStatusEffectBase>();
     }
 
     public TerraBattlePosition(Terra terra, BattleSide battleSide)
@@ -59,7 +59,7 @@ public class TerraBattlePosition
             { Stats.EVA, StatStages.NEUTRAL }
         };
         battlePositionState = BattlePositionState.NORMAL;
-        vStatusEffectList = new List<VolatileStatusEffectWrapper>();
+        vStatusEffectList = new List<VolatileStatusEffectBase>();
     }
 
     public void ResetStatStages()
@@ -84,29 +84,39 @@ public class TerraBattlePosition
 
     public void SetBattlePositionState(BattlePositionState battlePositionState) { this.battlePositionState = battlePositionState; }
 
-    public List<VolatileStatusEffectWrapper> GetVolatileStatusEffectList() { return vStatusEffectList; }
+    public List<VolatileStatusEffectBase> GetVolatileStatusEffectList() { return vStatusEffectList; }
 
     public bool AddVolatileStatusEffect(VolatileStatusEffectBase vStatusEffectBase, BattleSystem battleSystem)
     {
-        foreach(VolatileStatusEffectWrapper vStatusEffectWrapper in vStatusEffectList) {
-            if (vStatusEffectWrapper.GetVolatileStatusEffectBase().GetStatusName() == vStatusEffectBase.GetStatusName())
+        foreach (VolatileStatusEffectBase vStatusEffect in vStatusEffectList) {
+            if (vStatusEffect.GetVolatileStatusEffectSO().GetStatusName() == vStatusEffectBase.GetVolatileStatusEffectSO().GetStatusName())
                 return false;
         }
 
-        VolatileStatusEffectWrapper vStatusEffectW = new VolatileStatusEffectWrapper(vStatusEffectBase, this);
-        vStatusEffectList.Add(vStatusEffectW);
-        vStatusEffectW.GetBattleAction()?.AddBattleActions(battleSystem);
+        vStatusEffectList.Add(vStatusEffectBase);
+        vStatusEffectBase.AddBattleActions(battleSystem);
 
         return true;
     }
 
-    public bool RemoveVolatileStatusEffect(VolatileStatusEffectBase vStatusEffectBase)
+    public bool RemoveVolatileStatusEffect(VolatileStatusEffectSO vStatusEffectSO, BattleSystem battleSystem)
     {
         for(int i = vStatusEffectList.Count - 1; i >= 0; i--) {
-            if (vStatusEffectList[i].GetVolatileStatusEffectBase().GetStatusName() == vStatusEffectBase.GetStatusName()) {
+            if (vStatusEffectList[i].GetVolatileStatusEffectSO().GetStatusName() == vStatusEffectSO.GetStatusName()) {
+                vStatusEffectList[i].RemoveBattleActions(battleSystem);
                 vStatusEffectList.RemoveAt(i);
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    public bool ContainsVolatileStatusEffect(VolatileStatusEffectSO vStatusEffectSO)
+    {
+        foreach (VolatileStatusEffectBase vStatusEffect in vStatusEffectList) {
+            if (vStatusEffect.GetVolatileStatusEffectSO().GetStatusName() == vStatusEffectSO.GetStatusName())
+                return true;
         }
 
         return false;

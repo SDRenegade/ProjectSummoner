@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: StatResistance
   m_EditorClassIdentifier: 
   statusName: Stat Resistance
-  description: The Terra is immue to stat stage changes for a few turns.
+  description: Target terra cannot have their stats changed for a few turns.

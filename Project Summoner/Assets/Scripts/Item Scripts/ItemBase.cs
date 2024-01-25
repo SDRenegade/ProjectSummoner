@@ -2,18 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class ItemBase : ScriptableObject
+public abstract class ItemBase
 {
-    [SerializeField] private string itemName;
-    [SerializeField] [TextArea] private string description;
+    protected ItemSO itemSO;
+
+    public ItemBase(ItemSO itemSO)
+    {
+        this.itemSO = itemSO;
+    }
+
+    public abstract void OnOverworldUse();
 
     public abstract void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem);
 
     public abstract void RemoveBattleActions(BattleSystem battleSystem);
 
-    public abstract void OnOverworldUse();
-
-    public string GetItemName() { return  itemName; }
-
-    public string GetDescription() { return description; }
+    public ItemSO GetItemSO() { return itemSO; }
 }

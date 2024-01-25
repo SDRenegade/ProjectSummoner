@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: SpecialBarrier
   m_EditorClassIdentifier: 
   statusName: Special Barrier
-  description: A barrier that halfs the damage of incomming special attack.
+  description: Target terra takes less special damage for a few turns.

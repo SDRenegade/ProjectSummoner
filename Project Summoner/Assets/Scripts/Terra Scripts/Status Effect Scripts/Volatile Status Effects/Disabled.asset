@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Disabled
   m_EditorClassIdentifier: 
   statusName: Disabled
-  description: The user is unable to use the effected move for a few turns.
+  description: Target terra cannot use their last executed move for a few turns.
