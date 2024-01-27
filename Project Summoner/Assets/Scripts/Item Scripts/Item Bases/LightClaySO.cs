@@ -39,7 +39,7 @@ public class LightClay : ItemBase
         if (eventArgs.GetVolatileStatusEffect().GetVolatileStatusEffectSO().GetStatusName() != "Special Barrier")
             return;
 
-        Debug.Log(BattleDialog.ItemProked(this));
+        Debug.Log(BattleDialog.ItemProkedMsg(this));
         SpecialBarrierVolatileStatusEffect barrierEffect = (SpecialBarrierVolatileStatusEffect)eventArgs.GetVolatileStatusEffect();
         barrierEffect.SetTurnDuration(EXTENDED_TURN_DURATION);
     }

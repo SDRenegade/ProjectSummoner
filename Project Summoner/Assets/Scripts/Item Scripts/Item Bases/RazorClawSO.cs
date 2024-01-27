@@ -37,7 +37,7 @@ public class RazorClaw : ItemBase
         if (eventArgs.GetDirectAttackParams().GetAttackerPosition() != terraBattlePosition)
             return;
 
-        Debug.Log(BattleDialog.ItemProked(this));
+        Debug.Log(BattleDialog.ItemProkedMsg(this));
         eventArgs.GetDirectAttackParams().AddCritModifier(CRIT_MODIFIER);
     }
 }

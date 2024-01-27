@@ -6,11 +6,13 @@ public class OpeningMoveSelectionUIEventArgs : BattleEventArgs
 {
     private TerraBattlePosition terraBattlePosition;
     private List<int> disabledMoveIndicies;
+    private bool isMoveSelectionCanceled;
 
     public OpeningMoveSelectionUIEventArgs(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem) : base(battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
         disabledMoveIndicies = new List<int>();
+        isMoveSelectionCanceled = false;
     }
 
     public TerraBattlePosition GetTerraBattlePosition() { return terraBattlePosition; }
@@ -26,4 +28,8 @@ public class OpeningMoveSelectionUIEventArgs : BattleEventArgs
 
         disabledMoveIndicies.Add(moveIndex);
     }
+
+    public bool IsMoveSelectionCanceled() { return isMoveSelectionCanceled; }
+
+    public void SetMoveSelectionCancled(bool isMoveSelectionCanceled) { this.isMoveSelectionCanceled = isMoveSelectionCanceled; }
 }

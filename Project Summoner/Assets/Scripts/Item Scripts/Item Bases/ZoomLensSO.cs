@@ -53,7 +53,7 @@ public class ZoomLens : ItemBase
         if (!isAttacked)
             return;
 
-        Debug.Log(BattleDialog.ItemProked(this));
+        Debug.Log(BattleDialog.ItemProkedMsg(this));
         eventArgs.GetDirectAttackParams().AddAccuracyModifier(ACCURACY_MODIFIER);
     }
 

@@ -35,7 +35,7 @@ public class LaggingTail : ItemBase
         BattleSystem battleSystem = eventArgs.GetBattleSystem();
         foreach (TerraAttack terraAttack in battleSystem.GetBattleActionManager().GetTerraAttackList()) {
             if (terraAttack.GetAttackerPosition() == terraBattlePosition) {
-                Debug.Log(BattleDialog.ItemProked(this));
+                Debug.Log(BattleDialog.ItemProkedMsg(this));
                 terraAttack.SetSpeedPriority(SpeedPriority.LOW);
             }
         }

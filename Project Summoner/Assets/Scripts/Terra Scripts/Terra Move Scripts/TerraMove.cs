@@ -55,8 +55,5 @@ public class TerraMove
         this.currentPP = (currentPP > maxPP) ? maxPP : currentPP;
     }
 
-    public override string ToString()
-    {
-        return moveBase.GetMoveName();
-    }
+    public override string ToString() { return moveBase.GetMoveName(); }
 }

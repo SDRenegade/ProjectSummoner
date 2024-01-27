@@ -23,7 +23,9 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<DirectAttackEventArgs> OnDirectAttack;
     public event EventHandler<DirectAttackLogEventArgs> OnAttackMissed;
     public event EventHandler<TerraDamageByTerraEventArgs> OnTerraDamageByTerra;
+    public event EventHandler<TerraDamageByTerraEventArgs> OnPostTerraDamageByTerra;
     public event EventHandler<TerraDamagedEventArgs> OnTerraDamaged;
+    public event EventHandler<TerraDamagedEventArgs> OnPostTerraDamaged;
     public event EventHandler<TerraHealedEventArgs> OnTerraHealed;
     public event EventHandler<StatChangeEventArgs> OnStatChange;
     public event EventHandler<VolatileStatusEffectAddedEventArgs> OnVolatileStatusEffectAdded;
@@ -82,8 +84,8 @@ public class BattleSystem : MonoBehaviour
         secondarySideAI = new WildTerraAI();
 
         //--- (Temp) Hard-coding the leading terra held item until new system is added ---
-        primarySideTerraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Light Clay").CreateItemBase());
-        secondarySideTerraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Leftovers").CreateItemBase());
+        primarySideTerraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Shell Bell").CreateItemBase());
+        //secondarySideTerraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Leftovers").CreateItemBase());
 
         primarySideTerraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(primarySideTerraBattlePosition, this);
         secondarySideTerraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(secondarySideTerraBattlePosition, this);
@@ -143,17 +145,23 @@ public class BattleSystem : MonoBehaviour
         TerraBattlePosition terraBattlePosition = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0];
 
         //*** Opening Move Selection UI Event ***
-        OpeningMoveSelectionUIEventArgs eventArgs = InvokeOnOpeningMoveSelectionUI(terraBattlePosition);
+        OpeningMoveSelectionUIEventArgs openingMoveSelectionUIEventArgs = InvokeOnOpeningMoveSelectionUI(terraBattlePosition);
 
-        List<TerraMove> moveList = terraBattlePosition.GetTerra().GetMoves();
+        if (openingMoveSelectionUIEventArgs.IsMoveSelectionCanceled()) {
+            //Check if all battle positions are ready. If so, switch to combat state.
+            if (battleActionManager.AddReadyBattlePosition())
+                EndActionSelection();
+            return;
+        }
 
         //Create a list of available moves indicies after acounting for null move slots and disabled moves
+        List<TerraMove> moveList = terraBattlePosition.GetTerra().GetMoves();
         List<int> availableMoveIndicies = new List<int>() { 0, 1, 2, 3 };
         for (int i = availableMoveIndicies.Count - 1; i >= 0; i--) {
             if (availableMoveIndicies[i] >= terraBattlePosition.GetTerra().GetMoves().Count || terraBattlePosition.GetTerra().GetMoves()[availableMoveIndicies[i]].GetCurrentPP() <= 0)
                 availableMoveIndicies.RemoveAt(i);
         }
-        foreach (int index in eventArgs.GetDisabledMoveIndicies())
+        foreach (int index in openingMoveSelectionUIEventArgs.GetDisabledMoveIndicies())
             availableMoveIndicies.Remove(index);
 
         if (availableMoveIndicies.Count == 0) {
@@ -165,15 +173,17 @@ public class BattleSystem : MonoBehaviour
                 struggle);
             battleActionManager.GetTerraAttackList().Add(terraAttack);
 
-            battleActionManager.AddReadyBattlePosition();
             //Check if all battle positions are ready. If so, switch to combat state.
-            if (battleActionManager.IsAllBattlePositionsReady())
+            if (battleActionManager.AddReadyBattlePosition())
                 EndActionSelection();
         }
         else
-            battleHUD.OpenMoveSelectionUI(moveList, eventArgs.GetDisabledMoveIndicies());
+            battleHUD.OpenMoveSelectionUI(moveList, openingMoveSelectionUIEventArgs.GetDisabledMoveIndicies());
     }
 
+    //TODO Temp method being used for move button action until the terra battle position can be passed as
+    //an argument. Have a method in the action manager that calls this method and then checks for all ready
+    //positions, since this method is called in other classes such as Choice Band.
     public void MoveSelectionAction(int moveIndex)
     {
         if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
@@ -196,10 +206,31 @@ public class BattleSystem : MonoBehaviour
         //Add the selected moves battle actions into the event system
         terraAttack.GetTerraMoveAction()?.AddBattleActions(this);
 
-        battleActionManager.AddReadyBattlePosition();
         //Check if all battle positions are ready. If so, switch to combat state.
-        if (battleActionManager.IsAllBattlePositionsReady())
+        if (battleActionManager.AddReadyBattlePosition())
             EndActionSelection();
+    }
+
+    //--- (Temp) This method is currently being called from Choice Band during the action slection event.
+    //So, the ready position and the check for end of action selection method calls were removed.
+    public void MoveSelectionAction(TerraBattlePosition attackerPosition, List<TerraBattlePosition> defenderList, int moveIndex)
+    {
+        if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
+            return;
+
+        TerraMove selectedMove = attackerPosition.GetTerra().GetMoves()[moveIndex];
+        if (selectedMove == null)
+            return;
+        if (selectedMove.GetCurrentPP() <= 0) {
+            Debug.Log(BattleDialog.NoMovePowerPointsLeftMsg(selectedMove));
+            return;
+        }
+
+        //Initializes the selected attack and add the new TerraAttack to the TerraAttackList
+        TerraAttack terraAttack = new TerraAttack(attackerPosition, defenderList, selectedMove);
+        battleActionManager.GetTerraAttackList().Add(terraAttack);
+        //Add the selected moves battle actions into the event system
+        terraAttack.GetTerraMoveAction()?.AddBattleActions(this);
     }
 
     public void EndActionSelection()
@@ -243,6 +274,7 @@ public class BattleSystem : MonoBehaviour
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 
+    //Method used when a terra is dealt damage that is not from a terra attack
     public int? DamageTerra(TerraBattlePosition terraBattlePosition, int? damage)
     {
         if (damage == null)
@@ -251,20 +283,30 @@ public class BattleSystem : MonoBehaviour
         //*** Terra Damaged Event ***
         TerraDamagedEventArgs terraDamagedEventArgs = InvokeOnTerraDamaged(terraBattlePosition, damage);
 
-        if (terraDamagedEventArgs.GetDamage() != null) {
-            Debug.Log(BattleDialog.TerraDamagedMsg(terraBattlePosition.GetTerra(), (int)damage));
-            terraBattlePosition.GetTerra().TakeDamage((int)terraDamagedEventArgs.GetDamage());
+        ApplyTerraDamage(terraBattlePosition, terraDamagedEventArgs.GetDamage());
 
-            if (terraBattlePosition.GetTerra().GetCurrentHP() <= 0) {
-                Debug.Log(BattleDialog.TerraFaintedMsg(terraBattlePosition.GetTerra()));
-                //*** Terra Faint Event ***
-                InvokeOnTerraFainted(terraBattlePosition);
-                //--- (Temp) Match ends once a single terra faints, until parties are added ---
-                isMatchFinished = true;
-            }
-        }
+        //*** Post Terra Damaged Event ***
+        InvokeOnPostTerraDamaged(terraDamagedEventArgs);
 
         return terraDamagedEventArgs.GetDamage();
+    }
+
+    //Method called after damage calculate and terra damage events are invoked to actually apply the damage
+    public void ApplyTerraDamage(TerraBattlePosition terraBattlePosition, int? damage)
+    {
+        if (damage == null)
+            return;
+
+        Debug.Log(BattleDialog.TerraDamagedMsg(terraBattlePosition.GetTerra(), (int)damage));
+        terraBattlePosition.GetTerra().TakeDamage((int)damage);
+
+        if (terraBattlePosition.GetTerra().GetCurrentHP() <= 0) {
+            Debug.Log(BattleDialog.TerraFaintedMsg(terraBattlePosition.GetTerra()));
+            //*** Terra Faint Event ***
+            InvokeOnTerraFainted(terraBattlePosition);
+            //--- (Temp) Match ends once a single terra faints, until parties are added ---
+            isMatchFinished = true;
+        }
     }
 
     public int? HealTerra(TerraBattlePosition terraBattlePosition, int? healAmt)
@@ -395,10 +437,24 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
+    public TerraDamageByTerraEventArgs InvokeOnPostTerraDamageByTerra(TerraDamageByTerraEventArgs eventArgs)
+    {
+        OnPostTerraDamageByTerra?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
     public TerraDamagedEventArgs InvokeOnTerraDamaged(TerraBattlePosition terraBattlePosition, int? damage)
     {
         TerraDamagedEventArgs eventArgs = new TerraDamagedEventArgs(terraBattlePosition, damage, this);
         OnTerraDamaged?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public TerraDamagedEventArgs InvokeOnPostTerraDamaged(TerraDamagedEventArgs eventArgs)
+    {
+        OnPostTerraDamaged?.Invoke(this, eventArgs);
 
         return eventArgs;
     }

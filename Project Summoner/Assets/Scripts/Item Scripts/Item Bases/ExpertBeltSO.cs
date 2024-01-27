@@ -41,7 +41,7 @@ public class ExpertBelt : ItemBase
         if (moveBase.GetMoveType().GetTypeEffectivenessModifier(defendingTerra.GetTerraBase().GetTerraTypes()) < TerraTypeExtension.GetEffectivenessTypeValue(EffectivenessTypes.SUPER))
             return;
 
-        Debug.Log(BattleDialog.ItemProked(this));
+        Debug.Log(BattleDialog.ItemProkedMsg(this));
         eventArgs.GetDirectAttackParams().AddDamageModifier(DAMAGE_MODIFIER);
     }
 }

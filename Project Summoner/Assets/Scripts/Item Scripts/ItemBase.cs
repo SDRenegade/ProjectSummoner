@@ -18,4 +18,6 @@ public abstract class ItemBase
     public abstract void RemoveBattleActions(BattleSystem battleSystem);
 
     public ItemSO GetItemSO() { return itemSO; }
+
+    public override string ToString() { return itemSO.GetItemName(); }
 }

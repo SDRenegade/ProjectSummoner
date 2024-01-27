@@ -40,7 +40,7 @@ public class MiracleSeed : ItemBase
         if (eventArgs.GetDirectAttackParams().GetMove().GetMoveBase().GetMoveType() != EMPOWERED_TYPE)
             return;
 
-        Debug.Log(BattleDialog.ItemProked(this));
+        Debug.Log(BattleDialog.ItemProkedMsg(this));
         eventArgs.GetDirectAttackParams().AddDamageModifier(DAMAGE_MULTIPLIER);
     }
 }

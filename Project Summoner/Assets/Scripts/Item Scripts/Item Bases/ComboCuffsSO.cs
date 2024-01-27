@@ -43,7 +43,7 @@ public class ComboCuffs : ItemBase
         if (eventArgs.GetDirectAttackParams().GetAttackerPosition() != terraBattlePosition)
             return;
 
-        Debug.Log(BattleDialog.ItemProked(this));
+        Debug.Log(BattleDialog.ItemProkedMsg(this));
         if (eventArgs.GetDirectAttackParams().GetMove().GetMoveBase().GetMoveName() == previousAttack?.GetMoveName()) {
             if(comboCounter < DAMAGE_MODIFIER_LIST.Length - 1)
                 comboCounter++;

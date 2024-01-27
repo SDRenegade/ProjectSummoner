@@ -37,7 +37,7 @@ public class LaxIncense : ItemBase
         if (eventArgs.GetDirectAttackParams().GetDefenderPosition() != terraBattlePosition)
             return;
 
-        Debug.Log(BattleDialog.ItemProked(this));
+        Debug.Log(BattleDialog.ItemProkedMsg(this));
         eventArgs.GetDirectAttackParams().AddCritModifier(LOWERED_CRIT_MODIFIER);
     }
 }

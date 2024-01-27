@@ -43,7 +43,7 @@ public class AdamantOrb : ItemBase
         if (eventArgs.GetDirectAttackParams().GetMove().GetMoveBase().GetMoveType() != EMPOWERED_MOVE_TYPE)
             return;
 
-        Debug.Log(BattleDialog.ItemProked(this));
+        Debug.Log(BattleDialog.ItemProkedMsg(this));
         eventArgs.GetDirectAttackParams().AddDamageModifier(DAMAGE_MULTIPLIER);
     }
 }

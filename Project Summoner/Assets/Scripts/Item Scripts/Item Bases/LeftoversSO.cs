@@ -34,7 +34,7 @@ public class Leftovers : ItemBase
 
     public void HealthRegen(object sender, BattleEventArgs eventArgs)
     {
-        Debug.Log(BattleDialog.ItemProked(this));
+        Debug.Log(BattleDialog.ItemProkedMsg(this));
 
         Terra terra = terraBattlePosition.GetTerra();
         int? healAmt = (int)(terra.GetMaxHP() * PERCENT_HEALTH_HEAL);

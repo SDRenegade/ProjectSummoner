@@ -39,7 +39,7 @@ public class MuscleBrace : ItemBase
         if (eventArgs.GetDirectAttackParams().GetMove().GetMoveBase().GetDamageType() != DamageType.PHYSICAL)
             return;
 
-        Debug.Log(BattleDialog.ItemProked(this));
+        Debug.Log(BattleDialog.ItemProkedMsg(this));
         eventArgs.GetDirectAttackParams().AddDamageModifier(PHYSICAL_DAMAGE_MODIFIER);
     }
 }

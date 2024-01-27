@@ -142,10 +142,13 @@ public class CombatBattleState : BattleState
         directAttackLog.SetDamage(CombatCalculator.CalculateDamage(directAttackLog.GetDirectAttackParams(), directAttackLog.IsCrit()));
 
         //*** Terra Damage by Terra Event ***
-        battleSystem.InvokeOnTerraDamageByTerra(terraAttack, directAttackLog);
+        TerraDamageByTerraEventArgs terraDamageByTerraEventArgs = battleSystem.InvokeOnTerraDamageByTerra(terraAttack, directAttackLog);
 
         if (directAttackLog.IsCrit())
             Debug.Log(BattleDialog.CRITICAL_HIT);
-        battleSystem.DamageTerra(directAttackLog.GetDefenderPosition(), directAttackLog.GetDamage());
+        battleSystem.ApplyTerraDamage(directAttackLog.GetDefenderPosition(), directAttackLog.GetDamage());
+
+        //*** Post Terra Damaged by Terra Event ***
+        battleSystem.InvokeOnPostTerraDamageByTerra(terraDamageByTerraEventArgs);
     }
 }

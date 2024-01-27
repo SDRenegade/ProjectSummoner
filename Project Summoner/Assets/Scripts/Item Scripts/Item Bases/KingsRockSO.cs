@@ -39,7 +39,7 @@ public class KingsRock : ItemBase
         if (Random.Range(0f, 1f) > FLINCH_CHANCE)
             return;
 
-        Debug.Log(BattleDialog.ItemProked(this));
+        Debug.Log(BattleDialog.ItemProkedMsg(this));
         eventArgs.GetBattleSystem().AddVolatileStatusEffect(terraBattlePosition, SODatabase.GetInstance().GetVolatileStatusEffectByName("Flinched"));
     }
 }

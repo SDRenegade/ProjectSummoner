@@ -563,9 +563,6 @@ MonoBehaviour:
     - moveBase: {fileID: 11400000, guid: bd1aecb2193b359438b9e423cfd674c1, type: 2}
       maxPP: 30
       currentPP: 30
-    - moveBase: {fileID: 11400000, guid: bbab58efed0be3d4493ef2893699d3fd, type: 2}
-      maxPP: 30
-      currentPP: 30
     statusEffectWrapper:
       statusEffectBase: {fileID: 0}
     currentHP: 20
@@ -2807,7 +2804,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 9.67
+      value: 3.95
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.y

@@ -23,7 +23,6 @@ public class ProtectedVolatileStatusEffect : VolatileStatusEffectBase
 
     public override void AddBattleActions(BattleSystem battleSystem)
     {
-        Debug.Log("Protected vStatusEffect AddBattleActions terra: " + terraBattlePosition.GetTerra());
         battleSystem.OnDirectAttack += ProtectActivate;
         battleSystem.OnEndOfTurn += EndOfTurnSetCooldown;
     }

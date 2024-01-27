@@ -104,11 +104,6 @@ public class Terra
         currentHP = (currentHP + healAmt <= GetMaxHP()) ? currentHP + healAmt : GetMaxHP();
     }
 
-    public override string ToString()
-    {
-        return terraBase.GetSpeciesName();
-    }
-
     public TerraBase GetTerraBase() { return terraBase; }
 
     public void SetTerraBase(TerraBase terraBase) { this.terraBase = terraBase; }
@@ -174,4 +169,6 @@ public class Terra
     public int GetSpDefence() { return Mathf.FloorToInt(level * terraBase.GetBaseSpDefence() * BASE_STAT_MULTIPLIER + 5); }
 
     public int GetSpeed() { return Mathf.FloorToInt(level * terraBase.GetBaseSpeed() * BASE_STAT_MULTIPLIER + 5); }
+
+    public override string ToString() { return terraBase.GetSpeciesName(); }
 }

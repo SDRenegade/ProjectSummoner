@@ -166,12 +166,16 @@ public static class BattleDialog
     }
 
     public static string MistProkedMsg(Terra terra) {
-        return terra + " is immune to stat changes with mist active";
+        return terra + " is immune to stat changes with mist active.";
     }
 
     // ================== Item Messages ==================
-    public static string ItemProked(ItemBase item) {
-        return item.GetItemSO().GetItemName() + " has proked";
+    public static string ItemProkedMsg(ItemBase item) {
+        return item + " has proked.";
+    }
+
+    public static string ItemConsumedMsg(ItemBase item) {
+        return item + " has been consumed.";
     }
 
     // ================== UI Selection Messages ==================

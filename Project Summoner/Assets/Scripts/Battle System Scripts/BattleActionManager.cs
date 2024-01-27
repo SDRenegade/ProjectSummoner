@@ -47,7 +47,8 @@ public class BattleActionManager
         attemptEscape = false;
     }
 
-    public void AddReadyBattlePosition()
+    //Returns true if all battle positions are ready
+    public bool AddReadyBattlePosition()
     {
         for (int i = 0; i < readyActionList.Length; i++) {
             if (readyActionList[i] == false) {
@@ -55,6 +56,8 @@ public class BattleActionManager
                 break;
             }
         }
+
+        return IsAllBattlePositionsReady();
     }
 
     public bool IsAllBattlePositionsReady()

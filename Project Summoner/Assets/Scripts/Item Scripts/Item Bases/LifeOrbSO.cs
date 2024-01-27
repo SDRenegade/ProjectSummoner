@@ -40,7 +40,7 @@ public class LifeOrb : ItemBase
         if (eventArgs.GetDirectAttackParams().GetAttackerPosition() != terraBattlePosition)
             return;
 
-        Debug.Log(BattleDialog.ItemProked(this));
+        Debug.Log(BattleDialog.ItemProkedMsg(this));
         eventArgs.GetDirectAttackParams().AddDamageModifier(DAMAGE_MODIFIER);
     }
 
@@ -51,7 +51,7 @@ public class LifeOrb : ItemBase
         if (eventArgs.GetDirectAttackLog().GetDamage() == null)
             return;
 
-        Debug.Log(BattleDialog.ItemProked(this));
+        Debug.Log(BattleDialog.ItemProkedMsg(this));
         int recoilDamage = (int)(terraBattlePosition.GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_RECOIL);
         eventArgs.GetBattleSystem().DamageTerra(terraBattlePosition, recoilDamage);
     }
