@@ -9,19 +9,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e94c603ffaed4147891e2871bb75d14, type: 3}
+  m_Script: {fileID: 11500000, guid: e1c3b9031521f4a40a11c0f27a3dfd0d, type: 3}
   m_Name: SuckerPunch
   m_EditorClassIdentifier: 
   moveName: Sucker Punch
-  description: A strike that always hits first if the opponent uses a move that infilicts
-    damage this turn.
-  moveType: 11
+  description: An attack that hits first if the opponent attacks you this turn. Otherwise,
+    this attack fails.
+  terraType: 11
   damageType: 0
   baseMovePriority: 2
   baseDamage:
-    value: 60
+    value: 30
     isNull: 0
   baseAccuracy:
     value: 0
     isNull: 1
   basePP: 15
+  hasChargeTurn: 0
+  hasRechargeTurn: 0

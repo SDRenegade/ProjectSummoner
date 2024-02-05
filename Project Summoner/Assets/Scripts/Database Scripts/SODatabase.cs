@@ -45,7 +45,7 @@ public class SODatabase : MonoBehaviour
         return terra;
     }
 
-    public TerraMoveBase GetTerraMoveByID(int id)
+    public TerraMoveSO GetTerraMoveByID(int id)
     {
         if (id >= terraMoveDatabase.GetTerraMoveList().Count)
             return null;
@@ -53,10 +53,10 @@ public class SODatabase : MonoBehaviour
         return terraMoveDatabase.GetTerraMoveList()[id];
     }
 
-    public TerraMoveBase GetTerraMoveByName(string name)
+    public TerraMoveSO GetTerraMoveByName(string name)
     {
-        TerraMoveBase terraMove = null;
-        foreach (TerraMoveBase terraMoveBase in terraMoveDatabase.GetTerraMoveList()) {
+        TerraMoveSO terraMove = null;
+        foreach (TerraMoveSO terraMoveBase in terraMoveDatabase.GetTerraMoveList()) {
             if (terraMoveBase.GetMoveName() == name) {
                 terraMove = terraMoveBase;
                 break;
@@ -129,7 +129,7 @@ public class SODatabase : MonoBehaviour
         return effect;
     }
 
-    public TerraMoveBase GetRandomMetronomeMove()
+    public TerraMoveSO GetRandomMetronomeMove()
     {
         if (metronomeMovesDatabase.GetMetronomeMoveList().Count == 0)
             return null;

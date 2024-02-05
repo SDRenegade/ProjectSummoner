@@ -15,7 +15,7 @@ MonoBehaviour:
   moveName: Counter
   description: An attack that has the user unleash double the physical damage they
     recieved this turn to the opponent
-  moveType: 11
+  terraType: 1
   damageType: 0
   baseMovePriority: -2
   baseDamage:
@@ -25,3 +25,5 @@ MonoBehaviour:
     value: 0
     isNull: 1
   basePP: 15
+  hasChargeTurn: 0
+  hasRechargeTurn: 0

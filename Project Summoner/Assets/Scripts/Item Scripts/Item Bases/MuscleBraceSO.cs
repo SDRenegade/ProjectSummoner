@@ -36,7 +36,7 @@ public class MuscleBrace : ItemBase
     {
         if (eventArgs.GetDirectAttackParams().GetAttackerPosition() != terraBattlePosition)
             return;
-        if (eventArgs.GetDirectAttackParams().GetMove().GetMoveBase().GetDamageType() != DamageType.PHYSICAL)
+        if (eventArgs.GetDirectAttackParams().GetMove().GetMoveSO().GetDamageType() != DamageType.PHYSICAL)
             return;
 
         Debug.Log(BattleDialog.ItemProkedMsg(this));

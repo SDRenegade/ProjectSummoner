@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Growl
   description: An intimidating growl that lowers the opponenets attack
-  moveType: 1
+  terraType: 1
   damageType: 2
   baseMovePriority: 0
   baseDamage:
@@ -24,3 +24,5 @@ MonoBehaviour:
     value: 0
     isNull: 1
   basePP: 35
+  hasChargeTurn: 0
+  hasRechargeTurn: 0

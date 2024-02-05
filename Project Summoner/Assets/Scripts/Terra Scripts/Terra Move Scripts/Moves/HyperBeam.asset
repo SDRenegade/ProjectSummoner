@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Hyper Beam
   description: A strong attack that takes a turn to recharge after use.
-  moveType: 1
+  terraType: 1
   damageType: 0
   baseMovePriority: 0
   baseDamage:
@@ -24,3 +24,5 @@ MonoBehaviour:
     value: 100
     isNull: 0
   basePP: 5
+  hasChargeTurn: 0
+  hasRechargeTurn: 1

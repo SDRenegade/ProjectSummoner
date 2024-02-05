@@ -15,7 +15,7 @@ MonoBehaviour:
   moveName: Mist
   description: A move that has the user resist any stat changes for the next few
     turns.
-  moveType: 12
+  terraType: 12
   damageType: 2
   baseMovePriority: 0
   baseDamage:
@@ -25,3 +25,5 @@ MonoBehaviour:
     value: 0
     isNull: 1
   basePP: 20
+  hasChargeTurn: 0
+  hasRechargeTurn: 0

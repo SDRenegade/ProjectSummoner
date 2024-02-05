@@ -15,7 +15,7 @@ MonoBehaviour:
   moveName: Substitute
   description: A decoy with half the user's health is will take the damage from attacks
     until its health runs out. Recoil is taken when this move is used.
-  moveType: 1
+  terraType: 1
   damageType: 2
   baseMovePriority: 0
   baseDamage:

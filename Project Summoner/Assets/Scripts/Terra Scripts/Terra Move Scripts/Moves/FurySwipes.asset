@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Fury Swipes
   description: An attack that can hit between 2 and 5 times
-  moveType: 1
+  terraType: 1
   damageType: 0
   baseMovePriority: 0
   baseDamage:
@@ -24,3 +24,5 @@ MonoBehaviour:
     value: 100
     isNull: 0
   basePP: 25
+  hasChargeTurn: 0
+  hasRechargeTurn: 0

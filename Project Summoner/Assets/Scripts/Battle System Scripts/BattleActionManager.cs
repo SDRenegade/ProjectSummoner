@@ -35,14 +35,18 @@ public class BattleActionManager
         attackLog[attackLog.Count - 1].Add(eventArgs.GetTerraAttack());
     }
 
-    public void ResetActions()
+    public void ResetActions(BattleSystem battleSystem)
     {
         for(int i = 0; i < readyActionList.Length; i++)
             readyActionList[i] = false;
         //Removes all terra attacks from attack list that are not persistent
         for (int i = terraAttackList.Count - 1; i >= 0; i--) {
-            if (!terraAttackList[i].IsPersistent())
+            if (terraAttackList[i].IsCharging())
+                terraAttackList[i].SetCharging(false);
+            else if (!terraAttackList[i].IsPersistent() && !terraAttackList[i].IsRecharging()) {
+                terraAttackList[i].GetTerraMoveBase()?.RemoveBattleActions(battleSystem);
                 terraAttackList.RemoveAt(i);
+            }
         }
         attemptEscape = false;
     }

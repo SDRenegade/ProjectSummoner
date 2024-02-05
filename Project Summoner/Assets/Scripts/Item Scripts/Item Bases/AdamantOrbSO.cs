@@ -40,7 +40,7 @@ public class AdamantOrb : ItemBase
             return;
         if (eventArgs.GetDirectAttackParams().GetAttackerPosition().GetTerra().GetTerraBase().GetSpeciesName() != TERRA_SPECIES)
             return;
-        if (eventArgs.GetDirectAttackParams().GetMove().GetMoveBase().GetMoveType() != EMPOWERED_MOVE_TYPE)
+        if (eventArgs.GetDirectAttackParams().GetMove().GetMoveSO().GetTerraType() != EMPOWERED_MOVE_TYPE)
             return;
 
         Debug.Log(BattleDialog.ItemProkedMsg(this));

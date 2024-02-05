@@ -14,7 +14,7 @@ public class ReceiveTerraInteraction : MonoBehaviour, Interactable
 
         if (party.AddPartyMember(terra)) {
             Debug.Log("Contragulations you have just received a " + terra.GetTerraBase().GetSpeciesName());
-            Debug.Log("Level: " + terra.GetLevel() + " Move set: " + terra.GetMoves()[0]?.GetMoveBase().GetMoveName() + ", " + terra.GetMoves()[1]?.GetMoveBase().GetMoveName());
+            Debug.Log("Level: " + terra.GetLevel() + " Move set: " + terra.GetMoves()[0]?.GetMoveSO().GetMoveName() + ", " + terra.GetMoves()[1]?.GetMoveSO().GetMoveName());
         }
         else
             Debug.Log("Your party is full");

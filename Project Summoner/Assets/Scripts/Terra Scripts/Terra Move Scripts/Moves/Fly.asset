@@ -15,7 +15,7 @@ MonoBehaviour:
   moveName: Fly
   description: An attack that has the user fly into the air the first turn and attack
     the next turn.
-  moveType: 7
+  terraType: 7
   damageType: 0
   baseMovePriority: 0
   baseDamage:
@@ -25,3 +25,5 @@ MonoBehaviour:
     value: 100
     isNull: 0
   basePP: 20
+  hasChargeTurn: 0
+  hasRechargeTurn: 0

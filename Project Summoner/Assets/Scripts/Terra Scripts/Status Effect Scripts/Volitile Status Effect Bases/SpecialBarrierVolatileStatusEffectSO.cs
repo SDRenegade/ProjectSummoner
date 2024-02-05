@@ -50,7 +50,7 @@ public class SpecialBarrierVolatileStatusEffect : VolatileStatusEffectBase
     {
         if (eventArgs.GetDirectAttackLog().GetDefenderPosition() != terraBattlePosition)
             return;
-        if (eventArgs.GetTerraAttack().GetMove().GetMoveBase().GetDamageType() != DamageType.SPECIAL)
+        if (eventArgs.GetTerraAttack().GetMove().GetMoveSO().GetDamageType() != DamageType.SPECIAL)
             return;
 
         eventArgs.GetDirectAttackLog().SetDamage(eventArgs.GetDirectAttackLog().GetDamage() / 2);

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Dragon Rage
   description: A move that always deals 40 damage
-  moveType: 12
+  terraType: 12
   damageType: 1
   baseMovePriority: 0
   baseDamage:
@@ -24,3 +24,5 @@ MonoBehaviour:
     value: 100
     isNull: 0
   basePP: 20
+  hasChargeTurn: 0
+  hasRechargeTurn: 0

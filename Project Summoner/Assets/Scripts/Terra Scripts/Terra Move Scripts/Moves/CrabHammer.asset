@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Crab Hammer
   description: Increased crit rate
-  moveType: 3
+  terraType: 3
   damageType: 0
   baseMovePriority: 0
   baseDamage:
@@ -24,3 +24,5 @@ MonoBehaviour:
     value: 90
     isNull: 0
   basePP: 15
+  hasChargeTurn: 0
+  hasRechargeTurn: 0

@@ -15,12 +15,24 @@ public class ActionSelectionBattleState : BattleState
         TerraBattlePosition[] secondarySidePositions = battleSystem.GetBattlefield().GetSecondaryBattleSide().GetTerraBattlePositionArr();
         for (int i = 0; i < secondarySidePositions.Length; i++)
             ProcessActionSelection(battleSystem.GetSecondarySideAI(), secondarySidePositions[i], battleSystem);
+
+        //Check if all battle positions are ready. If so, switch to combat state.
+        if (battleSystem.GetBattleActionManager().IsAllBattlePositionsReady())
+            battleSystem.EndActionSelection();
     }
 
     private void ProcessActionSelection(BattleAI battleAI, TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
         //*** Entering Action Selection Event ***
         EnteringActionSelectionEventArgs enteringActionSelectionEventArgs = battleSystem.InvokeOnEnteringActionSelection(terraBattlePosition);
+
+        //Checks if there is already a terra attack queued from last turn for this terra battle position
+        for(int i = 0; i < battleSystem.GetBattleActionManager().GetTerraAttackList().Count; i++) {
+            if (battleSystem.GetBattleActionManager().GetTerraAttackList()[i].GetAttackerPosition() == terraBattlePosition) {
+                battleSystem.GetBattleActionManager().AddReadyBattlePosition();
+                return;
+            }
+        }
 
         if (enteringActionSelectionEventArgs.IsSkipActionSelection())
             battleSystem.GetBattleActionManager().AddReadyBattlePosition();
@@ -30,9 +42,5 @@ public class ActionSelectionBattleState : BattleState
             battleAI.PerformAction(terraBattlePosition, enteringActionSelectionEventArgs.GetDisabledMoveIndicies(), battleSystem);
             battleSystem.GetBattleActionManager().AddReadyBattlePosition();
         }
-
-        //Check if all battle positions are ready. If so, switch to combat state.
-        if (battleSystem.GetBattleActionManager().IsAllBattlePositionsReady())
-            battleSystem.EndActionSelection();
     }
 }

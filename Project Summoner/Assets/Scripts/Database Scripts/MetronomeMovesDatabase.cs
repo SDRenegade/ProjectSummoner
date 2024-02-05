@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "MetronomeMoveDatabase", menuName = "Database/Metronome Move Database")]
 public class MetronomeMovesDatabase : ScriptableObject
 {
-    [SerializeField] private List<TerraMoveBase> metronomeMoveList;
+    [SerializeField] private List<TerraMoveSO> metronomeMoveList;
 
-    public List<TerraMoveBase> GetMetronomeMoveList() { return metronomeMoveList; }
+    public List<TerraMoveSO> GetMetronomeMoveList() { return metronomeMoveList; }
 }

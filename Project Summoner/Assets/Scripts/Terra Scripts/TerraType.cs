@@ -31,7 +31,7 @@ public enum EffectivenessTypes
 
 public static class TerraTypeExtension
 {
-    //These are set for convinence, so the entier TypeEffectiveness.VALUE doesn't need to be typed for the chart
+    //These are set for convinence, so the entire TypeEffectiveness.<VALUE> doesn't need to be typed for the chart
     private static readonly EffectivenessTypes NEUTRAL = EffectivenessTypes.NEUTRAL;
     private static readonly EffectivenessTypes SUPER = EffectivenessTypes.SUPER;
     private static readonly EffectivenessTypes NOT_VERY = EffectivenessTypes.NOT_VERY;
@@ -63,6 +63,23 @@ public static class TerraTypeExtension
     public static EffectivenessTypes GetTypeEffectiveness(this TerraType attackType, TerraType defendType)
     {
         return typeEffectivenessChart[(int)attackType, (int)defendType];
+    }
+
+    public static EffectivenessTypes GetTypeEffectiveness(this TerraType attackType, List<TerraType> defendTypeList)
+    {
+        EffectivenessTypes effectivenessType;
+        float effectivenessModifier = attackType.GetTypeEffectivenessModifier(defendTypeList);
+
+        if(effectivenessModifier <= 0)
+            effectivenessType = EffectivenessTypes.IMMUNE;
+        else if(effectivenessModifier < 1)
+            effectivenessType = EffectivenessTypes.NOT_VERY;
+        else if(effectivenessModifier >= 2)
+            effectivenessType = EffectivenessTypes.SUPER;
+        else
+            effectivenessType = EffectivenessTypes.NEUTRAL;
+
+        return effectivenessType;
     }
 
     public static float GetTypeEffectivenessModifier(this TerraType attackType, TerraType defendType)

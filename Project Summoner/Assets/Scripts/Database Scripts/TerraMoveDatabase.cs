@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraMoveDatabase", menuName = "Database/Terra Move Database")]
 public class TerraMoveDatabase : ScriptableObject
 {
-    [SerializeField] private List<TerraMoveBase> terraMoveList;
+    [SerializeField] private List<TerraMoveSO> terraMoveList;
 
-    public List<TerraMoveBase> GetTerraMoveList() { return terraMoveList; }
+    public List<TerraMoveSO> GetTerraMoveList() { return terraMoveList; }
 }

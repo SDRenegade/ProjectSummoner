@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Petal Dance
   description: A move that hits for between 2 and 3 turns before confusing the user.
-  moveType: 2
+  terraType: 2
   damageType: 1
   baseMovePriority: 0
   baseDamage:
@@ -24,3 +24,5 @@ MonoBehaviour:
     value: 100
     isNull: 0
   basePP: 15
+  hasChargeTurn: 0
+  hasRechargeTurn: 0

@@ -70,13 +70,31 @@ public class CombatBattleState : BattleState
     private void ProcessTerraAttack(TerraAttack terraAttack, BattleSystem battleSystem)
     {
         Debug.Log(BattleDialog.AttackUsedMsg(terraAttack));
-
         //*** Terra Attack Declaration Event ***
         battleSystem.InvokeOnAttackDeclaration(terraAttack);
 
-        //If the attack is canceled, continue to the next attack
+        //If the attack is canceled, remove battle actions on the canceled attack and
+        //continue to the next attack
         if (terraAttack.IsCanceled()) {
-            terraAttack.GetTerraMoveAction()?.RemoveBattleActions(battleSystem);
+            terraAttack.GetTerraMoveBase()?.RemoveBattleActions(battleSystem);
+            return;
+        }
+
+        if (terraAttack.IsCharging()) {
+            //*** Attack Charging Event ***
+            AttackChargingEventArgs attackChargingEventArgs = battleSystem.InvokeOnAttackCharging(terraAttack);
+
+            if(attackChargingEventArgs.IsCanceled())
+                terraAttack.SetCharging(false);
+            else {
+                Debug.Log(BattleDialog.AttackCharging(terraAttack.GetMove().GetMoveSO()));
+                return;
+            }
+        }
+
+        if (terraAttack.IsRecharging()) {
+            Debug.Log(BattleDialog.AttackRecharging(terraAttack.GetAttackerPosition().GetTerra()));
+            terraAttack.SetRecharging(false);
             return;
         }
 
@@ -89,7 +107,6 @@ public class CombatBattleState : BattleState
             TerraBattlePosition attackerPosition = terraAttack.GetAttackerPosition();
             TerraBattlePosition defenderPosition = terraAttack.GetDefendersPositionList()[i];
 
-            //Add this attack as a new log in the list
             directAttackLogList.Add(new DirectAttackLog(attackerPosition, defenderPosition, terraAttack.GetMove()));
 
             //*** Direct Attack Event ***
@@ -104,11 +121,7 @@ public class CombatBattleState : BattleState
                 //*** Attack Missed Event ***
                 battleSystem.InvokeOnAttackMissed(directAttackLogList[i]);
 
-                if (directAttackLogList[i].GetDirectAttackParams().GetHitCount() > 1)
-                    Debug.Log(BattleDialog.MultiHitMsg(
-                        directAttackLogList[i].GetDirectAttackParams().GetAttackerPosition().GetTerra(),
-                        directAttackLogList[i].GetDirectAttackParams().GetHitCount()));
-
+                terraAttack.GetTerraMoveBase().RemoveBattleActions(battleSystem);
                 continue;
             }
 
@@ -117,11 +130,19 @@ public class CombatBattleState : BattleState
             for (int j = 0; j < directAttackLogList[i].GetDirectAttackParams().GetHitCount(); j++)
                 DamageStep(terraAttack, directAttackLogList[i], battleSystem);
 
-            //After damage is calculated and applied we activate the move's post attack effect
-            terraAttack.GetTerraMoveAction()?.PostAttackEffect(directAttackLogList[i], battleSystem);
+            terraAttack.GetTerraMoveBase()?.PostAttackEffect(directAttackLogList[i], battleSystem);
 
             //*** Post Attack Event ***
             battleSystem.InvokeOnPostAttack(directAttackLogList[i]);
+
+            //Checks if there is a recharge turn to the terra move that was used
+            if (terraAttack.GetMove().GetMoveSO().HasRechargeTurn()) {
+                //*** Attack Recharging Event ***
+                AttackChargingEventArgs attackRechargingEventArgs = battleSystem.InvokeOnAttackRecharging(terraAttack);
+
+                if (!attackRechargingEventArgs.IsCanceled())
+                    terraAttack.SetRecharging(true);
+            }
 
             if (directAttackLogList[i].GetDirectAttackParams().GetHitCount() > 1)
                 Debug.Log(BattleDialog.MultiHitMsg(
@@ -135,7 +156,7 @@ public class CombatBattleState : BattleState
     //If the move used is not a status move and the damage step is not canceled, we calculate the damage dealt
     private void DamageStep(TerraAttack terraAttack, DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
-        if (terraAttack.GetMove().GetMoveBase().GetDamageType() == DamageType.STATUS || directAttackLog.GetDirectAttackParams().IsDamageStepCanceled())
+        if (terraAttack.GetMove().GetMoveSO().GetDamageType() == DamageType.STATUS || directAttackLog.GetDirectAttackParams().IsDamageStepCanceled())
             return;
 
         directAttackLog.SetCrit(CombatCalculator.CriticalHitCheck(directAttackLog.GetDirectAttackParams()));

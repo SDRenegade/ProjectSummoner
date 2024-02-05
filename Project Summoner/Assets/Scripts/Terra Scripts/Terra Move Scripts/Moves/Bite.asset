@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Bite
   description: Lunge at the opponent and bite them.
-  moveType: 11
+  terraType: 11
   damageType: 0
   baseMovePriority: 0
   baseDamage:
@@ -24,3 +24,5 @@ MonoBehaviour:
     value: 100
     isNull: 0
   basePP: 25
+  hasChargeTurn: 0
+  hasRechargeTurn: 0

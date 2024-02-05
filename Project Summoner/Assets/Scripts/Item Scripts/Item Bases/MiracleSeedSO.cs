@@ -37,7 +37,7 @@ public class MiracleSeed : ItemBase
     {
         if (eventArgs.GetDirectAttackParams().GetAttackerPosition() != terraBattlePosition)
             return;
-        if (eventArgs.GetDirectAttackParams().GetMove().GetMoveBase().GetMoveType() != EMPOWERED_TYPE)
+        if (eventArgs.GetDirectAttackParams().GetMove().GetMoveSO().GetTerraType() != EMPOWERED_TYPE)
             return;
 
         Debug.Log(BattleDialog.ItemProkedMsg(this));

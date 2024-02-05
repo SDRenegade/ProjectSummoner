@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 942e6bb399afe8e4087433dfe9987899, type: 3}
+  m_Script: {fileID: 11500000, guid: 64094e472dd7cd845a07b42f1fc4bfd5, type: 3}
   m_Name: SuperFang
   m_EditorClassIdentifier: 
   moveName: Super Fang
-  description: An attack that always deals half of the opponents health
-  moveType: 1
+  description: An attack that always deals half of the opponents currnet HP.
+  terraType: 1
   damageType: 0
   baseMovePriority: 0
   baseDamage:
@@ -23,4 +23,6 @@ MonoBehaviour:
   baseAccuracy:
     value: 100
     isNull: 0
-  basePP: 15
+  basePP: 20
+  hasChargeTurn: 0
+  hasRechargeTurn: 0

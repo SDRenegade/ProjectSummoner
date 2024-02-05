@@ -14,11 +14,11 @@ public class ProtectedVolatileStatusEffectSO : VolatileStatusEffectSO
 
 public class ProtectedVolatileStatusEffect : VolatileStatusEffectBase
 {
-    private bool isCooldown;
+    private bool isOnCooldown;
 
     public ProtectedVolatileStatusEffect(TerraBattlePosition terraBattlePosition, VolatileStatusEffectSO vStatusEffectSO) : base(terraBattlePosition, vStatusEffectSO)
     {
-        isCooldown = false;
+        isOnCooldown = false;
     }
 
     public override void AddBattleActions(BattleSystem battleSystem)
@@ -37,6 +37,8 @@ public class ProtectedVolatileStatusEffect : VolatileStatusEffectBase
     {
         if (eventArgs.GetDirectAttackParams().GetDefenderPosition() != terraBattlePosition)
             return;
+        if (isOnCooldown)
+            return;
 
         eventArgs.SetCanceled(true);
         Debug.Log(BattleDialog.ProtectActiveMsg(terraBattlePosition.GetTerra()));
@@ -46,9 +48,8 @@ public class ProtectedVolatileStatusEffect : VolatileStatusEffectBase
 
     private void EndOfTurnSetCooldown(object sender, BattleEventArgs eventArgs)
     {
-        if (!isCooldown) {
-            isCooldown = true;
-        }
+        if (!isOnCooldown)
+            isOnCooldown = true;
         else
             terraBattlePosition.RemoveVolatileStatusEffect(vStatusEffectSO, eventArgs.GetBattleSystem());
     }

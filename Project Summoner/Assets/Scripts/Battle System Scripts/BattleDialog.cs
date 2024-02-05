@@ -12,8 +12,6 @@ public static class BattleDialog
     public static readonly string ATTACK_MISSED = "The attack missed.";
     public static readonly string ATTACK_FAILED = "But it failed.";
     public static readonly string CRITICAL_HIT = "It was a critical hit!";
-    public static readonly string HYPER_BEAM_RECHARGE = "Hyper Beam is recharging.";
-    public static readonly string SOLAR_BEAM_CHARGE = "Solar Beam is charging.";
 
     // ================== Combat Messages ==================
     public static string AttackUsedMsg(Terra attackingTerra, TerraMove move) {
@@ -123,6 +121,14 @@ public static class BattleDialog
 
     public static string FlinchedMsg(Terra terra) {
         return terra + " has flinched.";
+    }
+
+    public static string AttackCharging(TerraMoveSO terraMoveSO) {
+        return terraMoveSO + " is charging.";
+    }
+
+    public static string AttackRecharging(Terra terra) {
+        return terra + " is recharging.";
     }
 
     public static string MultiHitMsg(Terra terra, int numHits) {

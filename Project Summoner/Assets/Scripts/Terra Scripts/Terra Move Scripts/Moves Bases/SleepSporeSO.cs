@@ -1,0 +1,33 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Sleep Spore")]
+public class SleepSporeSO : TerraMoveSO
+{
+    public override TerraMoveBase CreateTerraMoveAction(TerraAttack terraAttack)
+    {
+        return new SleepSpore(terraAttack, this);
+    }
+}
+
+public class SleepSpore : TerraMoveBase
+{
+    public SleepSpore(TerraAttack terraAttack, TerraMoveSO terraMoveSO) : base(terraAttack, terraMoveSO) {}
+
+    public override void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
+    {
+        TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
+
+        if (!defenderPosition.GetTerra().HasStatusEffect()) {
+            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Sleep"), defenderPosition, battleSystem);
+            BattleDialog.SleepInflictedMsg(defenderPosition.GetTerra());
+        }
+        else
+            Debug.Log(BattleDialog.ATTACK_FAILED);
+    }
+
+    public override void AddBattleActions(BattleSystem battleSystem) {}
+
+    public override void RemoveBattleActions(BattleSystem battleSystem) {}
+}

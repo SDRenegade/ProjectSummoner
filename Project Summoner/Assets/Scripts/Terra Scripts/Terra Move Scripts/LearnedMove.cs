@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class LearnedMove
 {
-    [SerializeField] private TerraMoveBase movebase;
+    [SerializeField] private TerraMoveSO movebase;
     [SerializeField] private int levelLearned;
 
     public TerraMove GetMove() { return new TerraMove(movebase); }

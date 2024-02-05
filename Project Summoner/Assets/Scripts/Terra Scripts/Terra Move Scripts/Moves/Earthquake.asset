@@ -15,7 +15,7 @@ MonoBehaviour:
   moveName: Earthquake
   description: An attack that hits all terra on the field and deals double damage
     to any terra that is underground.
-  moveType: 6
+  terraType: 6
   damageType: 0
   baseMovePriority: 0
   baseDamage:

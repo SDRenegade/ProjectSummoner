@@ -9,18 +9,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e696462669572624ab692b5b86a3146f, type: 3}
+  m_Script: {fileID: 11500000, guid: 50ddad06734c0f74985ad2840ed1c440, type: 3}
   m_Name: Gust
   m_EditorClassIdentifier: 
   moveName: Gust
-  description: An attack that deals double damage if the target is flying.
-  moveType: 7
-  damageType: 0
+  description: An attack that deals double damage if the opponent is flying
+  terraType: 7
+  damageType: 1
   baseMovePriority: 0
   baseDamage:
-    value: 60
+    value: 40
     isNull: 0
   baseAccuracy:
     value: 100
     isNull: 0
-  basePP: 25
+  basePP: 20
+  hasChargeTurn: 0
+  hasRechargeTurn: 0

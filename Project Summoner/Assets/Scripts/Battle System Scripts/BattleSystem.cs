@@ -28,7 +28,10 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<TerraDamagedEventArgs> OnPostTerraDamaged;
     public event EventHandler<TerraHealedEventArgs> OnTerraHealed;
     public event EventHandler<StatChangeEventArgs> OnStatChange;
+    public event EventHandler<VolatileStatusEffectRollEventArgs> OnVolatileStatusEffectRoll;
     public event EventHandler<VolatileStatusEffectAddedEventArgs> OnVolatileStatusEffectAdded;
+    public event EventHandler<AttackChargingEventArgs> OnAttackCharging;
+    public event EventHandler<AttackChargingEventArgs> OnAttackRecharging;
     public event EventHandler<TerraFaintedEventArgs> OnTerraFainted;
     public event EventHandler<DirectAttackLogEventArgs> OnPostAttack;
     public event EventHandler<BattleEventArgs> OnEndOfTurn;
@@ -84,7 +87,7 @@ public class BattleSystem : MonoBehaviour
         secondarySideAI = new WildTerraAI();
 
         //--- (Temp) Hard-coding the leading terra held item until new system is added ---
-        primarySideTerraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Shell Bell").CreateItemBase());
+        primarySideTerraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Jaboca Berry").CreateItemBase());
         //secondarySideTerraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Leftovers").CreateItemBase());
 
         primarySideTerraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(primarySideTerraBattlePosition, this);
@@ -204,7 +207,7 @@ public class BattleSystem : MonoBehaviour
             selectedMove);
         battleActionManager.GetTerraAttackList().Add(terraAttack);
         //Add the selected moves battle actions into the event system
-        terraAttack.GetTerraMoveAction()?.AddBattleActions(this);
+        terraAttack.GetTerraMoveBase()?.AddBattleActions(this);
 
         //Check if all battle positions are ready. If so, switch to combat state.
         if (battleActionManager.AddReadyBattlePosition())
@@ -230,7 +233,7 @@ public class BattleSystem : MonoBehaviour
         TerraAttack terraAttack = new TerraAttack(attackerPosition, defenderList, selectedMove);
         battleActionManager.GetTerraAttackList().Add(terraAttack);
         //Add the selected moves battle actions into the event system
-        terraAttack.GetTerraMoveAction()?.AddBattleActions(this);
+        terraAttack.GetTerraMoveBase()?.AddBattleActions(this);
     }
 
     public void EndActionSelection()
@@ -336,6 +339,14 @@ public class BattleSystem : MonoBehaviour
         }
     }
 
+    public bool RollForVolatileStatusEffect(TerraBattlePosition attackerPosition, TerraBattlePosition defenderPosition, VolatileStatusEffectSO vStatusEffectSO, float rollOdds)
+    {
+        //*** Volatile Status Effect Roll Event ***
+        VolatileStatusEffectRollEventArgs volatileStatusEffectRollEventArgs = InvokeOnVolatileStatusEffectRoll(attackerPosition, defenderPosition, vStatusEffectSO, rollOdds);
+        
+        return CastRoll(volatileStatusEffectRollEventArgs.GetRollOdds()) ? AddVolatileStatusEffect(defenderPosition, vStatusEffectSO) : false;
+    }
+
     public bool AddVolatileStatusEffect(TerraBattlePosition terraBattlePosition, VolatileStatusEffectSO vStatusEffectSO)
     {
         VolatileStatusEffectBase vStatusEffect = vStatusEffectSO.CreateVolatileStatusEffect(terraBattlePosition);
@@ -347,6 +358,11 @@ public class BattleSystem : MonoBehaviour
             return false;
 
         return terraBattlePosition.AddVolatileStatusEffect(vStatusEffectAddedEventArgs.GetVolatileStatusEffect(), this);
+    }
+
+    public bool CastRoll(float rollOdds)
+    {
+        return UnityEngine.Random.Range(0, 1f) < rollOdds;
     }
 
     public BattleEventArgs InvokeOnStartOfTurn()
@@ -475,10 +491,34 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
+    public VolatileStatusEffectRollEventArgs InvokeOnVolatileStatusEffectRoll(TerraBattlePosition attackerPosition, TerraBattlePosition defenderPosition, VolatileStatusEffectSO vStatusEffectSO, float rollOdds)
+    {
+        VolatileStatusEffectRollEventArgs eventArgs = new VolatileStatusEffectRollEventArgs(attackerPosition, defenderPosition, vStatusEffectSO, rollOdds, this);
+        OnVolatileStatusEffectRoll?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
     public VolatileStatusEffectAddedEventArgs InvokeOnVolatileStatusEffectAdded(TerraBattlePosition terraBattlePosition, VolatileStatusEffectBase vStatusEffect)
     {
         VolatileStatusEffectAddedEventArgs eventArgs = new VolatileStatusEffectAddedEventArgs(terraBattlePosition, vStatusEffect, this);
         OnVolatileStatusEffectAdded?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public AttackChargingEventArgs InvokeOnAttackCharging(TerraAttack terraAttack)
+    {
+        AttackChargingEventArgs eventArgs = new AttackChargingEventArgs(terraAttack, this);
+        OnAttackCharging?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public AttackChargingEventArgs InvokeOnAttackRecharging(TerraAttack terraAttack)
+    {
+        AttackChargingEventArgs eventArgs = new AttackChargingEventArgs(terraAttack, this);
+        OnAttackRecharging?.Invoke(this, eventArgs);
 
         return eventArgs;
     }

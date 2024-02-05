@@ -7,6 +7,9 @@ public class DirectAttackParams
     private TerraBattlePosition attackerPosition;
     private TerraBattlePosition defenderPosition;
     private TerraMove move;
+    private List<TerraType> attackerTerraTypeList;
+    private List<TerraType> defenderTerraTypeList;
+    private TerraType moveTerraType;
     private int hitCount;
     private float accuracyModifier;
     private bool isMustHit;
@@ -21,6 +24,13 @@ public class DirectAttackParams
         this.attackerPosition = attackerPosition;
         this.defenderPosition = defenderPosition;
         this.move = move;
+        attackerTerraTypeList = new List<TerraType>();
+        foreach(TerraType type in attackerPosition.GetTerra().GetTerraBase().GetTerraTypes())
+            attackerTerraTypeList.Add(type);
+        defenderTerraTypeList = new List<TerraType>();
+        foreach (TerraType type in defenderPosition.GetTerra().GetTerraBase().GetTerraTypes())
+            defenderTerraTypeList.Add(type);
+        moveTerraType = move.GetMoveSO().GetTerraType();
         hitCount = 1;
         accuracyModifier = 1f;
         isMustHit = false;
@@ -36,7 +46,19 @@ public class DirectAttackParams
     public TerraBattlePosition GetDefenderPosition() { return defenderPosition; }
 
     public TerraMove GetMove() { return move; }
-    
+
+    public List<TerraType> GetAttackerTerraTypeList() { return attackerTerraTypeList; }
+
+    public void SetAttackerTerraTypeList(List<TerraType> attackerTerraTypeList) { this.attackerTerraTypeList = attackerTerraTypeList; }
+
+    public List<TerraType> GetDefenderTerraTypeList() { return defenderTerraTypeList; }
+
+    public void SetDefenderTerraTypeList(List<TerraType> defenderTerraTypeList) { this.defenderTerraTypeList = defenderTerraTypeList; }
+
+    public TerraType GetMoveTerraType() { return moveTerraType; }
+
+    public void SetMoveTerraType(TerraType moveTerraType) { this.moveTerraType = moveTerraType; }
+
     public int GetHitCount() { return hitCount; }
 
     public void SetHitCount(int hitCount) { this.hitCount = hitCount; }

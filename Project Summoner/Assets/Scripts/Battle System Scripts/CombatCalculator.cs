@@ -21,11 +21,11 @@ public static class CombatCalculator
     {
         if (directAttackParams.GetDefenderPosition().GetBattlePositionState() != BattlePositionState.NORMAL)
             return false;
-        if (directAttackParams.IsMustHit() || directAttackParams.GetMove().GetMoveBase().GetBaseAccuracy().IsNull())
+        if (directAttackParams.IsMustHit() || directAttackParams.GetMove().GetMoveSO().GetBaseAccuracy().IsNull())
             return true;
 
         float randomHitIndex = Random.Range(0, 1f);
-        float moveAccuracy = (directAttackParams.GetMove().GetMoveBase().GetBaseAccuracy().GetValue() * 0.01f) * StatStagesExtension.GetStatStageMultiplier(directAttackParams.GetAttackerPosition().GetStatStage(Stats.ACC)) * directAttackParams.GetAccuracyModifier();
+        float moveAccuracy = (directAttackParams.GetMove().GetMoveSO().GetBaseAccuracy().GetValue() * 0.01f) * StatStagesExtension.GetStatStageMultiplier(directAttackParams.GetAttackerPosition().GetStatStage(Stats.ACC)) * directAttackParams.GetAccuracyModifier();
         float defenderEvasiveness = StatStagesExtension.GetStatStageMultiplier(directAttackParams.GetDefenderPosition().GetStatStage(Stats.EVA)) * directAttackParams.GetEvasivenessModifier();
         float attackAccuracyIndex = moveAccuracy / defenderEvasiveness;
 
@@ -41,23 +41,21 @@ public static class CombatCalculator
 
     public static int? CalculateDamage(DirectAttackParams directAttackParams, bool isCrit)
     {
-        DamageType damageType = directAttackParams.GetMove().GetMoveBase().GetDamageType();
-        TerraMoveBase terraMoveBase = directAttackParams.GetMove().GetMoveBase();
-        TerraBattlePosition attackerPosition = directAttackParams.GetAttackerPosition();
-        TerraBattlePosition defenderPosition = directAttackParams.GetDefenderPosition();
+        DamageType damageType = directAttackParams.GetMove().GetMoveSO().GetDamageType();
+        TerraMoveSO terraMoveBase = directAttackParams.GetMove().GetMoveSO();
         if (terraMoveBase.GetBaseDamage().IsNull() || damageType == DamageType.STATUS)
             return null;
-        float typeEffectivenessModifier = terraMoveBase.GetMoveType().GetTypeEffectivenessModifier(defenderPosition.GetTerra().GetTerraBase().GetTerraTypes());
+        float typeEffectivenessModifier = directAttackParams.GetMoveTerraType().GetTypeEffectivenessModifier(directAttackParams.GetDefenderTerraTypeList());
         if (typeEffectivenessModifier == 0)
             return null;
-
+        
         //Initial damage calculation without any modifiers
-        float damage = (float)InitialAttackDamage(attackerPosition, defenderPosition, terraMoveBase);
+        float damage = (float)InitialAttackDamage(directAttackParams.GetAttackerPosition(), directAttackParams.GetDefenderPosition(), terraMoveBase);
         //Move effectivness modifer
         damage *= typeEffectivenessModifier;
         //STAB condition modifier
-        foreach(TerraType type in attackerPosition.GetTerra().GetTerraBase().GetTerraTypes()) {
-            if(type == terraMoveBase.GetMoveType()) {
+        foreach(TerraType type in directAttackParams.GetAttackerTerraTypeList()) {
+            if(type == directAttackParams.GetMoveTerraType()) {
                 damage *= STAB_BONUS;
                 break;
             }
@@ -74,7 +72,7 @@ public static class CombatCalculator
         return (int)(damage > 0 ? damage : 1);
     }
 
-    public static float? InitialAttackDamage(TerraBattlePosition attackerPosition, TerraBattlePosition defenderPosition, TerraMoveBase terraMoveBase)
+    public static float? InitialAttackDamage(TerraBattlePosition attackerPosition, TerraBattlePosition defenderPosition, TerraMoveSO terraMoveBase)
     {
         DamageType damageType = terraMoveBase.GetDamageType();
         if (terraMoveBase.GetBaseDamage().IsNull() || damageType == DamageType.STATUS)

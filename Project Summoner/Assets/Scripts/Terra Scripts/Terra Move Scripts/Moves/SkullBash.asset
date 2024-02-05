@@ -15,7 +15,7 @@ MonoBehaviour:
   moveName: Skull Bash
   description: An attack that raises the users defence the first turn and attacks
     the next turn.
-  moveType: 1
+  terraType: 1
   damageType: 0
   baseMovePriority: 0
   baseDamage:
@@ -25,3 +25,5 @@ MonoBehaviour:
     value: 100
     isNull: 0
   basePP: 15
+  hasChargeTurn: 1
+  hasRechargeTurn: 0

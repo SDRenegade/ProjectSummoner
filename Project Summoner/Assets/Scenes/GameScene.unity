@@ -216,16 +216,16 @@ MonoBehaviour:
     terraNickname: 
     level: 10
     moves:
-    - moveBase: {fileID: 11400000, guid: f1545a69710d63e4196e278a50f65919, type: 2}
+    - moveSO: {fileID: 0}
       maxPP: 25
       currentPP: 25
-    - moveBase: {fileID: 11400000, guid: 757428f5e0f077547a0b7a01a3c85a81, type: 2}
+    - moveSO: {fileID: 0}
       maxPP: 20
       currentPP: 20
-    - moveBase: {fileID: 11400000, guid: 1957f409079d5d949ac0c8757d2e0418, type: 2}
+    - moveSO: {fileID: 0}
       maxPP: 20
       currentPP: 20
-    - moveBase: {fileID: 11400000, guid: 625642123288b564ea27374ef0a2e221, type: 2}
+    - moveSO: {fileID: 0}
       maxPP: 20
       currentPP: 20
     statusEffectWrapper:
@@ -558,9 +558,12 @@ MonoBehaviour:
   terra:
     terraBase: {fileID: 11400000, guid: 4423df2580197fe468e0df8e1d363e6d, type: 2}
     terraNickname: 
-    level: 10
+    level: 8
     moves:
-    - moveBase: {fileID: 11400000, guid: bd1aecb2193b359438b9e423cfd674c1, type: 2}
+    - moveSO: {fileID: 11400000, guid: bbab58efed0be3d4493ef2893699d3fd, type: 2}
+      maxPP: 30
+      currentPP: 30
+    - moveSO: {fileID: 11400000, guid: bd1aecb2193b359438b9e423cfd674c1, type: 2}
       maxPP: 30
       currentPP: 30
     statusEffectWrapper:
@@ -1324,16 +1327,16 @@ MonoBehaviour:
     terraNickname: 
     level: 10
     moves:
-    - moveBase: {fileID: 0}
+    - moveSO: {fileID: 0}
       maxPP: 20
       currentPP: 20
-    - moveBase: {fileID: 0}
+    - moveSO: {fileID: 0}
       maxPP: 20
       currentPP: 20
-    - moveBase: {fileID: 0}
+    - moveSO: {fileID: 0}
       maxPP: 15
       currentPP: 15
-    - moveBase: {fileID: 0}
+    - moveSO: {fileID: 0}
       maxPP: 0
       currentPP: 0
     statusEffectWrapper:
@@ -1893,16 +1896,16 @@ MonoBehaviour:
     terraNickname: 
     level: 10
     moves:
-    - moveBase: {fileID: 0}
+    - moveSO: {fileID: 0}
       maxPP: 20
       currentPP: 20
-    - moveBase: {fileID: 0}
+    - moveSO: {fileID: 0}
       maxPP: 30
       currentPP: 30
-    - moveBase: {fileID: 0}
+    - moveSO: {fileID: 0}
       maxPP: 15
       currentPP: 15
-    - moveBase: {fileID: 0}
+    - moveSO: {fileID: 0}
       maxPP: 0
       currentPP: 0
     statusEffectWrapper:
@@ -2804,7 +2807,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.95
+      value: 5.33
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3172,13 +3175,13 @@ MonoBehaviour:
     terraNickname: 
     level: 10
     moves:
-    - moveBase: {fileID: 0}
+    - moveSO: {fileID: 0}
       maxPP: 15
       currentPP: 15
-    - moveBase: {fileID: 0}
+    - moveSO: {fileID: 0}
       maxPP: 20
       currentPP: 20
-    - moveBase: {fileID: 0}
+    - moveSO: {fileID: 0}
       maxPP: 15
       currentPP: 15
     statusEffectWrapper:

@@ -14,7 +14,7 @@ public class EndOfTurnBattleState : BattleState
         battleSystem.UpdateTerraStatusBars();
 
         Debug.Log("============== Entered End of Turn Battle State ==============");
-        battleSystem.GetBattleActionManager().ResetActions();
+        battleSystem.GetBattleActionManager().ResetActions(battleSystem);
 
         battleManager.SwitchState(battleManager.GetStartTurnState());
     }

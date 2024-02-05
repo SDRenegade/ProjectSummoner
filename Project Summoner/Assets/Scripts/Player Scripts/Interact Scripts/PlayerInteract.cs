@@ -37,7 +37,7 @@ public class PlayerInteract : MonoBehaviour
             if (terraEncounter.GetTerra().GetMoves()[i] != null) {
                 if (i != 0)
                     sb.Append(", ");
-                sb.Append(terraEncounter.GetTerra().GetMoves()[i].GetMoveBase().GetMoveName());
+                sb.Append(terraEncounter.GetTerra().GetMoves()[i].GetMoveSO().GetMoveName());
             }
         }
         Debug.Log(sb);

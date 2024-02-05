@@ -9,7 +9,7 @@ public class TerraBase : ScriptableObject
     [SerializeField] [TextArea] private string logEntry;
     [SerializeField] private List<TerraType> terraTypes;
     [SerializeField] private List<LearnedMove> naturalMovePool;
-    [SerializeField] private List<TerraMoveBase> teachableMovePool;
+    [SerializeField] private List<TerraMoveSO> teachableMovePool;
 
     [SerializeField] private int baseHP;
     [SerializeField] private int baseAttack;

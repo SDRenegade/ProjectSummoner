@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Solar Beam
   description: A strong attack that takes a turn to charge.
-  moveType: 2
-  damageType: 0
+  terraType: 2
+  damageType: 1
   baseMovePriority: 0
   baseDamage:
     value: 60
@@ -24,3 +24,5 @@ MonoBehaviour:
     value: 100
     isNull: 0
   basePP: 10
+  hasChargeTurn: 1
+  hasRechargeTurn: 0

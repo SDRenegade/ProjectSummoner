@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Metronome
   description: A move that executes a random move.
-  moveType: 1
+  terraType: 1
   damageType: 2
   baseMovePriority: 0
   baseDamage:
@@ -24,3 +24,5 @@ MonoBehaviour:
     value: 0
     isNull: 1
   basePP: 10
+  hasChargeTurn: 0
+  hasRechargeTurn: 0

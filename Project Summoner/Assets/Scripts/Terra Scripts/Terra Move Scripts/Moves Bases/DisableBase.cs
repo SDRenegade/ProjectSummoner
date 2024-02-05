@@ -5,19 +5,19 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "TerraMoveBase", menuName = "TerraMove/Disable")]
-public class DisableBase : TerraMoveBase
+public class DisableBase : TerraMoveSO
 {
-    public override TerraMoveAction CreateTerraMoveAction(TerraAttack terraAttack)
+    public override TerraMoveBase CreateTerraMoveAction(TerraAttack terraAttack)
     {
-        return new DisableAction();
+        return new Disable(terraAttack, this);
     }
 }
 
-public class DisableAction : TerraMoveAction
+public class Disable : TerraMoveBase
 {
-    public DisableAction() {}
+    public Disable(TerraAttack terraAttack, TerraMoveSO terraMoveSO) : base(terraAttack, terraMoveSO) {}
 
-    public void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
+    public override void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
         if (battleSystem.AddVolatileStatusEffect(directAttackLog.GetDefenderPosition(), SODatabase.GetInstance().GetVolatileStatusEffectByName("Disabled")))
             Debug.Log(BattleDialog.DisableActiveMsg(directAttackLog.GetDefenderPosition().GetTerra()));
@@ -25,7 +25,7 @@ public class DisableAction : TerraMoveAction
             Debug.Log(BattleDialog.ATTACK_FAILED);
     }
 
-    public void AddBattleActions(BattleSystem battleSystem) {}
+    public override void AddBattleActions(BattleSystem battleSystem) {}
 
-    public void RemoveBattleActions(BattleSystem battleSystem) {}
+    public override void RemoveBattleActions(BattleSystem battleSystem) {}
 }

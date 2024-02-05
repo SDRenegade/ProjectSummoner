@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveName: Decay
   description: Inflicts Blight on the opponenet
-  moveType: 8
+  terraType: 8
   damageType: 2
   baseMovePriority: 0
   baseDamage:
@@ -24,3 +24,5 @@ MonoBehaviour:
     value: 80
     isNull: 0
   basePP: 15
+  hasChargeTurn: 0
+  hasRechargeTurn: 0

@@ -18,7 +18,7 @@ public class ComboCuffs : ItemBase
     };
 
     private TerraBattlePosition terraBattlePosition;
-    private TerraMoveBase previousAttack;
+    private TerraMoveSO previousAttack;
     private int comboCounter;
 
     public ComboCuffs(ItemSO itemSO) : base(itemSO) {}
@@ -44,13 +44,13 @@ public class ComboCuffs : ItemBase
             return;
 
         Debug.Log(BattleDialog.ItemProkedMsg(this));
-        if (eventArgs.GetDirectAttackParams().GetMove().GetMoveBase().GetMoveName() == previousAttack?.GetMoveName()) {
+        if (eventArgs.GetDirectAttackParams().GetMove().GetMoveSO().GetMoveName() == previousAttack?.GetMoveName()) {
             if(comboCounter < DAMAGE_MODIFIER_LIST.Length - 1)
                 comboCounter++;
         }
         else {
             comboCounter = 0;
-            previousAttack = eventArgs.GetDirectAttackParams().GetMove().GetMoveBase();
+            previousAttack = eventArgs.GetDirectAttackParams().GetMove().GetMoveSO();
         }
 
         eventArgs.GetDirectAttackParams().AddDamageModifier(DAMAGE_MODIFIER_LIST[comboCounter]);

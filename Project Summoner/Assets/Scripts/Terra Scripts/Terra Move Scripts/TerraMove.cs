@@ -6,32 +6,32 @@ using UnityEngine;
 [System.Serializable]
 public class TerraMove
 {
-    [SerializeField] private TerraMoveBase moveBase;
+    [SerializeField] private TerraMoveSO moveSO;
     [SerializeField] private int maxPP;
     [SerializeField] private int currentPP;
 
-    public TerraMove(TerraMoveBase moveBase)
+    public TerraMove(TerraMoveSO moveSO)
     {
-        this.moveBase = moveBase;
-        maxPP = moveBase.GetBasePP();
+        this.moveSO = moveSO;
+        maxPP = moveSO.GetBasePP();
         currentPP = maxPP;
     }
 
-    public TerraMove(TerraMoveBase moveBase, int maxPP)
+    public TerraMove(TerraMoveSO moveSO, int maxPP)
     {
-        this.moveBase = moveBase;
+        this.moveSO = moveSO;
         this.maxPP = maxPP;
         currentPP = maxPP;
     }
 
     public TerraMove(TerraMoveSavable terraMoveSavable)
     {
-        moveBase = SODatabase.GetInstance().GetTerraMoveByName(terraMoveSavable.GetTerraMoveBaseName());
+        moveSO = SODatabase.GetInstance().GetTerraMoveByName(terraMoveSavable.GetTerraMoveBaseName());
         maxPP = terraMoveSavable.GetMaxPP();
         currentPP = terraMoveSavable.GetCurrentPP();
     }
 
-    public TerraMoveBase GetMoveBase() { return moveBase; }
+    public TerraMoveSO GetMoveSO() { return moveSO; }
 
     public int GetMaxPP() { return maxPP; }
 
@@ -47,13 +47,13 @@ public class TerraMove
 
     public int GetCurrentPP() {  return currentPP; }
 
-    public void SetCurrentPP(int currentPP)
-    {
-        if (currentPP < 0)
-            return;
+    public void SetCurrentPP(int currentPP) { this.currentPP = Mathf.Clamp(currentPP, 0, maxPP); }
 
-        this.currentPP = (currentPP > maxPP) ? maxPP : currentPP;
+    public void RecoverPP(int num)
+    {
+        int newCurrentPP = currentPP + num;
+        currentPP = Mathf.Clamp(newCurrentPP, 0, maxPP);
     }
 
-    public override string ToString() { return moveBase.GetMoveName(); }
+    public override string ToString() { return moveSO.GetMoveName(); }
 }

@@ -42,6 +42,7 @@ public class ShellBell : ItemBase
         if (terraBattlePosition.GetTerra().GetCurrentHP() == terraBattlePosition.GetTerra().GetMaxHP())
             return;
 
+        Debug.Log(BattleDialog.ItemProkedMsg(this));
         int healAmt = (int)(terraBattlePosition.GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_HEAL);
         eventArgs.GetBattleSystem().HealTerra(terraBattlePosition, healAmt);
     }

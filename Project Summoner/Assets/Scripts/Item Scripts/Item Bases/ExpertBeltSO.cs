@@ -36,9 +36,9 @@ public class ExpertBelt : ItemBase
     {
         if (eventArgs.GetDirectAttackParams().GetAttackerPosition() != terraBattlePosition)
             return;
-        TerraMoveBase moveBase = eventArgs.GetDirectAttackParams().GetMove().GetMoveBase();
+        TerraMoveSO moveBase = eventArgs.GetDirectAttackParams().GetMove().GetMoveSO();
         Terra defendingTerra = eventArgs.GetDirectAttackParams().GetDefenderPosition().GetTerra();
-        if (moveBase.GetMoveType().GetTypeEffectivenessModifier(defendingTerra.GetTerraBase().GetTerraTypes()) < TerraTypeExtension.GetEffectivenessTypeValue(EffectivenessTypes.SUPER))
+        if (moveBase.GetTerraType().GetTypeEffectivenessModifier(defendingTerra.GetTerraBase().GetTerraTypes()) < TerraTypeExtension.GetEffectivenessTypeValue(EffectivenessTypes.SUPER))
             return;
 
         Debug.Log(BattleDialog.ItemProkedMsg(this));

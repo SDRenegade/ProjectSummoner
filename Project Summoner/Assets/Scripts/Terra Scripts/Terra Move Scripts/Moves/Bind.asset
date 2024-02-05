@@ -15,7 +15,7 @@ MonoBehaviour:
   moveName: Bind
   description: A weak attack that does damage to the opponent for between two and
     five turns.
-  moveType: 1
+  terraType: 1
   damageType: 0
   baseMovePriority: 0
   baseDamage:
@@ -25,3 +25,5 @@ MonoBehaviour:
     value: 100
     isNull: 0
   basePP: 25
+  hasChargeTurn: 0
+  hasRechargeTurn: 0

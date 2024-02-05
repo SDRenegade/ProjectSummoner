@@ -11,7 +11,7 @@ public class TerraMoveSavable
 
     public TerraMoveSavable(TerraMove terraMove)
     {
-        terraMoveBaseName = terraMove.GetMoveBase().GetMoveName();
+        terraMoveBaseName = terraMove.GetMoveSO().GetMoveName();
         maxPP = terraMove.GetMaxPP();
         currentPP = terraMove.GetCurrentPP();
     }

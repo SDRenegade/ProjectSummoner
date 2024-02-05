@@ -14,9 +14,11 @@ public class TerraAttack
     private TerraBattlePosition attackerPosition;
     private List<TerraBattlePosition> defendersPositionList;
     private TerraMove move;
-    private TerraMoveAction terraMoveAction;
+    private TerraMoveBase terraMoveBase;
     private MovePriority movePriority;
-    private SpeedPriority speedPiority;
+    private SpeedPriority speedPriority;
+    private bool isCharging;
+    private bool isRecharging;
     private bool isPersistent;
     private bool isCanceled;
 
@@ -25,9 +27,11 @@ public class TerraAttack
         this.attackerPosition = attackerPosition;
         defendersPositionList = new List<TerraBattlePosition> { defenderPosition };
         this.move = move;
-        terraMoveAction = move.GetMoveBase().CreateTerraMoveAction(this);
-        movePriority = move.GetMoveBase().GetBaseMovePriority();
-        speedPiority = SpeedPriority.NEUTRAL;
+        terraMoveBase = move.GetMoveSO().CreateTerraMoveAction(this);
+        movePriority = move.GetMoveSO().GetBaseMovePriority();
+        speedPriority = SpeedPriority.NEUTRAL;
+        isCharging = move.GetMoveSO().HasChargeTurn();
+        isRecharging = false;
         isPersistent = false;
         isCanceled = false;
     }
@@ -37,8 +41,11 @@ public class TerraAttack
         this.attackerPosition = attackerPosition;
         this.defendersPositionList = defendersPositionList;
         this.move = move;
-        terraMoveAction = move.GetMoveBase().CreateTerraMoveAction(this);
-        movePriority = move.GetMoveBase().GetBaseMovePriority();
+        terraMoveBase = move.GetMoveSO().CreateTerraMoveAction(this);
+        movePriority = move.GetMoveSO().GetBaseMovePriority();
+        speedPriority = SpeedPriority.NEUTRAL;
+        isCharging = move.GetMoveSO().HasChargeTurn();
+        isRecharging = false;
         isPersistent = false;
         isCanceled = false;
     }
@@ -52,19 +59,27 @@ public class TerraAttack
     public void SetMove(TerraMove move)
     {
         this.move = move;
-        terraMoveAction = move.GetMoveBase().CreateTerraMoveAction(this);
-        movePriority = move.GetMoveBase().GetBaseMovePriority();
+        terraMoveBase = move.GetMoveSO().CreateTerraMoveAction(this);
+        movePriority = move.GetMoveSO().GetBaseMovePriority();
     }
 
-    public TerraMoveAction GetTerraMoveAction() {  return terraMoveAction; }
+    public TerraMoveBase GetTerraMoveBase() {  return terraMoveBase; }
 
     public MovePriority GetMovePriority() {  return movePriority; }
 
     public void SetMovePriority(MovePriority movePriority) { this.movePriority = movePriority; }
 
-    public SpeedPriority GetSpeedPiority() { return speedPiority; }
+    public SpeedPriority GetSpeedPiority() { return speedPriority; }
 
-    public void SetSpeedPriority(SpeedPriority speedPiority) { this.speedPiority = speedPiority; }
+    public void SetSpeedPriority(SpeedPriority speedPiority) { this.speedPriority = speedPiority; }
+
+    public bool IsCharging() { return isCharging; }
+
+    public void SetCharging(bool isCharging) { this.isCharging = isCharging; }
+
+    public bool IsRecharging() { return isRecharging; }
+
+    public void SetRecharging(bool isRecharging) { this.isRecharging = isRecharging; }
 
     public bool IsPersistent() { return isPersistent; }
 
