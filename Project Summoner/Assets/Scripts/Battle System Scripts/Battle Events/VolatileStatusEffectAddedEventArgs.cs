@@ -2,22 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VolatileStatusEffectAddedEventArgs : BattleEventArgs
+public class VolatileStatusEffectAddedEventArgs : VolatileStatusEffectEventArgs
 {
-    private TerraBattlePosition terraBattlePosition;
-    private VolatileStatusEffectBase vStatusEffect;
     private bool isCanceled;
 
-    public VolatileStatusEffectAddedEventArgs(TerraBattlePosition terraBattlePosition, VolatileStatusEffectBase vStatusEffect, BattleSystem battleSystem) : base(battleSystem)
+    public VolatileStatusEffectAddedEventArgs(TerraBattlePosition terraBattlePosition, VolatileStatusEffectBase vStatusEffect, BattleSystem battleSystem) : base(terraBattlePosition, vStatusEffect, battleSystem)
     {
-        this.terraBattlePosition = terraBattlePosition;
-        this.vStatusEffect = vStatusEffect;
         isCanceled = false;
     }
-
-    public TerraBattlePosition GetTerraBattlePosition() { return terraBattlePosition; }
-
-    public VolatileStatusEffectBase GetVolatileStatusEffect() { return vStatusEffect; }
 
     public bool IsCanceled() { return isCanceled; }
 

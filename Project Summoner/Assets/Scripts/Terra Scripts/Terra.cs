@@ -153,8 +153,10 @@ public class Terra
     //Sets the status effect and adds battle actions. Used during a battle.
     public void SetStatusEffect(StatusEffectSO statusEffectSO, TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
+        statusEffect?.RemoveBattleActions(battleSystem);
+
         statusEffect = (statusEffectSO != null) ? statusEffectSO.CreateStatusEffectInstance() : null;
-        statusEffect.AddBattleActions(terraBattlePosition, battleSystem);
+        statusEffect?.AddBattleActions(terraBattlePosition, battleSystem);
     }
 
     public bool HasStatusEffect() { return statusEffect != null; }

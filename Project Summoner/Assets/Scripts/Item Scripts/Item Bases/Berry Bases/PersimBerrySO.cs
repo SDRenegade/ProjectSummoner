@@ -2,20 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "ItemSO", menuName = "Item/Berry/Cheri Berry")]
-public class CheriBerrySO : ItemSO
+[CreateAssetMenu(fileName = "ItemSO", menuName = "Item/Berry/Persim Berry")]
+public class PersimBerrySO : ItemSO
 {
     public override ItemBase CreateItemBase()
     {
-        return new CheriBerry(this);
+        return new PersimBerry(this);
     }
 }
 
-public class CheriBerry : ItemBase
+public class PersimBerry : ItemBase
 {
     private TerraBattlePosition terraBattlePosition;
 
-    public CheriBerry(ItemSO itemSO) : base(itemSO) {}
+    public PersimBerry(ItemSO itemSO) : base(itemSO) {}
 
     public override void OnOverworldUse() {}
 
@@ -23,23 +23,23 @@ public class CheriBerry : ItemBase
     {
         this.terraBattlePosition = terraBattlePosition;
 
-        battleSystem.OnPostStatusEffectAdded += RemoveParalysis;
+        battleSystem.OnPostVolatileStatusEffectAdded += RemoveConfusion;
     }
 
     public override void RemoveBattleActions(BattleSystem battleSystem)
     {
-        battleSystem.OnPostStatusEffectAdded -= RemoveParalysis;
+        battleSystem.OnPostVolatileStatusEffectAdded -= RemoveConfusion;
     }
 
-    private void RemoveParalysis(object sender, StatusEffectEventArgs eventArgs)
+    private void RemoveConfusion(object sender, VolatileStatusEffectEventArgs eventArgs)
     {
         if (eventArgs.GetTerraBattlePosition() != terraBattlePosition)
             return;
-        if (eventArgs.GetStatusEffectSO().GetStatusName() != "Paralysis")
+        if (eventArgs.GetVolatileStatusEffect().GetVolatileStatusEffectSO().GetStatusName() != "Confusion")
             return;
 
         Debug.Log(BattleDialog.ItemProkedMsg(this));
-        terraBattlePosition.GetTerra().SetStatusEffect(null, terraBattlePosition, eventArgs.GetBattleSystem());
+        terraBattlePosition.RemoveVolatileStatusEffect(eventArgs.GetVolatileStatusEffect().GetVolatileStatusEffectSO(), eventArgs.GetBattleSystem());
 
         ConsumeOnUse(terraBattlePosition, eventArgs.GetBattleSystem());
     }

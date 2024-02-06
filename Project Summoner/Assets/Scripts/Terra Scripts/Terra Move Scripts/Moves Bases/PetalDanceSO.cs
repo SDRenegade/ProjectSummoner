@@ -30,9 +30,7 @@ public class PetalDance : TerraMoveBase
         if (turnCounter < turnDuration)
             return;
 
-        if (battleSystem.AddVolatileStatusEffect(directAttackLog.GetAttackerPosition(), SODatabase.GetInstance().GetVolatileStatusEffectByName("Confusion")))
-            Debug.Log(BattleDialog.ConfusionInflictedMsg(terraAttack.GetAttackerPosition().GetTerra()));
-        else
+        if (!battleSystem.AddVolatileStatusEffect(directAttackLog.GetAttackerPosition(), SODatabase.GetInstance().GetVolatileStatusEffectByName("Confusion")))
             Debug.Log(BattleDialog.ATTACK_FAILED);
 
         RemoveBattleActions(battleSystem);

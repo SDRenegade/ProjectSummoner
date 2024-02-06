@@ -59,6 +59,10 @@ public static class BattleDialog
         return terra + " has been inflicted with " + statusEffectSO;
     }
 
+    public static string VolatileStatusInflictionMsg(Terra terra, VolatileStatusEffectSO vStatusEffectSO) {
+        return terra + " has been inflicted with " + vStatusEffectSO;
+    }
+
     public static string ParalysisProkedMsg(Terra terra) {
         return terra + " is paralyzed and unable to move this turn.";
     }

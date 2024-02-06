@@ -22,7 +22,6 @@ public class Struggle : TerraMoveBase
         TerraBattlePosition terraBattlePosition = directAttackLog.GetAttackerPosition();
 
         int recoilDamage = (int)(terraBattlePosition.GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_RECOIL);
-        Debug.Log(BattleDialog.RecoilDamageMsg(terraBattlePosition.GetTerra(), recoilDamage));
         battleSystem.DamageTerra(terraBattlePosition, recoilDamage);
     }
 

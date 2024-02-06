@@ -86,6 +86,16 @@ public class TerraBattlePosition
 
     public List<VolatileStatusEffectBase> GetVolatileStatusEffectList() { return vStatusEffectList; }
 
+    public bool HasVolatileStatusEffect(VolatileStatusEffectSO vStatusEffectSO)
+    {
+        foreach(VolatileStatusEffectBase vStatusEffect in vStatusEffectList) {
+            if (vStatusEffect.GetVolatileStatusEffectSO().GetStatusName() == vStatusEffectSO.GetStatusName())
+                return true;
+        }
+
+        return false;
+    }
+
     public bool AddVolatileStatusEffect(VolatileStatusEffectBase vStatusEffectBase, BattleSystem battleSystem)
     {
         foreach (VolatileStatusEffectBase vStatusEffect in vStatusEffectList) {

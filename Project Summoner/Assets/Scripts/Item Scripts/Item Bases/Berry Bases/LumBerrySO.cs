@@ -2,20 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "ItemSO", menuName = "Item/Berry/Cheri Berry")]
-public class CheriBerrySO : ItemSO
+[CreateAssetMenu(fileName = "ItemSO", menuName = "Item/Berry/Lum Berry")]
+public class LumBerrySO : ItemSO
 {
     public override ItemBase CreateItemBase()
     {
-        return new CheriBerry(this);
+        return new LumBerry(this);
     }
 }
 
-public class CheriBerry : ItemBase
+public class LumBerry : ItemBase
 {
     private TerraBattlePosition terraBattlePosition;
 
-    public CheriBerry(ItemSO itemSO) : base(itemSO) {}
+    public LumBerry(ItemSO itemSO) : base(itemSO) {}
 
     public override void OnOverworldUse() {}
 
@@ -23,19 +23,17 @@ public class CheriBerry : ItemBase
     {
         this.terraBattlePosition = terraBattlePosition;
 
-        battleSystem.OnPostStatusEffectAdded += RemoveParalysis;
+        battleSystem.OnPostStatusEffectAdded += RemoveStatusEffect;
     }
 
     public override void RemoveBattleActions(BattleSystem battleSystem)
     {
-        battleSystem.OnPostStatusEffectAdded -= RemoveParalysis;
+        battleSystem.OnPostStatusEffectAdded -= RemoveStatusEffect;
     }
 
-    private void RemoveParalysis(object sender, StatusEffectEventArgs eventArgs)
+    private void RemoveStatusEffect(object sender, StatusEffectEventArgs eventArgs)
     {
         if (eventArgs.GetTerraBattlePosition() != terraBattlePosition)
-            return;
-        if (eventArgs.GetStatusEffectSO().GetStatusName() != "Paralysis")
             return;
 
         Debug.Log(BattleDialog.ItemProkedMsg(this));
