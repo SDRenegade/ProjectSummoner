@@ -13,7 +13,7 @@ public class SparksSO : TerraMoveSO
 
 public class Sparks : TerraMoveBase
 {
-    private static readonly int PARALYZE_CHANCE = 20;
+    private static readonly float PARALYZE_CHANCE = 0.4f;
 
     public Sparks(TerraAttack terraAttack, TerraMoveSO terraMoveSO) : base(terraAttack, terraMoveSO) {}
 
@@ -21,11 +21,8 @@ public class Sparks : TerraMoveBase
     {
         TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
 
-        bool isParalyzed = PARALYZE_CHANCE >= Random.Range(0, 100);
-        if (!defenderPosition.GetTerra().HasStatusEffect() && isParalyzed) {
-            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Paralysis"), defenderPosition, battleSystem);
-            Debug.Log(BattleDialog.ParalysisInflictedMsg(defenderPosition.GetTerra()));
-        }
+        if (PARALYZE_CHANCE >= Random.Range(0f, 1f))
+            battleSystem.AddStatusEffect(defenderPosition, SODatabase.GetInstance().GetStatusEffectByName("Paralysis"));
     }
 
     public override void AddBattleActions(BattleSystem battleSystem) {}

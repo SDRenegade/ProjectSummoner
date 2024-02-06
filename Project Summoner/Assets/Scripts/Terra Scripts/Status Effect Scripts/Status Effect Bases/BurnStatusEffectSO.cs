@@ -3,33 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "StatusEffect", menuName = "StatusEffect/Burn")]
-public class BurnStatusEffect : StatusEffectBase
+public class BurnStatusEffectSO : StatusEffectSO
 {
-    public override BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition)
+    public override StatusEffectBase CreateStatusEffectInstance()
     {
-        return new BurnStatusEffectAction(terraBattlePosition);
+        return new BurnStatusEffect(this);
     }
 }
 
-class BurnStatusEffectAction : BattleAction
+class BurnStatusEffect : StatusEffectBase
 {
     private static readonly float PERCENT_MAX_HEALTH_BURN = 1/8f;
     private static readonly float DAMAGE_REDUCTION = 0.8f;
 
     private TerraBattlePosition terraBattlePosition;
 
-    public BurnStatusEffectAction(TerraBattlePosition terraBattlePosition)
+    public BurnStatusEffect(StatusEffectSO statusEffectSO) : base(statusEffectSO) {}
+
+    public override void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
-    }
 
-    public void AddBattleActions(BattleSystem battleSystem)
-    {
         battleSystem.OnEndOfTurn += BurnActive;
         battleSystem.OnDirectAttack += AttackReductionActive;
     }
 
-    public void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveBattleActions(BattleSystem battleSystem)
     {
         battleSystem.OnEndOfTurn -= BurnActive;
         battleSystem.OnDirectAttack -= AttackReductionActive;

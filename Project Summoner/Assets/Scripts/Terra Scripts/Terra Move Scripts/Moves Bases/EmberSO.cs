@@ -22,11 +22,8 @@ public class Ember : TerraMoveBase
     {
         TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
 
-        bool isBurned = BURN_CHANCE > Random.Range(0, 1f);
-        if (!defenderPosition.GetTerra().HasStatusEffect() && isBurned) {
-            Debug.Log(BattleDialog.BurnInflictedMsg(defenderPosition.GetTerra()));
-            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Burn"), defenderPosition, battleSystem);
-        }
+        if(BURN_CHANCE > Random.Range(0, 1f))
+            battleSystem.AddStatusEffect(defenderPosition, SODatabase.GetInstance().GetStatusEffectByName("Burn"));
     }
 
     public override void AddBattleActions(BattleSystem battleSystem) {}

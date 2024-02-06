@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "StatusEffect", menuName = "StatusEffect/Sleep")]
-public class SleepStatusEffect : StatusEffectBase
+public class SleepStatusEffectSO : StatusEffectSO
 {
-    public SleepStatusEffect() {}
-
-    public override BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition)
+    public override StatusEffectBase CreateStatusEffectInstance()
     {
-        return new SleepStatusEffectAction(terraBattlePosition);
+        return new SleepStatusEffect(this);
     }
 }
 
-public class SleepStatusEffectAction : BattleAction
+public class SleepStatusEffect : StatusEffectBase
 {
     private static readonly int MIN_TURNS_SLEEP = 2;
     private static readonly int MAX_TURNS_SLEEP = 5;
@@ -22,19 +20,20 @@ public class SleepStatusEffectAction : BattleAction
     private int numTurnsSleep;
     private int turnCounter;
 
-    public SleepStatusEffectAction(TerraBattlePosition terraBattlePosition)
+    public SleepStatusEffect(StatusEffectSO statusEffectSO) : base(statusEffectSO)
     {
-        this.terraBattlePosition = terraBattlePosition;
         numTurnsSleep = Random.Range(MIN_TURNS_SLEEP, MAX_TURNS_SLEEP + 1);
         turnCounter = 0;
     }
 
-    public void AddBattleActions(BattleSystem battleSystem)
+    public override void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
+        this.terraBattlePosition = terraBattlePosition;
+
         battleSystem.OnAttackDeclaration += SleepActive;
     }
 
-    public void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveBattleActions(BattleSystem battleSystem)
     {
         battleSystem.OnAttackDeclaration -= SleepActive;
     }

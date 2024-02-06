@@ -3,33 +3,30 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "StatusEffect", menuName = "StatusEffect/Paralysis")]
-public class ParalysisStatusEffect : StatusEffectBase
+public class ParalysisStatusEffectSO : StatusEffectSO
 {
-    public ParalysisStatusEffect() {}
-
-    public override BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition)
+    public override StatusEffectBase CreateStatusEffectInstance()
     {
-        return new ParalysisStatusEffectAction(terraBattlePosition);
+        return new ParalysisStatusEffect(this);
     }
 }
 
-public class ParalysisStatusEffectAction : BattleAction
+public class ParalysisStatusEffect : StatusEffectBase
 {
     private static readonly float PARALYSIS_CHANCE = 0.5f;
 
     private TerraBattlePosition terraBattlePosition;
 
-    public ParalysisStatusEffectAction(TerraBattlePosition terraBattlePosition)
+    public ParalysisStatusEffect(StatusEffectSO statusEffectSO) : base(statusEffectSO) {}
+
+    public override void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
-    }
 
-    public void AddBattleActions(BattleSystem battleSystem)
-    {
         battleSystem.OnAttackDeclaration += ParalysisActive;
     }
 
-    public void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveBattleActions(BattleSystem battleSystem)
     {
         battleSystem.OnAttackDeclaration -= ParalysisActive;
     }
@@ -39,8 +36,7 @@ public class ParalysisStatusEffectAction : BattleAction
         if (eventArgs.GetTerraAttack().GetAttackerPosition() != terraBattlePosition)
             return;
 
-        bool isParalyzed = PARALYSIS_CHANCE >= Random.Range(0f, 1f);
-        if (isParalyzed) {
+        if (PARALYSIS_CHANCE >= Random.Range(0f, 1f)) {
             eventArgs.GetTerraAttack().SetCanceled(true);
             Debug.Log(BattleDialog.ParalysisProkedMsg(terraBattlePosition.GetTerra()));
         }

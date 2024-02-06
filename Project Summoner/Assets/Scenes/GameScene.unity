@@ -228,8 +228,6 @@ MonoBehaviour:
     - moveSO: {fileID: 0}
       maxPP: 20
       currentPP: 20
-    statusEffectWrapper:
-      statusEffectBase: {fileID: 0}
     currentHP: 24
 --- !u!1 &16921876
 GameObject:
@@ -560,14 +558,9 @@ MonoBehaviour:
     terraNickname: 
     level: 8
     moves:
-    - moveSO: {fileID: 11400000, guid: bbab58efed0be3d4493ef2893699d3fd, type: 2}
+    - moveSO: {fileID: 11400000, guid: 625642123288b564ea27374ef0a2e221, type: 2}
       maxPP: 30
       currentPP: 30
-    - moveSO: {fileID: 11400000, guid: bd1aecb2193b359438b9e423cfd674c1, type: 2}
-      maxPP: 30
-      currentPP: 30
-    statusEffectWrapper:
-      statusEffectBase: {fileID: 0}
     currentHP: 20
 --- !u!1 &251490208 stripped
 GameObject:
@@ -1339,8 +1332,6 @@ MonoBehaviour:
     - moveSO: {fileID: 0}
       maxPP: 0
       currentPP: 0
-    statusEffectWrapper:
-      statusEffectBase: {fileID: 0}
     currentHP: 20
 --- !u!135 &624831009
 SphereCollider:
@@ -1908,8 +1899,6 @@ MonoBehaviour:
     - moveSO: {fileID: 0}
       maxPP: 0
       currentPP: 0
-    statusEffectWrapper:
-      statusEffectBase: {fileID: 0}
     currentHP: 20
 --- !u!135 &788169155
 SphereCollider:
@@ -2807,7 +2796,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.33
+      value: 9.43
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3184,8 +3173,6 @@ MonoBehaviour:
     - moveSO: {fileID: 0}
       maxPP: 15
       currentPP: 15
-    statusEffectWrapper:
-      statusEffectBase: {fileID: 0}
     currentHP: 20
 --- !u!135 &1672181197
 SphereCollider:

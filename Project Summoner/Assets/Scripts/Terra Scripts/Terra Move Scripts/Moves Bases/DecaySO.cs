@@ -19,10 +19,8 @@ public class Decay : TerraMoveBase
     {
         TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
 
-        if (!defenderPosition.GetTerra().HasStatusEffect()) {
-            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Blight"), defenderPosition, battleSystem);
-            Debug.Log(BattleDialog.BlightInflictedMsg(defenderPosition.GetTerra()));
-        }
+        if (!battleSystem.AddStatusEffect(defenderPosition, SODatabase.GetInstance().GetStatusEffectByName("Blight")))
+            Debug.Log(BattleDialog.ATTACK_FAILED);
     }
 
     public override void AddBattleActions(BattleSystem battleSystem) {}

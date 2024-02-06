@@ -41,7 +41,7 @@ public class DreamEater : TerraMoveBase
             return;
 
         Terra defendingTerra = eventArgs.GetDirectAttackParams().GetDefenderPosition().GetTerra();
-        if (defendingTerra.GetStatusEffectWrapper().GetStatusEffectBase() != SODatabase.GetInstance().GetStatusEffectByName("Sleep"))
+        if (defendingTerra.GetStatusEffect().GetStatusEffectSO() != SODatabase.GetInstance().GetStatusEffectByName("Sleep"))
             eventArgs.SetCanceled(true);
     }
 }

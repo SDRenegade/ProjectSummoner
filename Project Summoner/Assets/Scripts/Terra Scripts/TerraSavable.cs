@@ -9,7 +9,7 @@ public class TerraSavable
     [SerializeField] private string terraNickname;
     [SerializeField] private int level;
     [SerializeField] private List<TerraMoveSavable> savableMoves;
-    [SerializeField] private string statusEffectBaseName;
+    [SerializeField] private string statusEffectName;
     [SerializeField] private int currentHP;
 
     public TerraSavable(Terra terra)
@@ -20,8 +20,7 @@ public class TerraSavable
         savableMoves = new List<TerraMoveSavable>();
         for(int i = 0; i < terra.GetMoves().Count; i++)
             savableMoves.Add(new TerraMoveSavable(terra.GetMoves()[i]));
-        if(terra.GetStatusEffectWrapper().GetStatusEffectBase() != null)
-            statusEffectBaseName = terra.GetStatusEffectWrapper().GetStatusEffectBase().GetStatusName();
+        statusEffectName = (terra.GetStatusEffect() != null) ? terra.GetStatusEffect().GetStatusEffectSO().GetStatusName() : null;
         currentHP = terra.GetCurrentHP();
     }
 
@@ -33,7 +32,7 @@ public class TerraSavable
 
     public List<TerraMoveSavable> GetSavableMoves() {  return savableMoves; }
 
-    public string GetStatusEffectBaseName() {  return statusEffectBaseName; }
+    public string GetStatusEffectName() {  return statusEffectName; }
 
     public int GetCurrentHP() {  return currentHP; }
 }

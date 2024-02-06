@@ -28,6 +28,8 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<TerraDamagedEventArgs> OnPostTerraDamaged;
     public event EventHandler<TerraHealedEventArgs> OnTerraHealed;
     public event EventHandler<StatChangeEventArgs> OnStatChange;
+    public event EventHandler<StatusEffectAddedEventArgs> OnStatusEffectAdded;
+    public event EventHandler<StatusEffectEventArgs> OnPostStatusEffectAdded;
     public event EventHandler<VolatileStatusEffectRollEventArgs> OnVolatileStatusEffectRoll;
     public event EventHandler<VolatileStatusEffectAddedEventArgs> OnVolatileStatusEffectAdded;
     public event EventHandler<AttackChargingEventArgs> OnAttackCharging;
@@ -78,8 +80,8 @@ public class BattleSystem : MonoBehaviour
         //Initialize the existing status conditions on the terra in the event system
         TerraBattlePosition primarySideTerraBattlePosition = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0];
         TerraBattlePosition secondarySideTerraBattlePosition = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0];
-        primarySideTerraBattlePosition.GetTerra().GetStatusEffectWrapper()?.AddStatusEffectBattleAction(primarySideTerraBattlePosition, this);
-        secondarySideTerraBattlePosition.GetTerra().GetStatusEffectWrapper()?.AddStatusEffectBattleAction(secondarySideTerraBattlePosition, this);
+        primarySideTerraBattlePosition.GetTerra().GetStatusEffect()?.AddBattleActions(primarySideTerraBattlePosition, this);
+        secondarySideTerraBattlePosition.GetTerra().GetStatusEffect()?.AddBattleActions(secondarySideTerraBattlePosition, this);
 
         UpdateTerraStatusBars();
 
@@ -87,7 +89,7 @@ public class BattleSystem : MonoBehaviour
         secondarySideAI = new WildTerraAI();
 
         //--- (Temp) Hard-coding the leading terra held item until new system is added ---
-        primarySideTerraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Jaboca Berry").CreateItemBase());
+        //primarySideTerraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Cheri Berry").CreateItemBase());
         //secondarySideTerraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Leftovers").CreateItemBase());
 
         primarySideTerraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(primarySideTerraBattlePosition, this);
@@ -339,6 +341,26 @@ public class BattleSystem : MonoBehaviour
         }
     }
 
+    public bool AddStatusEffect(TerraBattlePosition terraBattlePosition, StatusEffectSO statusEffectSO)
+    {
+        if (terraBattlePosition.GetTerra().HasStatusEffect())
+            return false;
+
+        //*** Status Effect Added Event ***
+        StatusEffectAddedEventArgs statusEffectAddedEventArgs = InvokeOnStatusEffectAdded(terraBattlePosition, statusEffectSO);
+
+        if (statusEffectAddedEventArgs.IsCanceled())
+            return false;
+
+        Debug.Log(BattleDialog.StatusInflictionMsg(terraBattlePosition.GetTerra(), statusEffectSO));
+        terraBattlePosition.GetTerra().SetStatusEffect(statusEffectSO, terraBattlePosition, this);
+
+        //*** Post Status Effect Added Event ***
+        InvokeOnPostStatusEffectAdded(terraBattlePosition, statusEffectSO);
+
+        return true;
+    }
+
     public bool RollForVolatileStatusEffect(TerraBattlePosition attackerPosition, TerraBattlePosition defenderPosition, VolatileStatusEffectSO vStatusEffectSO, float rollOdds)
     {
         //*** Volatile Status Effect Roll Event ***
@@ -487,6 +509,22 @@ public class BattleSystem : MonoBehaviour
     {
         StatChangeEventArgs eventArgs = new StatChangeEventArgs(terraBattlePosition, stat, modification, this);
         OnStatChange?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public StatusEffectAddedEventArgs InvokeOnStatusEffectAdded(TerraBattlePosition terraBattlePosition, StatusEffectSO statusEffectSO)
+    {
+        StatusEffectAddedEventArgs eventArgs = new StatusEffectAddedEventArgs(terraBattlePosition, statusEffectSO, this);
+        OnStatusEffectAdded?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public StatusEffectEventArgs InvokeOnPostStatusEffectAdded(TerraBattlePosition terraBattlePosition, StatusEffectSO statusEffectSO)
+    {
+        StatusEffectEventArgs eventArgs = new StatusEffectEventArgs(terraBattlePosition, statusEffectSO, this);
+        OnPostStatusEffectAdded?.Invoke(this, eventArgs);
 
         return eventArgs;
     }

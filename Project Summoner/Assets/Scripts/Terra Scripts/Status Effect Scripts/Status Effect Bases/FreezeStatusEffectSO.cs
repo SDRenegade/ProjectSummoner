@@ -3,33 +3,30 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "StatusEffect", menuName = "StatusEffect/Freeze")]
-public class FreezeStatusEffect : StatusEffectBase
+public class FreezeStatusEffectSO : StatusEffectSO
 {
-    public FreezeStatusEffect() {}
-
-    public override BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition)
+    public override StatusEffectBase CreateStatusEffectInstance()
     {
-        return new FreezeStatusEffectAction(terraBattlePosition);
+        return new FreezeStatusEffect(this);
     }
 }
 
-public class FreezeStatusEffectAction : BattleAction
+public class FreezeStatusEffect : StatusEffectBase
 {
     private static readonly float THAW_CHANCE = 0.25f;
 
     private TerraBattlePosition terraBattlePosition;
 
-    public FreezeStatusEffectAction(TerraBattlePosition terraBattlePosition)
+    public FreezeStatusEffect(StatusEffectSO statusEffectSO) : base(statusEffectSO) {}
+
+    public override void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
-    }
 
-    public void AddBattleActions(BattleSystem battleSystem)
-    {
         battleSystem.OnAttackDeclaration += FreezeActive;
     }
 
-    public void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveBattleActions(BattleSystem battleSystem)
     {
         battleSystem.OnAttackDeclaration -= FreezeActive;
     }

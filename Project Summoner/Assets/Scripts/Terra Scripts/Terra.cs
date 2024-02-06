@@ -13,7 +13,7 @@ public class Terra
     [SerializeField] [Range(1, 100)] private int level;
     [SerializeField] private List<TerraMove> moves;
     [SerializeField] private ItemBase heldItem;
-    [SerializeField] private StatusEffectWrapper statusEffectWrapper;
+    [SerializeField] private StatusEffectBase statusEffect;
     [SerializeField] [Min(0)] private int currentHP;
 
     public Terra(TerraBase terraBase)
@@ -24,7 +24,7 @@ public class Terra
         moves = new List<TerraMove>();
         GenerateNaturalMoveSet();
         heldItem = null;
-        statusEffectWrapper = new StatusEffectWrapper(null);
+        statusEffect = null;
         currentHP = GetMaxHP();
     }
 
@@ -36,7 +36,7 @@ public class Terra
         moves = new List<TerraMove>();
         GenerateNaturalMoveSet();
         heldItem = null;
-        statusEffectWrapper = new StatusEffectWrapper(null);
+        statusEffect = null;
         currentHP = GetMaxHP();
     }
 
@@ -49,8 +49,8 @@ public class Terra
         for(int i = 0; i < terraSavable.GetSavableMoves().Count; i++)
             moves.Add(new TerraMove(terraSavable.GetSavableMoves()[i]));
         heldItem = null;
-        StatusEffectBase savedStatusEffect = SODatabase.GetInstance().GetStatusEffectByName(terraSavable.GetStatusEffectBaseName());
-        statusEffectWrapper = (savedStatusEffect != null) ? new StatusEffectWrapper(savedStatusEffect) : new StatusEffectWrapper(null);
+        StatusEffectSO savedStatusEffectSO = SODatabase.GetInstance().GetStatusEffectByName(terraSavable.GetStatusEffectName());
+        statusEffect = (savedStatusEffectSO != null) ? savedStatusEffectSO.CreateStatusEffectInstance() : null;
         currentHP = terraSavable.GetCurrentHP();
     }
 
@@ -142,21 +142,22 @@ public class Terra
         this.currentHP = hp;
     }
 
-    public StatusEffectWrapper GetStatusEffectWrapper() { return statusEffectWrapper; }
+    public StatusEffectBase GetStatusEffect() { return statusEffect; }
 
     //Sets the status effect WITHOUT adding battle actions. Used for applying status effects out of battle.
-    public void SetStatusEffect(StatusEffectBase statusEffectBase)
+    public void SetStatusEffect(StatusEffectSO statusEffectSO)
     {
-        statusEffectWrapper.SetStatusEffectBase(statusEffectBase);
+        statusEffect = (statusEffectSO != null) ? statusEffectSO.CreateStatusEffectInstance() : null;
     }
 
     //Sets the status effect and adds battle actions. Used during a battle.
-    public void SetStatusEffect(StatusEffectBase statusEffectBase, TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
+    public void SetStatusEffect(StatusEffectSO statusEffectSO, TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
-        statusEffectWrapper.SetStatusEffectBase(statusEffectBase, terraBattlePosition, battleSystem);
+        statusEffect = (statusEffectSO != null) ? statusEffectSO.CreateStatusEffectInstance() : null;
+        statusEffect.AddBattleActions(terraBattlePosition, battleSystem);
     }
 
-    public bool HasStatusEffect() { return statusEffectWrapper.GetStatusEffectBase() != null; }
+    public bool HasStatusEffect() { return statusEffect != null; }
 
     public int GetMaxHP() { return Mathf.FloorToInt(level * terraBase.GetBaseHP() * BASE_STAT_MULTIPLIER + 10); }
 

@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "StatusEffect", menuName = "StatusEffect/Blight")]
-public class BlightStatusEffect : StatusEffectBase
+public class BlightStatusEffectSO : StatusEffectSO
 {
-    public BlightStatusEffect() {}
+    public BlightStatusEffectSO() {}
 
-    public override BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition)
+    public override StatusEffectBase CreateStatusEffectInstance()
     {
-        return new BlightStatusEffectAction(terraBattlePosition);
+        return new BlightStatusEffect(this);
     }
 }
 
-public class BlightStatusEffectAction : BattleAction
+public class BlightStatusEffect : StatusEffectBase
 {
     private static readonly float[] BLIGHT_DAMAGE_LIST = new float[5] {
         1/12f, 1/8f, 1/6f, 1/4f, 1/3f
@@ -22,21 +22,20 @@ public class BlightStatusEffectAction : BattleAction
     private TerraBattlePosition terraBattlePosition;
     private int blightCounter;
 
-    public BlightStatusEffectAction(TerraBattlePosition terraBattlePosition)
+    public BlightStatusEffect(StatusEffectSO statusEffectSO) : base(statusEffectSO)
     {
-        this.terraBattlePosition = terraBattlePosition;
         blightCounter = 0;
     }
 
-    public void AddBattleActions(BattleSystem battleSystem)
+    public override void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
-        blightCounter = 0;
+        this.terraBattlePosition = terraBattlePosition;
+
         battleSystem.OnEndOfTurn += BlightActive;
     }
 
-    public void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveBattleActions(BattleSystem battleSystem)
     {
-        blightCounter = 0;
         battleSystem.OnEndOfTurn -= BlightActive;
     }
 

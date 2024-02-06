@@ -2,17 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public abstract class StatusEffectBase : ScriptableObject
+public abstract class StatusEffectBase
 {
-    [SerializeField] protected string statusName;
-    [SerializeField] [TextArea] protected string description;
+    protected StatusEffectSO statusEffectSO;
 
-    public StatusEffectBase() {}
+    public StatusEffectBase(StatusEffectSO statusEffectSO)
+    {
+        this.statusEffectSO = statusEffectSO;
+    }
 
-    public abstract BattleAction CreateBattleAction(TerraBattlePosition terraBattlePosition);
+    public abstract void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem);
 
-    public string GetStatusName() { return statusName; }
+    public abstract void RemoveBattleActions(BattleSystem battleSystem);
 
-    public string GetDescription() { return description; }
+    public StatusEffectSO GetStatusEffectSO() { return statusEffectSO; }
 }

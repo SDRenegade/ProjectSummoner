@@ -87,7 +87,7 @@ public class SODatabase : MonoBehaviour
         return item;
     }
 
-    public StatusEffectBase GetStatusEffectByID(int id)
+    public StatusEffectSO GetStatusEffectByID(int id)
     {
         if (id >= statusEffectDatabase.GetStatusEffectList().Count)
             return null;
@@ -95,10 +95,10 @@ public class SODatabase : MonoBehaviour
         return statusEffectDatabase.GetStatusEffectList()[id];
     }
 
-    public StatusEffectBase GetStatusEffectByName(string name)
+    public StatusEffectSO GetStatusEffectByName(string name)
     {
-        StatusEffectBase effect = null;
-        foreach (StatusEffectBase statusEffect in statusEffectDatabase.GetStatusEffectList()) {
+        StatusEffectSO effect = null;
+        foreach (StatusEffectSO statusEffect in statusEffectDatabase.GetStatusEffectList()) {
             if (statusEffect.GetStatusName() == name) {
                 effect = statusEffect;
                 break;

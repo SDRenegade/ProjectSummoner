@@ -55,24 +55,8 @@ public static class BattleDialog
         return terra + " has fainted.";
     }
 
-    public static string ParalysisInflictedMsg(Terra terra) {
-        return terra + " has been paralyzed.";
-    }
-
-    public static string BurnInflictedMsg(Terra terra) {
-        return terra + " has been burned.";
-    }
-
-    public static string SleepInflictedMsg(Terra terra) {
-        return terra + " has fallen asleep.";
-    }
-
-    public static string FreezeInflictedMsg(Terra terra) {
-        return terra + " has been frozen.";
-    }
-
-    public static string BlightInflictedMsg(Terra terra) {
-        return terra + " has been inflicted with blight.";
+    public static string StatusInflictionMsg(Terra terra, StatusEffectSO statusEffectSO) {
+        return terra + " has been inflicted with " + statusEffectSO;
     }
 
     public static string ParalysisProkedMsg(Terra terra) {

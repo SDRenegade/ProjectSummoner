@@ -21,11 +21,8 @@ public class FlashFreeze : TerraMoveBase
     {
         TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
 
-        bool hasFreezeProked = FREEZE_CHANCE >= Random.Range(0f, 1f);
-        if (!defenderPosition.GetTerra().HasStatusEffect() && hasFreezeProked) {
-            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Freeze"), defenderPosition, battleSystem);
-            BattleDialog.FreezeInflictedMsg(defenderPosition.GetTerra());
-        }
+        if(FREEZE_CHANCE >= Random.Range(0f, 1f))
+            battleSystem.AddStatusEffect(defenderPosition, SODatabase.GetInstance().GetStatusEffectByName("Freeze"));
     }
 
     public override void AddBattleActions(BattleSystem battleSystem) {}

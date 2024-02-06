@@ -19,11 +19,7 @@ public class SleepSpore : TerraMoveBase
     {
         TerraBattlePosition defenderPosition = directAttackLog.GetDefenderPosition();
 
-        if (!defenderPosition.GetTerra().HasStatusEffect()) {
-            defenderPosition.GetTerra().SetStatusEffect(SODatabase.GetInstance().GetStatusEffectByName("Sleep"), defenderPosition, battleSystem);
-            BattleDialog.SleepInflictedMsg(defenderPosition.GetTerra());
-        }
-        else
+        if (!battleSystem.AddStatusEffect(defenderPosition, SODatabase.GetInstance().GetStatusEffectByName("Sleep")))
             Debug.Log(BattleDialog.ATTACK_FAILED);
     }
 
