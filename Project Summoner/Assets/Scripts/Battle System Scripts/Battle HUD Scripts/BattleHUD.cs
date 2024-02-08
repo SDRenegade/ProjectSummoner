@@ -10,6 +10,11 @@ public class BattleHUD : MonoBehaviour
     [SerializeField] private GameObject menuSelectionObject;
     [SerializeField] private GameObject moveSelectionObject;
 
+    public void Start()
+    {
+        CloseAllSelectionUI();
+    }
+
     public void UpdateTerraStatusBars(Battlefield battlefield)
     {
         playerTerraStatusBar.UpdateStatusBar(battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0].GetTerra());

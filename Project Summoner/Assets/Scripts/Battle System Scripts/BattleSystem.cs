@@ -10,6 +10,12 @@ public enum BattleType
     SUMMONER
 }
 
+public enum BattleFormat
+{
+    SINGLE,
+    DOUBLE
+}
+
 public class BattleSystem : MonoBehaviour
 {
     public event EventHandler<BattleEventArgs> OnStartOfTurn;
@@ -40,103 +46,86 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<BattleEventArgs> OnEndOfTurn;
 
     [SerializeField] private BattleHUD battleHUD;
-
-    //Actor Positions
-    [SerializeField] private Transform playerTransform;
-    [SerializeField] private Transform opponentTransform;
-    [SerializeField] private Transform playerTerraTransform;
-    [SerializeField] private Transform opponentTerraTransform;
-
-    //Player & opposing summoner prefabs
-    [SerializeField] private GameObject playerPrefab;
-    [SerializeField] private GameObject opponentPrefab;
+    [SerializeField] private BattleStage battleStage;
     
-    //Player & opposing summoner gameobject's
-    private GameObject playerBattleObject;
-    //private GameObject opponentBattleObject
-    //The currently battling Terras and their gameobject (Change the neme of the variables later)
-    private TerraBattleObject playerLeadingTerra;
-    private TerraBattleObject wildTerra;
+    private List<Terra> primarySummonerTerraList;
+    private List<Terra> secondarySummonerTerraList;
 
     private bool isMatchFinished;
     private BattleType battleType;
-    private BattleAI primarySideAI; // Might move BattleAI to the BattleSide classes
+    private BattleFormat battleFormat;
+    private BattleAI primarySideAI;
     private BattleAI secondarySideAI;
     private Battlefield battlefield;
     private BattleStateManager battleStateManager;
     private BattleActionManager battleActionManager;
+
 
     public void Start()
     {
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
+        primarySummonerTerraList = BattleLoader.GetInstance().GetPrimarySummonerTerraList();
+        secondarySummonerTerraList = BattleLoader.GetInstance().GetSecondarySummonerTerraList();
+
         isMatchFinished = false;
         battleType = BattleLoader.GetInstance().GetBattleType();
-
-        SetupBattleScene();
-
-        battlefield = new Battlefield(playerBattleObject.GetComponent<TerraParty>(), wildTerra.GetTerra());
-        //Initialize the existing status conditions on the terra in the event system
-        TerraBattlePosition primarySideTerraBattlePosition = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0];
-        TerraBattlePosition secondarySideTerraBattlePosition = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0];
-        primarySideTerraBattlePosition.GetTerra().GetStatusEffect()?.AddBattleActions(primarySideTerraBattlePosition, this);
-        secondarySideTerraBattlePosition.GetTerra().GetStatusEffect()?.AddBattleActions(secondarySideTerraBattlePosition, this);
-
-        UpdateTerraStatusBars();
-
+        battleFormat = BattleLoader.GetInstance().GetBattleFormat();
         primarySideAI = null;
         secondarySideAI = new WildTerraAI();
+        battlefield = new Battlefield(battleFormat, primarySummonerTerraList, secondarySummonerTerraList);
 
-        //--- (Temp) Hard-coding the leading terra held item until new system is added ---
-        primarySideTerraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Persim Berry").CreateItemBase());
-        secondarySideTerraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Leftovers").CreateItemBase());
-
-        primarySideTerraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(primarySideTerraBattlePosition, this);
-        secondarySideTerraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(secondarySideTerraBattlePosition, this);
-
-        //Logging the item that each leading terra is holding
-        if (primarySideTerraBattlePosition.GetTerra().GetHeldItem() != null)
-            Debug.Log("Primary Leading Terra Item: " + primarySideTerraBattlePosition.GetTerra().GetHeldItem().GetItemSO().GetItemName());
-        if (secondarySideTerraBattlePosition.GetTerra().GetHeldItem() != null)
-            Debug.Log("Secondary Leading Terra Item: " + secondarySideTerraBattlePosition.GetTerra().GetHeldItem().GetItemSO().GetItemName());
+        InitBattleStage();
+        InitBattleActions();
+        UpdateTerraStatusBars(); //Might not be needed. Could be getting called elsewhere
 
         //--- (Temp) Change second argument once more battle positions are added ---
         battleActionManager = new BattleActionManager(this, 2);
         battleStateManager = new BattleStateManager(this);
     }
 
-    private void SetupBattleScene()
+    private void InitBattleStage()
     {
-        battleHUD.CloseAllSelectionUI();
-
-        if (BattleLoader.GetInstance().GetPlayerTerraList() != null) {
-            playerBattleObject = Instantiate(playerPrefab);
-            playerBattleObject.transform.position = playerTransform.position;
-            playerBattleObject.transform.eulerAngles = playerTransform.eulerAngles;
-            TerraParty playerParty = playerBattleObject.GetComponent<TerraParty>();
-            playerParty.AddPartyMemberList(BattleLoader.GetInstance().GetPlayerTerraList());
-
-            playerLeadingTerra = new TerraBattleObject(playerParty.GetTerraList()[0]);
-            playerLeadingTerra.SetTerraGO(Instantiate(playerLeadingTerra.GetTerra().GetTerraBase().GetTerraGameObject()));
-            playerLeadingTerra.GetTerraGO().transform.position = playerTerraTransform.position;
-            playerLeadingTerra.GetTerraGO().transform.eulerAngles = playerTerraTransform.eulerAngles;
-        }
-        else
-            Debug.Log("No player terra party detected in BattleLoader");
-
-        if (battleType == BattleType.WILD) {
-            if (BattleLoader.GetInstance().GetWildTerra() != null) {
-                wildTerra = new TerraBattleObject(BattleLoader.GetInstance().GetWildTerra());
-                wildTerra.SetTerraGO(Instantiate(wildTerra.GetTerra().GetTerraBase().GetTerraGameObject()));
-                wildTerra.GetTerraGO().transform.position = opponentTerraTransform.position;
-                wildTerra.GetTerraGO().transform.eulerAngles = opponentTerraTransform.eulerAngles;
-            }
-            else
-                Debug.Log("No opponenet object detected in BattleLoader");
+        TerraBattlePosition[] primarySummonerTerraPositionList = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
+        for (int i = 0; i < primarySummonerTerraPositionList.Length; i++) {
+            if(primarySummonerTerraList[i] != null)
+                battleStage.SetTerraAtPosition(primarySummonerTerraList[i], battleFormat, true, i);
         }
 
-        BattleLoader.GetInstance().Clear();
+        TerraBattlePosition[] secondarySummonerTerraPositionList = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
+        for (int i = 0; i < secondarySummonerTerraPositionList.Length; i++) {
+            if (secondarySummonerTerraList[i] != null)
+                battleStage.SetTerraAtPosition(secondarySummonerTerraList[i], battleFormat, false, i);
+        }
+    }
+
+    private void InitBattleActions()
+    {
+        //Initialize the existing status conditions and items on the terra in the event system
+        for(int i = 0; i < battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr().Length; i++) {
+            TerraBattlePosition terraBattlePosition = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[i];
+            terraBattlePosition.GetTerra().GetStatusEffect()?.AddBattleActions(terraBattlePosition, this);
+            //--- (Temp) Hard-coding the leading terra held item until new system is added ---
+            terraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Persim Berry").CreateItemBase());
+            terraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(terraBattlePosition, this);
+
+            //Logging the item that each leading terra is holding
+            if (terraBattlePosition.GetTerra().GetHeldItem() != null)
+                Debug.Log(terraBattlePosition.GetTerra() + " is holding the item: " + terraBattlePosition.GetTerra().GetHeldItem().GetItemSO().GetItemName());
+        }
+
+        for (int i = 0; i < battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr().Length; i++) {
+            TerraBattlePosition terraBattlePosition = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[i];
+            terraBattlePosition.GetTerra().GetStatusEffect()?.AddBattleActions(terraBattlePosition, this);
+            //--- (Temp) Hard-coding the leading terra held item until new system is added ---
+            //terraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Leftovers").CreateItemBase());
+            terraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(terraBattlePosition, this);
+
+            //Logging the item that each leading terra is holding
+            if (terraBattlePosition.GetTerra().GetHeldItem() != null)
+                Debug.Log(terraBattlePosition.GetTerra() + " is holding the item: " + terraBattlePosition.GetTerra().GetHeldItem().GetItemSO().GetItemName());
+        }
     }
 
     public void UpdateTerraStatusBars()
@@ -608,6 +597,8 @@ public class BattleSystem : MonoBehaviour
     public void SetMatchFinished(bool isMatchFinished) { this.isMatchFinished = isMatchFinished; }
 
     public BattleHUD GetBattleHUD() { return battleHUD; }
+
+    public BattleStage GetBattleStage() { return battleStage; }
 
     public BattleType GetBattleType() { return battleType; }
 

@@ -7,26 +7,28 @@ public class BattleSide
     private TerraBattlePosition[] terraBattlePositionArr;
     //private List<BattleHazard> hazardList;
 
-    public BattleSide(int numBattlePositions, TerraParty terraParty)
+    public BattleSide(BattleFormat battleFormat, List<Terra> terraList)
     {
+        int numBattlePositions = (battleFormat == BattleFormat.SINGLE) ? 1 : 2;
         terraBattlePositionArr = new TerraBattlePosition[numBattlePositions];
         for (int i = 0; i < numBattlePositions; i++)
             terraBattlePositionArr[i] = new TerraBattlePosition(this);
 
         int battlePositionIndex = 0;
-        for(int i = 0; i < terraParty.GetTerraList().Count; i++) {
+        for(int i = 0; i < terraList.Count; i++) {
             if (battlePositionIndex >= terraBattlePositionArr.Length)
                 break;
 
-            if (terraParty.GetTerraList()[i] != null && terraParty.GetTerraList()[i].GetCurrentHP() > 0) {
-                terraBattlePositionArr[battlePositionIndex].SetTerra(terraParty.GetTerraList()[i]);
+            if (terraList[i] != null && terraList[i].GetCurrentHP() > 0) {
+                terraBattlePositionArr[battlePositionIndex].SetTerra(terraList[i]);
                 battlePositionIndex++;
             }
         }
     }
 
-    public BattleSide(int numBattlePositions, Terra terra)
+    public BattleSide(BattleFormat battleFormat, Terra terra)
     {
+        int numBattlePositions = (battleFormat == BattleFormat.SINGLE) ? 1 : 2;
         terraBattlePositionArr = new TerraBattlePosition[numBattlePositions];
         for (int i = 0; i < numBattlePositions; i++)
             terraBattlePositionArr[i] = new TerraBattlePosition(this);

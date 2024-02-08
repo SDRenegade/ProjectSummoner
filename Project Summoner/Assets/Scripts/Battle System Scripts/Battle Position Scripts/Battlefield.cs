@@ -9,23 +9,23 @@ public class Battlefield
     //private WeatherCondition weatherCondition
     //private BattleTerrain battleTerrain
 
-    public Battlefield(TerraParty primarySideParty, Terra secondarySideTerra)
+    public Battlefield(BattleFormat battleFormat, List<Terra> primarySummonerTerraList, Terra secondarySummonerTerra)
     {
-        if (primarySideParty.GetTerraList()[0] != null)
-            primaryBattleSide = new BattleSide(1, primarySideParty);
+        if (primarySummonerTerraList[0] != null)
+            primaryBattleSide = new BattleSide(battleFormat, primarySummonerTerraList);
         else
             Debug.LogError("Primary Battle Side Party does not have a leading Terra");
-        secondaryBattleSide = new BattleSide(1, secondarySideTerra);
+        secondaryBattleSide = new BattleSide(battleFormat, secondarySummonerTerra);
     }
 
-    public Battlefield(TerraParty primarySideParty, TerraParty secondarySideParty)
+    public Battlefield(BattleFormat battleFormat, List<Terra> primarySummonerTerraList, List<Terra> secondarySummonerTerraList)
     {
-        if (primarySideParty.GetTerraList()[0] != null)
-            primaryBattleSide = new BattleSide(1, primarySideParty);
+        if (primarySummonerTerraList[0] != null)
+            primaryBattleSide = new BattleSide(battleFormat, primarySummonerTerraList);
         else
             Debug.LogError("Primary Battle Side Party does not have a leading Terra");
-        if (secondarySideParty.GetTerraList()[0] != null)
-            secondaryBattleSide = new BattleSide(1, secondarySideParty);
+        if (secondarySummonerTerraList[0] != null)
+            secondaryBattleSide = new BattleSide(battleFormat, secondarySummonerTerraList);
         else
             Debug.LogError("Secondary Battle Side Party does not have a leading Terra");
     }
