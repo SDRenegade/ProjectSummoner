@@ -128,23 +128,21 @@ public class BattleSystem : MonoBehaviour
         }
     }
 
+    //Might not be needed. Could just call the battleHUD method directly
     public void UpdateTerraStatusBars()
     {
-        battleHUD.UpdateTerraStatusBars(battlefield);
+        battleHUD.UpdateTerraStatusBars(battlefield, battleFormat);
     }
 
-    //TODO Find a way to pass the terrraBattlePosition of the action you are choosing
     public void OpenMoveSelectionUI()
     {
-        TerraBattlePosition terraBattlePosition = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0];
+        TerraBattlePosition terraBattlePosition = battleActionManager.GetNextTerraActionSelection();
 
         //*** Opening Move Selection UI Event ***
         OpeningMoveSelectionUIEventArgs openingMoveSelectionUIEventArgs = InvokeOnOpeningMoveSelectionUI(terraBattlePosition);
 
         if (openingMoveSelectionUIEventArgs.IsMoveSelectionCanceled()) {
-            //Check if all battle positions are ready. If so, switch to combat state.
-            if (battleActionManager.AddReadyBattlePosition())
-                EndActionSelection();
+            AddReadyBattlePosition();
             return;
         }
 
@@ -162,28 +160,24 @@ public class BattleSystem : MonoBehaviour
             TerraMove struggle = new TerraMove(SODatabase.GetInstance().GetTerraMoveByName("Struggle"));
             //Initializes the selected attack and add the new TerraAttack to the TerraAttackList
             TerraAttack terraAttack = new TerraAttack(
-                battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0],
+                terraBattlePosition,
                 battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0],
                 struggle);
-            battleActionManager.GetTerraAttackList().Add(terraAttack);
+            battleActionManager.AddSelectedActionToStack(new TerraAttackBattleAction(terraBattlePosition, terraAttack));
 
-            //Check if all battle positions are ready. If so, switch to combat state.
-            if (battleActionManager.AddReadyBattlePosition())
-                EndActionSelection();
+            AddReadyBattlePosition();
         }
         else
             battleHUD.OpenMoveSelectionUI(moveList, openingMoveSelectionUIEventArgs.GetDisabledMoveIndicies());
     }
 
-    //TODO Temp method being used for move button action until the terra battle position can be passed as
-    //an argument. Have a method in the action manager that calls this method and then checks for all ready
-    //positions, since this method is called in other classes such as Choice Band.
     public void MoveSelectionAction(int moveIndex)
     {
         if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
             return;
 
-        TerraMove selectedMove = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0].GetTerra().GetMoves()[moveIndex];
+        TerraBattlePosition terraBattlePosition = battleActionManager.GetNextTerraActionSelection();
+        TerraMove selectedMove = terraBattlePosition.GetTerra().GetMoves()[moveIndex];
         if (selectedMove == null)
             return;
         if (selectedMove.GetCurrentPP() <= 0) {
@@ -193,16 +187,14 @@ public class BattleSystem : MonoBehaviour
 
         //Initializes the selected attack and add the new TerraAttack to the TerraAttackList
         TerraAttack terraAttack = new TerraAttack(
-            battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0],
+            terraBattlePosition,
             battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0],
             selectedMove);
-        battleActionManager.GetTerraAttackList().Add(terraAttack);
+        battleActionManager.AddSelectedActionToStack(new TerraAttackBattleAction(terraBattlePosition, terraAttack));
         //Add the selected moves battle actions into the event system
         terraAttack.GetTerraMoveBase()?.AddBattleActions(this);
 
-        //Check if all battle positions are ready. If so, switch to combat state.
-        if (battleActionManager.AddReadyBattlePosition())
-            EndActionSelection();
+        AddReadyBattlePosition();
     }
 
     //--- (Temp) This method is currently being called from Choice Band during the action slection event.
@@ -227,11 +219,24 @@ public class BattleSystem : MonoBehaviour
         terraAttack.GetTerraMoveBase()?.AddBattleActions(this);
     }
 
+    private void AddReadyBattlePosition()
+    {
+        battleActionManager.AddReadyBattlePosition();
+
+        //Check if all battle positions are ready. If so, switch to combat state. Else, transition to
+        //next terra action selection.
+        if (battleActionManager.IsAllBattlePositionsReady())
+            EndActionSelection();
+        else if (battleActionManager.GetNextTerraActionSelection() != null)
+            OpenMoveSelectionUI();
+    }
+
     public void EndActionSelection()
     {
         if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
             return;
 
+        battleActionManager.ProcessSelectedActionStack();
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 

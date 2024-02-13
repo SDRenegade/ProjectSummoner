@@ -6,6 +6,10 @@ using UnityEngine.UI;
 
 public class TerraBattleStatusBar : MonoBehaviour
 {
+    private static readonly Color32 HIGH_HP_RANGE_COLOR = new Color32(20, 200, 0, 255);
+    private static readonly Color32 MEDIUM_HP_RANGE_COLOR = new Color32(240, 250, 0, 255);
+    private static readonly Color32 LOW_HP_RANGE_COLOR = new Color32(210, 0, 0, 255);
+
     [SerializeField] private ProgressBar healthBar;
     [SerializeField] private TextMeshProUGUI terraNameTMP;
     [SerializeField] private TextMeshProUGUI terraLevelTMP;
@@ -20,11 +24,11 @@ public class TerraBattleStatusBar : MonoBehaviour
         float progressValue = (float)terra.GetCurrentHP() / terra.GetMaxHP();
         healthBar.SetProgress(progressValue);
         if (progressValue > 0.5f)
-            healthBar.GetImage().color = new Color32(20, 200, 0, 255);
+            healthBar.GetImage().color = HIGH_HP_RANGE_COLOR;
         else if (progressValue > 0.25)
-            healthBar.GetImage().color = new Color32(240, 250, 0, 255);
+            healthBar.GetImage().color = MEDIUM_HP_RANGE_COLOR;
         else
-            healthBar.GetImage().color = new Color32(210, 0, 0, 255);
+            healthBar.GetImage().color = LOW_HP_RANGE_COLOR;
 
         terraCurrentHealthTMP.SetText(terra.GetCurrentHP().ToString());
         terraMaxHealthTMP.SetText(terra.GetMaxHP().ToString());

@@ -12,4 +12,6 @@ public abstract class VolatileStatusEffectSO : ScriptableObject
     public string GetStatusName() { return statusName; }
 
     public string GetDescription() { return description; }
+
+    public override string ToString() { return statusName; }
 }

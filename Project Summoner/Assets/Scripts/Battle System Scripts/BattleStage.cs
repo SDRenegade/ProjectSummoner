@@ -18,45 +18,50 @@ public class BattleStage : MonoBehaviour
     private Vector3 secondarySummonerPos;
     private GameObject primarySummonerGO;
     private GameObject secondarySummonerGO;
-    private List<GameObject> primaryTerraGOList;
-    private List<GameObject> secondaryTerraGOList;
+    private GameObject[] primaryTerraGOArr;
+    private GameObject[] secondaryTerraGOArr;
 
     public void Start()
     {
-        primaryTerraFieldCenterPos = battlefieldOrigin.position;
-        primaryTerraFieldCenterPos.z -= opposingTerraSpacing;
-        secondaryTerraFieldCenterPos = battlefieldOrigin.position;
-        secondaryTerraFieldCenterPos.z += opposingTerraSpacing;
+        float sinOfBattleOriginY = Mathf.Sin((battlefieldOrigin.eulerAngles.y * Mathf.PI) / 180f);
+        float cosOfBattleOriginY = Mathf.Cos((battlefieldOrigin.eulerAngles.y * Mathf.PI) / 180f);
 
+        primaryTerraFieldCenterPos = battlefieldOrigin.position;
+        primaryTerraFieldCenterPos.x -= opposingTerraSpacing * sinOfBattleOriginY;
+        primaryTerraFieldCenterPos.z -= opposingTerraSpacing * cosOfBattleOriginY;
+        secondaryTerraFieldCenterPos = battlefieldOrigin.position;
+        secondaryTerraFieldCenterPos.x += opposingTerraSpacing * sinOfBattleOriginY;
+        secondaryTerraFieldCenterPos.z += opposingTerraSpacing * cosOfBattleOriginY;
         primarySummonerPos = primaryTerraFieldCenterPos;
-        primarySummonerPos.z -= summonerTerraSpacing;
+        primarySummonerPos.x -= summonerTerraSpacing * sinOfBattleOriginY;
+        primarySummonerPos.z -= summonerTerraSpacing * cosOfBattleOriginY;
         secondarySummonerPos = secondaryTerraFieldCenterPos;
-        secondarySummonerPos.z += summonerTerraSpacing;
+        secondarySummonerPos.x += summonerTerraSpacing * sinOfBattleOriginY;
+        secondarySummonerPos.z += summonerTerraSpacing * cosOfBattleOriginY;
 
         if (primarySummonerPrefab != null) {
             primarySummonerGO = Instantiate(primarySummonerPrefab);
             primarySummonerGO.transform.position = primarySummonerPos;
+            primarySummonerGO.transform.eulerAngles = new Vector3(0f, battlefieldOrigin.eulerAngles.y, 0f);
         }
-        if (secondarySummonerPrefab != null) {
+        if (BattleLoader.GetInstance().GetBattleType() != BattleType.WILD && secondarySummonerPrefab != null) {
             secondarySummonerGO = Instantiate(secondarySummonerPrefab);
             secondarySummonerGO.transform.position = secondarySummonerPos;
+            secondarySummonerGO.transform.eulerAngles = new Vector3(0f, battlefieldOrigin.eulerAngles.y - 180f, 0f);
         }
 
-        primaryTerraGOList = new List<GameObject> { null };
-        secondaryTerraGOList = new List<GameObject> { null };
-        if(BattleLoader.GetInstance().GetBattleFormat() == BattleFormat.DOUBLE) {
-            primaryTerraGOList.Add(null);
-            secondaryTerraGOList.Add(null);
-        }
+        int numTerraPositions = (BattleLoader.GetInstance().GetBattleFormat() == BattleFormat.SINGLE) ? 1 : 2;
+        primaryTerraGOArr = new GameObject[numTerraPositions];
+        secondaryTerraGOArr = new GameObject[numTerraPositions];
     }
 
     public GameObject GetPrimarySummonerGO() { return primarySummonerGO; }
 
     public GameObject GetSecondarySummonerGO() { return secondarySummonerGO; }
 
-    public List<GameObject> GetPrimaryTerraGOList() { return primaryTerraGOList; }
+    public GameObject[] GetPrimaryTerraGOArr() { return primaryTerraGOArr; }
 
-    public List<GameObject> GetSecondaryTerraGOList() { return secondaryTerraGOList; }
+    public GameObject[] GetSecondaryTerraGOArr() { return secondaryTerraGOArr; }
 
     public Vector3 GetTerraPosition(BattleFormat battleFormat, bool isPrimarySide, int positionIndex)
     {
@@ -64,7 +69,7 @@ public class BattleStage : MonoBehaviour
 
         //This could be generalized to account for any number of terra positions
         if(battleFormat == BattleFormat.DOUBLE) {
-            if (positionIndex < 0 || positionIndex > 1)
+            if (positionIndex < 0 || positionIndex >= primaryTerraGOArr.Length)
                 positionIndex = 0;
 
             float centerSpacing = allyTerraSpacing / 2;
@@ -81,12 +86,20 @@ public class BattleStage : MonoBehaviour
 
     public void SetTerraAtPosition(Terra terra, BattleFormat battleFormat, bool isPrimarySide, int positionIndex)
     {
+        if (positionIndex >= primaryTerraGOArr.Length) {
+            Debug.Log("position index " + positionIndex + " is out of bounds for SetTerraAtPosition in BattleStage.");
+            return;
+        }
+
         Vector3 terraPos = GetTerraPosition(battleFormat, isPrimarySide, positionIndex);
-        List<GameObject> terraGOList = isPrimarySide ? primaryTerraGOList : secondaryTerraGOList;
+        Vector3 terraRot = Vector3.zero;
+        terraRot.y = isPrimarySide ? battlefieldOrigin.eulerAngles.y : battlefieldOrigin.eulerAngles.y - 180f;
+        GameObject[] terraGOList = isPrimarySide ? primaryTerraGOArr : secondaryTerraGOArr;
 
         if (terraGOList[positionIndex] != null)
             Destroy(terraGOList[positionIndex]);
         terraGOList[positionIndex] = Instantiate(terra.GetTerraBase().GetTerraGameObject());
         terraGOList[positionIndex].transform.position = terraPos;
+        terraGOList[positionIndex].transform.eulerAngles = terraRot;
     }
 }

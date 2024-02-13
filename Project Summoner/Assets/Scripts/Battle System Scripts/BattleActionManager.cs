@@ -1,22 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.UI;
 using UnityEngine;
 
 public class BattleActionManager
 {
     private bool[] readyActionList;
+    private List<TerraBattlePosition> terraActionSelectionQueue;
+    private Stack<BattleAction> selectedActionStack;
     private List<List<TerraAttack>> attackLog;
     private List<TerraAttack> terraAttackList;
     //private List<TerraSwitchBattleAction> TerraSwitchList;
     //private SummonerDie nextCatchAttemptDie;
-    private bool attemptEscape;
+    private bool isAttemptingEscape;
 
     public BattleActionManager(BattleSystem battleSystem, int numBattlePositions)
     {
         readyActionList = new bool[numBattlePositions];
+        terraActionSelectionQueue = new List<TerraBattlePosition>();
+        selectedActionStack = new Stack<BattleAction>();
         attackLog = new List<List<TerraAttack>>();
         terraAttackList = new List<TerraAttack>();
-        attemptEscape = false;
+        isAttemptingEscape = false;
 
         battleSystem.OnEnteringCombatState += CreateNewTurnLog;
         battleSystem.OnAttackDeclaration += AddAttackLogEntry;
@@ -48,7 +53,42 @@ public class BattleActionManager
                 terraAttackList.RemoveAt(i);
             }
         }
-        attemptEscape = false;
+        isAttemptingEscape = false;
+    }
+
+    public void AddTerraToActionSelectionQueue(TerraBattlePosition terraBattlePosition)
+    {
+        terraActionSelectionQueue.Add(terraBattlePosition);
+    }
+
+    public void AddSelectedActionToStack(BattleAction battleAction)
+    {
+        if (terraActionSelectionQueue.Count <= 0) {
+            Debug.LogError("An action was attempted to be added to the stack without any terra in the action selection queue");
+            return;
+        }
+
+        terraActionSelectionQueue.RemoveAt(0);
+        selectedActionStack.Push(battleAction);
+    }
+
+    public bool CancelLastSelectedAction()
+    {
+        if (selectedActionStack.Count <= 0)
+            return false;
+
+        terraActionSelectionQueue.Insert(0, selectedActionStack.Pop().GetTerraBattlePosition());
+        RemoveReadyBattlePosition();
+        return true;
+    }
+
+    public void ProcessSelectedActionStack()
+    {
+        if (selectedActionStack.Count <= 0)
+            return;
+
+        while (selectedActionStack.Count > 0)
+            selectedActionStack.Pop().ProcessBattleAction(this);
     }
 
     //Returns true if all battle positions are ready
@@ -62,6 +102,18 @@ public class BattleActionManager
         }
 
         return IsAllBattlePositionsReady();
+    }
+
+    public bool RemoveReadyBattlePosition()
+    {
+        for (int i = readyActionList.Length - 1; i  >= 0; i--) {
+            if (readyActionList[i] == true) {
+                readyActionList[i] = false;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public bool IsAllBattlePositionsReady()
@@ -93,13 +145,18 @@ public class BattleActionManager
         return attackLog[attackLog.Count - 2];
     }
 
+    public TerraBattlePosition GetNextTerraActionSelection()
+    {
+        return (terraActionSelectionQueue.Count > 0) ? terraActionSelectionQueue[0] : null;
+    }
+
     public List<List<TerraAttack>> GetAttackLog() { return attackLog; }
 
     public List<TerraAttack> GetTerraAttackList() { return terraAttackList; }
 
     public void SetTerraAttackList(List<TerraAttack> terraAttackList) { this.terraAttackList = terraAttackList; }
 
-    public bool GetIsAttemptEscape() { return attemptEscape; }
+    public bool IsAttemptingEscape() { return isAttemptingEscape; }
 
-    public void SetAttemptEscape(bool attemptEscape) { this.attemptEscape = attemptEscape; }
+    public void SetAttemptingEscape(bool isAttemptingEscape) { this.isAttemptingEscape = isAttemptingEscape; }
 }
