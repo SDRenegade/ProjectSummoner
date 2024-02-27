@@ -21,10 +21,13 @@ public class BattleStage : MonoBehaviour
     private GameObject[] primaryTerraGOArr;
     private GameObject[] secondaryTerraGOArr;
 
+    private float sinOfBattleOriginY;
+    private float cosOfBattleOriginY;
+
     public void Start()
     {
-        float sinOfBattleOriginY = Mathf.Sin((battlefieldOrigin.eulerAngles.y * Mathf.PI) / 180f);
-        float cosOfBattleOriginY = Mathf.Cos((battlefieldOrigin.eulerAngles.y * Mathf.PI) / 180f);
+        sinOfBattleOriginY = Mathf.Sin((battlefieldOrigin.eulerAngles.y * Mathf.PI) / 180f);
+        cosOfBattleOriginY = Mathf.Cos((battlefieldOrigin.eulerAngles.y * Mathf.PI) / 180f);
 
         primaryTerraFieldCenterPos = battlefieldOrigin.position;
         primaryTerraFieldCenterPos.x -= opposingTerraSpacing * sinOfBattleOriginY;
@@ -75,10 +78,12 @@ public class BattleStage : MonoBehaviour
             float centerSpacing = allyTerraSpacing / 2;
             if (positionIndex == 0)
                 centerSpacing = -centerSpacing;
-            if(!isPrimarySide)
-                centerSpacing = -centerSpacing;
 
-            terraPosition.x += centerSpacing;
+            //Calculating the perpendicular sin and cos of the battle origin Y rotation
+            float perpendicularSinOfBattleOriginY = Mathf.Sin(((battlefieldOrigin.eulerAngles.y + 90) * Mathf.PI) / 180f);
+            float perpendicularCosOfBattleOriginY = Mathf.Cos(((battlefieldOrigin.eulerAngles.y + 90) * Mathf.PI) / 180f);
+            terraPosition.x += centerSpacing * perpendicularSinOfBattleOriginY;
+            terraPosition.z += centerSpacing * perpendicularCosOfBattleOriginY;
         }
 
         return terraPosition;

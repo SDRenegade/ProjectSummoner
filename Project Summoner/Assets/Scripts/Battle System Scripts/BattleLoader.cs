@@ -28,7 +28,7 @@ public class BattleLoader : MonoBehaviour
         primarySummonerTerraList = playerTerraList;
         secondarySummonerTerraList = new List<Terra> { wildTerra };
         battleType = BattleType.WILD;
-        battleFormat = BattleFormat.SINGLE;
+        battleFormat = BattleFormat.DOUBLE;
 
         //Save the player/scene data before loading into the battle scene
         SaveSystem.GetInstance().SaveGame();

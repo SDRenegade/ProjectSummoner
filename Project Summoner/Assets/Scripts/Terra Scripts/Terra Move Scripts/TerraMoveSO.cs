@@ -6,13 +6,14 @@ using UnityEngine;
 public abstract class TerraMoveSO : ScriptableObject
 {
     [SerializeField] protected string moveName;
-    [SerializeField] [TextArea] protected string description;
+    [SerializeField, TextArea] protected string description;
     [SerializeField] protected TerraType terraType;
     [SerializeField] protected DamageType damageType;
     [SerializeField] protected MovePriority baseMovePriority;
     [SerializeField] protected IntNullable baseDamage;
     [SerializeField] protected IntNullable baseAccuracy;
     [SerializeField] protected int basePP;
+    [SerializeField] protected bool isTargetSelectable;
     [SerializeField] protected bool hasChargeTurn;
     [SerializeField] protected bool hasRechargeTurn;
 
@@ -33,6 +34,8 @@ public abstract class TerraMoveSO : ScriptableObject
     public IntNullable GetBaseAccuracy() { return baseAccuracy; }
     
     public int GetBasePP() { return basePP; }
+
+    public bool IsTargetSelectable() { return isTargetSelectable;}
 
     public bool HasChargeTurn() {  return hasChargeTurn; }
 

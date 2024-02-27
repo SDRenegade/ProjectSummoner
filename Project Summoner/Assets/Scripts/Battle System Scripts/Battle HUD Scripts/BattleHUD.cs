@@ -5,17 +5,18 @@ using UnityEngine;
 
 public class BattleHUD : MonoBehaviour
 {
-    [SerializeField] private List<GameObject> primarySideTerraStatusBarList;
-    [SerializeField] private List<GameObject> secondarySideTerraStatusBarList;
+    [SerializeField] private List<TerraBattleStatusBar> primarySideTerraStatusBarList;
+    [SerializeField] private List<TerraBattleStatusBar> secondarySideTerraStatusBarList;
     [SerializeField] private GameObject menuSelectionObject;
-    [SerializeField] private GameObject moveSelectionObject;
+    [SerializeField] private MoveSelectionUI moveSelectionUI;
+    [SerializeField] private TargetSelectionUI targetSelectionUI;
 
     public void Start()
     {
         for(int i = 0; i < primarySideTerraStatusBarList.Count; i++)
-            primarySideTerraStatusBarList[i].SetActive(false);
+            primarySideTerraStatusBarList[i].gameObject.SetActive(false);
         for (int i = 0; i < secondarySideTerraStatusBarList.Count; i++)
-            secondarySideTerraStatusBarList[i].SetActive(false);
+            secondarySideTerraStatusBarList[i].gameObject.SetActive(false);
 
         CloseAllSelectionUI();
     }
@@ -27,33 +28,33 @@ public class BattleHUD : MonoBehaviour
 
         int numStatusBars = (battleFormat == BattleFormat.SINGLE) ? 1 : 2;
         for(int i = 0; i < numStatusBars; i++) {
-            if (primaryTerraBattlePositionArr[i] == null)
-                primarySideTerraStatusBarList[i].SetActive(false);
+            if (primaryTerraBattlePositionArr[i].GetTerra() == null)
+                primarySideTerraStatusBarList[i].gameObject.SetActive(false);
             else {
-                primarySideTerraStatusBarList[i].SetActive(true);
-                primarySideTerraStatusBarList[i].GetComponent<TerraBattleStatusBar>()?.UpdateStatusBar(primaryTerraBattlePositionArr[i].GetTerra());
+                primarySideTerraStatusBarList[i].gameObject.SetActive(true);
+                primarySideTerraStatusBarList[i].UpdateStatusBar(primaryTerraBattlePositionArr[i].GetTerra());
             }
 
-            if (primaryTerraBattlePositionArr[i] == null)
-                secondarySideTerraStatusBarList[i].SetActive(false);
+            if (secondaryTerraBattlePositionArr[i].GetTerra() == null)
+                secondarySideTerraStatusBarList[i].gameObject.SetActive(false);
             else {
-                secondarySideTerraStatusBarList[i].SetActive(true);
-                secondarySideTerraStatusBarList[i].GetComponent<TerraBattleStatusBar>()?.UpdateStatusBar(secondaryTerraBattlePositionArr[i].GetTerra());
+                secondarySideTerraStatusBarList[i].gameObject.SetActive(true);
+                secondarySideTerraStatusBarList[i].UpdateStatusBar(secondaryTerraBattlePositionArr[i].GetTerra());
             }
         }
     }
 
     public void OpenMenuSelectionUI()
     {
-        moveSelectionObject.SetActive(false);
+        CloseAllSelectionUI();
         menuSelectionObject.SetActive(true);
     }
 
+    //TODO Move to MoveSelectionUI class
     public void OpenMoveSelectionUI(List<TerraMove> terraMoves, List<int> disabledMoves)
     {
-        menuSelectionObject.SetActive(false);
+        CloseAllSelectionUI();
 
-        MoveSelectionUI moveSelectionUI = moveSelectionObject.GetComponent<MoveSelectionUI>();
         for (int i = 0; i < Terra.MOVE_SLOTS; i++) {
             if (moveSelectionUI.GetMoveBtns().Length <= i)
                 break;
@@ -68,12 +69,19 @@ public class BattleHUD : MonoBehaviour
             else
                 moveSelectionUI.GetMoveBtns()[i].interactable = true;
         }
-        moveSelectionObject.SetActive(true);
+        moveSelectionUI.gameObject.SetActive(true);
+    }
+
+    public void OpenTargetSelectionUI(TerraBattlePosition terraBattlePosition, Battlefield battlefield)
+    {
+        CloseAllSelectionUI();
+        targetSelectionUI.OpenTargetSelectionUI(terraBattlePosition, battlefield);
     }
 
     public void CloseAllSelectionUI()
     {
-        moveSelectionObject.SetActive(false);
         menuSelectionObject.SetActive(false);
+        moveSelectionUI.gameObject.SetActive(false);
+        targetSelectionUI.gameObject.SetActive(false);
     }
 }

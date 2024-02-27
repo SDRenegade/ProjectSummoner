@@ -14,6 +14,8 @@ public class BattleActionManager
     //private SummonerDie nextCatchAttemptDie;
     private bool isAttemptingEscape;
 
+    private TerraAttack pendingTerraAttack; //Might change location
+
     public BattleActionManager(BattleSystem battleSystem, int numBattlePositions)
     {
         readyActionList = new bool[numBattlePositions];
@@ -22,6 +24,7 @@ public class BattleActionManager
         attackLog = new List<List<TerraAttack>>();
         terraAttackList = new List<TerraAttack>();
         isAttemptingEscape = false;
+        pendingTerraAttack = null;
 
         battleSystem.OnEnteringCombatState += CreateNewTurnLog;
         battleSystem.OnAttackDeclaration += AddAttackLogEntry;
@@ -82,13 +85,13 @@ public class BattleActionManager
         return true;
     }
 
-    public void ProcessSelectedActionStack()
+    public void ProcessSelectedActionStack(BattleSystem battleSystem)
     {
         if (selectedActionStack.Count <= 0)
             return;
 
         while (selectedActionStack.Count > 0)
-            selectedActionStack.Pop().ProcessBattleAction(this);
+            selectedActionStack.Pop().ProcessBattleAction(battleSystem, this);
     }
 
     //Returns true if all battle positions are ready
@@ -159,4 +162,8 @@ public class BattleActionManager
     public bool IsAttemptingEscape() { return isAttemptingEscape; }
 
     public void SetAttemptingEscape(bool isAttemptingEscape) { this.isAttemptingEscape = isAttemptingEscape; }
+
+    public TerraAttack GetPendingTerraAttack() { return pendingTerraAttack; }
+
+    public void SetPendingTerraAttack(TerraAttack pendingTerraAttack) { this.pendingTerraAttack = pendingTerraAttack; }
 }

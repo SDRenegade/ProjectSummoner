@@ -9,12 +9,20 @@ public class ActionSelectionBattleState : BattleState
         BattleSystem battleSystem = battleManager.GetBattleSystem();
 
         TerraBattlePosition[] primarySidePositions = battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
-        for (int i = 0; i < primarySidePositions.Length; i++)
-            ProcessActionSelection(battleSystem.GetPrimarySideAI(), primarySidePositions[i], battleSystem);
+        for (int i = 0; i < primarySidePositions.Length; i++) {
+            if (primarySidePositions[i].GetTerra() != null)
+                ProcessActionSelection(battleSystem.GetPrimarySideAI(), primarySidePositions[i], battleSystem);
+            else
+                battleSystem.GetBattleActionManager().AddReadyBattlePosition();
+        }
 
         TerraBattlePosition[] secondarySidePositions = battleSystem.GetBattlefield().GetSecondaryBattleSide().GetTerraBattlePositionArr();
-        for (int i = 0; i < secondarySidePositions.Length; i++)
-            ProcessActionSelection(battleSystem.GetSecondarySideAI(), secondarySidePositions[i], battleSystem);
+        for (int i = 0; i < secondarySidePositions.Length; i++) {
+            if (secondarySidePositions[i].GetTerra() != null)
+                ProcessActionSelection(battleSystem.GetSecondarySideAI(), secondarySidePositions[i], battleSystem);
+            else
+                battleSystem.GetBattleActionManager().AddReadyBattlePosition();
+        }
 
         //Check if all battle positions are ready. If so, switch to combat state. Else, open action menu
         //for next terra in action slection queue.

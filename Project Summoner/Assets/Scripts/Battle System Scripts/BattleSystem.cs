@@ -80,21 +80,21 @@ public class BattleSystem : MonoBehaviour
         InitBattleActions();
         UpdateTerraStatusBars(); //Might not be needed. Could be getting called elsewhere
 
-        //--- (Temp) Change second argument once more battle positions are added ---
-        battleActionManager = new BattleActionManager(this, 2);
+        int numBattlePositions = (battleFormat == BattleFormat.SINGLE) ? 2 : 4;
+        battleActionManager = new BattleActionManager(this, numBattlePositions);
         battleStateManager = new BattleStateManager(this);
     }
 
     private void InitBattleStage()
     {
         TerraBattlePosition[] primarySummonerTerraPositionList = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
-        for (int i = 0; i < primarySummonerTerraPositionList.Length; i++) {
-            if(primarySummonerTerraList[i] != null)
+        for (int i = 0; i < primarySummonerTerraPositionList.Length && i < primarySummonerTerraList.Count; i++) {
+            if (primarySummonerTerraList[i] != null)
                 battleStage.SetTerraAtPosition(primarySummonerTerraList[i], battleFormat, true, i);
         }
 
         TerraBattlePosition[] secondarySummonerTerraPositionList = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
-        for (int i = 0; i < secondarySummonerTerraPositionList.Length; i++) {
+        for (int i = 0; i < secondarySummonerTerraPositionList.Length && i < secondarySummonerTerraList.Count; i++) {
             if (secondarySummonerTerraList[i] != null)
                 battleStage.SetTerraAtPosition(secondarySummonerTerraList[i], battleFormat, false, i);
         }
@@ -105,6 +105,9 @@ public class BattleSystem : MonoBehaviour
         //Initialize the existing status conditions and items on the terra in the event system
         for(int i = 0; i < battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr().Length; i++) {
             TerraBattlePosition terraBattlePosition = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[i];
+            if (terraBattlePosition.GetTerra() == null)
+                continue;
+
             terraBattlePosition.GetTerra().GetStatusEffect()?.AddBattleActions(terraBattlePosition, this);
             //--- (Temp) Hard-coding the leading terra held item until new system is added ---
             terraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Persim Berry").CreateItemBase());
@@ -117,6 +120,9 @@ public class BattleSystem : MonoBehaviour
 
         for (int i = 0; i < battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr().Length; i++) {
             TerraBattlePosition terraBattlePosition = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[i];
+            if (terraBattlePosition.GetTerra() == null)
+                continue;
+
             terraBattlePosition.GetTerra().GetStatusEffect()?.AddBattleActions(terraBattlePosition, this);
             //--- (Temp) Hard-coding the leading terra held item until new system is added ---
             //terraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Leftovers").CreateItemBase());
@@ -185,19 +191,40 @@ public class BattleSystem : MonoBehaviour
             return;
         }
 
-        //Initializes the selected attack and add the new TerraAttack to the TerraAttackList
-        TerraAttack terraAttack = new TerraAttack(
-            terraBattlePosition,
-            battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0],
-            selectedMove);
-        battleActionManager.AddSelectedActionToStack(new TerraAttackBattleAction(terraBattlePosition, terraAttack));
-        //Add the selected moves battle actions into the event system
-        terraAttack.GetTerraMoveBase()?.AddBattleActions(this);
+        if (selectedMove.GetMoveSO().IsTargetSelectable()) {
+            TerraAttack pendingTerraAttack = new TerraAttack(
+                terraBattlePosition,
+                GetBattlefield().GetSecondaryBattleSide().GetTerraBattlePositionArr()[0],
+                selectedMove);
+            battleActionManager.SetPendingTerraAttack(pendingTerraAttack);
+            OpenTargetSelectionUI(terraBattlePosition, battlefield);
+        }
+        else {
+            //Creating a list of all terra battle positions that are targetable
+            List<TerraBattlePosition> targetablePositionList = new List<TerraBattlePosition>();
+            TerraBattlePosition[] primaryTerraBattlePositions = GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
+            TerraBattlePosition[] secondaryTerraBattlePositions = GetBattlefield().GetSecondaryBattleSide().GetTerraBattlePositionArr();
+            for (int i = 0; i < primaryTerraBattlePositions.Length; i++) {
+                if (primaryTerraBattlePositions[i] == terraBattlePosition)
+                    continue;
+                targetablePositionList.Add(primaryTerraBattlePositions[i]);
+            }
+            for (int i = 0; i < secondaryTerraBattlePositions.Length; i++)
+                targetablePositionList.Add(secondaryTerraBattlePositions[i]);
 
-        AddReadyBattlePosition();
+            //Initializes the selected attack and add the new TerraAttack to the TerraAttackList
+            TerraAttack terraAttack = new TerraAttack(
+                terraBattlePosition,
+                targetablePositionList,
+                selectedMove);
+            battleActionManager.AddSelectedActionToStack(new TerraAttackBattleAction(terraBattlePosition, terraAttack));
+
+            AddReadyBattlePosition();
+        }
     }
 
-    //--- (Temp) This method is currently being called from Choice Band during the action slection event.
+    //TODO Refactor this to work like the other MoveSelectionAction method
+    //--- (Temp) This method is currently being called from Choice Band during the action selection event.
     //So, the ready position and the check for end of action selection method calls were removed.
     public void MoveSelectionAction(TerraBattlePosition attackerPosition, List<TerraBattlePosition> defenderList, int moveIndex)
     {
@@ -219,6 +246,16 @@ public class BattleSystem : MonoBehaviour
         terraAttack.GetTerraMoveBase()?.AddBattleActions(this);
     }
 
+    public void OpenTargetSelectionUI(TerraBattlePosition terraBattlePosition, Battlefield battlefield)
+    {
+        battleHUD.OpenTargetSelectionUI(terraBattlePosition, battlefield);
+    }
+
+    public void TargetSelection(int positionIndex)
+    {
+
+    }
+
     private void AddReadyBattlePosition()
     {
         battleActionManager.AddReadyBattlePosition();
@@ -228,7 +265,7 @@ public class BattleSystem : MonoBehaviour
         if (battleActionManager.IsAllBattlePositionsReady())
             EndActionSelection();
         else if (battleActionManager.GetNextTerraActionSelection() != null)
-            OpenMoveSelectionUI();
+            battleHUD.OpenMenuSelectionUI();
     }
 
     public void EndActionSelection()
@@ -236,7 +273,7 @@ public class BattleSystem : MonoBehaviour
         if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
             return;
 
-        battleActionManager.ProcessSelectedActionStack();
+        battleActionManager.ProcessSelectedActionStack(this);
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 

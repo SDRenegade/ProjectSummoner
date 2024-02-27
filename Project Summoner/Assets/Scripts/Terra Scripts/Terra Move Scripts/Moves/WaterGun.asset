@@ -24,5 +24,6 @@ MonoBehaviour:
     value: 100
     isNull: 0
   basePP: 25
+  isTargetSelectable: 1
   hasChargeTurn: 0
   hasRechargeTurn: 0
