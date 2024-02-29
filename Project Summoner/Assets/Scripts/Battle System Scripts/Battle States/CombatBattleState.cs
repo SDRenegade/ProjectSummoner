@@ -106,6 +106,8 @@ public class CombatBattleState : BattleState
         for (int i = 0; i < terraAttack.GetDefendersPositionList().Count; i++) {
             TerraBattlePosition attackerPosition = terraAttack.GetAttackerPosition();
             TerraBattlePosition defenderPosition = terraAttack.GetDefendersPositionList()[i];
+            if (defenderPosition.GetTerra() == null)
+                continue;
 
             directAttackLogList.Add(new DirectAttackLog(attackerPosition, defenderPosition, terraAttack.GetMove()));
 

@@ -169,7 +169,7 @@ public class BattleSystem : MonoBehaviour
                 terraBattlePosition,
                 battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0],
                 struggle);
-            battleActionManager.AddSelectedActionToStack(new TerraAttackBattleAction(terraBattlePosition, terraAttack));
+            battleActionManager.AddBattleActionToStack(new TerraAttackBattleAction(terraBattlePosition, terraAttack));
 
             AddReadyBattlePosition();
         }
@@ -191,33 +191,50 @@ public class BattleSystem : MonoBehaviour
             return;
         }
 
-        if (selectedMove.GetMoveSO().IsTargetSelectable()) {
+        //Creating a list of all terra battle positions that are targetable
+        List<TerraBattlePosition> targetablePositionList = new List<TerraBattlePosition>();
+        TerraBattlePosition[] primaryTerraBattlePositions = GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
+        TerraBattlePosition[] secondaryTerraBattlePositions = GetBattlefield().GetSecondaryBattleSide().GetTerraBattlePositionArr();
+        for (int i = 0; i < primaryTerraBattlePositions.Length; i++) {
+            if (primaryTerraBattlePositions[i] == terraBattlePosition || primaryTerraBattlePositions[i].GetTerra() == null)
+                continue;
+            targetablePositionList.Add(primaryTerraBattlePositions[i]);
+        }
+        for (int i = 0; i < secondaryTerraBattlePositions.Length; i++) {
+            if (secondaryTerraBattlePositions[i].GetTerra() != null)
+                targetablePositionList.Add(secondaryTerraBattlePositions[i]);
+        }
+
+        if (targetablePositionList.Count > 1 && selectedMove.GetMoveSO().IsTargetSelectable()) {
+            //If we just put null for target the compiler can't tell which constructor to use. So, we
+            //initialize a TerraBattlePosition to be null and pass that.
+            TerraBattlePosition nullTarget = null;
             TerraAttack pendingTerraAttack = new TerraAttack(
                 terraBattlePosition,
-                GetBattlefield().GetSecondaryBattleSide().GetTerraBattlePositionArr()[0],
+                nullTarget,
                 selectedMove);
             battleActionManager.SetPendingTerraAttack(pendingTerraAttack);
             OpenTargetSelectionUI(terraBattlePosition, battlefield);
         }
-        else {
-            //Creating a list of all terra battle positions that are targetable
-            List<TerraBattlePosition> targetablePositionList = new List<TerraBattlePosition>();
-            TerraBattlePosition[] primaryTerraBattlePositions = GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
-            TerraBattlePosition[] secondaryTerraBattlePositions = GetBattlefield().GetSecondaryBattleSide().GetTerraBattlePositionArr();
-            for (int i = 0; i < primaryTerraBattlePositions.Length; i++) {
-                if (primaryTerraBattlePositions[i] == terraBattlePosition)
-                    continue;
-                targetablePositionList.Add(primaryTerraBattlePositions[i]);
-            }
-            for (int i = 0; i < secondaryTerraBattlePositions.Length; i++)
-                targetablePositionList.Add(secondaryTerraBattlePositions[i]);
+        else if(selectedMove.GetMoveSO().IsSelfTargeting()) {
+            //Initializes the a new terra attack with the selected move and defender position to be the
+            //same as the attacker position
+            TerraAttack terraAttack = new TerraAttack(
+                terraBattlePosition,
+                terraBattlePosition,
+                selectedMove);
+            battleActionManager.AddBattleActionToStack(new TerraAttackBattleAction(terraBattlePosition, terraAttack));
 
-            //Initializes the selected attack and add the new TerraAttack to the TerraAttackList
+            AddReadyBattlePosition();
+        }
+        else {
+            //Initializes the a new terra attack with the selected move and defender positions to be all
+            //targetable positions
             TerraAttack terraAttack = new TerraAttack(
                 terraBattlePosition,
                 targetablePositionList,
                 selectedMove);
-            battleActionManager.AddSelectedActionToStack(new TerraAttackBattleAction(terraBattlePosition, terraAttack));
+            battleActionManager.AddBattleActionToStack(new TerraAttackBattleAction(terraBattlePosition, terraAttack));
 
             AddReadyBattlePosition();
         }
@@ -253,7 +270,28 @@ public class BattleSystem : MonoBehaviour
 
     public void TargetSelection(int positionIndex)
     {
+        TerraBattlePosition targetTerraPosition = null;
+        if(positionIndex == 0) {
+            if (battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0] != battleActionManager.GetPendingTerraAttack().GetAttackerPosition())
+                targetTerraPosition = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0];
+            else
+                targetTerraPosition = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[1];
+        }
+        else if(positionIndex == 1) {
+            if (battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0].GetTerra() != null)
+                targetTerraPosition = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0];
+        }
+        else if(positionIndex == 2) {
+            if (battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[1].GetTerra() != null)
+                targetTerraPosition = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[1];
+        }
 
+        if (targetTerraPosition != null) {
+            battleActionManager.PushPendingTerraAttack(targetTerraPosition);
+            AddReadyBattlePosition();
+        }
+        else
+            Debug.LogError("The position index " + positionIndex + " is not a valid target.");
     }
 
     private void AddReadyBattlePosition()

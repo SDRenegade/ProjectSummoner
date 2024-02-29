@@ -14,6 +14,7 @@ public abstract class TerraMoveSO : ScriptableObject
     [SerializeField] protected IntNullable baseAccuracy;
     [SerializeField] protected int basePP;
     [SerializeField] protected bool isTargetSelectable;
+    [SerializeField] protected bool isSelfTargeting;
     [SerializeField] protected bool hasChargeTurn;
     [SerializeField] protected bool hasRechargeTurn;
 
@@ -35,7 +36,9 @@ public abstract class TerraMoveSO : ScriptableObject
     
     public int GetBasePP() { return basePP; }
 
-    public bool IsTargetSelectable() { return isTargetSelectable;}
+    public bool IsTargetSelectable() { return isTargetSelectable; }
+
+    public bool IsSelfTargeting() { return isSelfTargeting; }
 
     public bool HasChargeTurn() {  return hasChargeTurn; }
 

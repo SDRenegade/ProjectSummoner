@@ -14,7 +14,7 @@ public class BattleActionManager
     //private SummonerDie nextCatchAttemptDie;
     private bool isAttemptingEscape;
 
-    private TerraAttack pendingTerraAttack; //Might change location
+    private TerraAttack pendingTerraAttack;
 
     public BattleActionManager(BattleSystem battleSystem, int numBattlePositions)
     {
@@ -64,7 +64,7 @@ public class BattleActionManager
         terraActionSelectionQueue.Add(terraBattlePosition);
     }
 
-    public void AddSelectedActionToStack(BattleAction battleAction)
+    public void AddBattleActionToStack(BattleAction battleAction)
     {
         if (terraActionSelectionQueue.Count <= 0) {
             Debug.LogError("An action was attempted to be added to the stack without any terra in the action selection queue");
@@ -83,6 +83,13 @@ public class BattleActionManager
         terraActionSelectionQueue.Insert(0, selectedActionStack.Pop().GetTerraBattlePosition());
         RemoveReadyBattlePosition();
         return true;
+    }
+
+    public void PushPendingTerraAttack(TerraBattlePosition targetTerraPosition)
+    {
+        pendingTerraAttack.GetDefendersPositionList().Add(targetTerraPosition);
+        AddBattleActionToStack(new TerraAttackBattleAction(pendingTerraAttack.GetAttackerPosition(), pendingTerraAttack));
+        pendingTerraAttack = null;
     }
 
     public void ProcessSelectedActionStack(BattleSystem battleSystem)

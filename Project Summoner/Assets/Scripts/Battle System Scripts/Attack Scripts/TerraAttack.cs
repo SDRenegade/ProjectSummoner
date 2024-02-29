@@ -25,7 +25,9 @@ public class TerraAttack
     public TerraAttack(TerraBattlePosition attackerPosition, TerraBattlePosition defenderPosition, TerraMove move)
     {
         this.attackerPosition = attackerPosition;
-        defendersPositionList = new List<TerraBattlePosition> { defenderPosition };
+        defendersPositionList = new List<TerraBattlePosition>();
+        if (defenderPosition != null)
+            defendersPositionList.Add(defenderPosition);
         this.move = move;
         terraMoveBase = move.GetMoveSO().CreateTerraMoveAction(this);
         movePriority = move.GetMoveSO().GetBaseMovePriority();
@@ -39,7 +41,9 @@ public class TerraAttack
     public TerraAttack(TerraBattlePosition attackerPosition, List<TerraBattlePosition> defendersPositionList, TerraMove move)
     {
         this.attackerPosition = attackerPosition;
-        this.defendersPositionList = defendersPositionList;
+        this.defendersPositionList = new List<TerraBattlePosition>();
+        for(int i = 0; i < defendersPositionList.Count; i++)
+            this.defendersPositionList.Add(defendersPositionList[i]);
         this.move = move;
         terraMoveBase = move.GetMoveSO().CreateTerraMoveAction(this);
         movePriority = move.GetMoveSO().GetBaseMovePriority();
@@ -71,7 +75,7 @@ public class TerraAttack
 
     public SpeedPriority GetSpeedPiority() { return speedPriority; }
 
-    public void SetSpeedPriority(SpeedPriority speedPiority) { this.speedPriority = speedPiority; }
+    public void SetSpeedPriority(SpeedPriority speedPriority) { this.speedPriority = speedPriority; }
 
     public bool IsCharging() { return isCharging; }
 
