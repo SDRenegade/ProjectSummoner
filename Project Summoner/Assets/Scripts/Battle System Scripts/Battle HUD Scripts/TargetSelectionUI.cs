@@ -8,17 +8,20 @@ public class TargetSelectionUI : MonoBehaviour
 {
     [SerializeField] private Button opponentPos1Btn;
     [SerializeField] private Button opponentPos2Btn;
-    [SerializeField] private Button allyPosBtn;
+    [SerializeField] private Button allyPos1Btn;
+    [SerializeField] private Button allyPos2Btn;
 
     public void OpenTargetSelectionUI(TerraBattlePosition terraBattlePosition, Battlefield battlefield)
     {
+        SetAllButtonActives(false);
+
         TerraBattlePosition[] primaryTerraBattlePositions = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
         TerraBattlePosition[] secondaryTerraBattlePositions = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
-        TerraBattlePosition allyPosition = null;
+        int? allyPositionIndex = null;
         for (int i = 0; i < primaryTerraBattlePositions.Length; i++) {
             if (primaryTerraBattlePositions[i] == terraBattlePosition)
                 continue;
-            allyPosition = primaryTerraBattlePositions[i];
+            allyPositionIndex = i;
             break;
         }
 
@@ -26,21 +29,31 @@ public class TargetSelectionUI : MonoBehaviour
             opponentPos1Btn.gameObject.SetActive(true);
             opponentPos1Btn.GetComponentInChildren<TextMeshProUGUI>()?.SetText(secondaryTerraBattlePositions[0].GetTerra().ToString());
         }
-        else
-            opponentPos1Btn.gameObject.SetActive(false);
         if (secondaryTerraBattlePositions[1].GetTerra() != null) {
             opponentPos2Btn.gameObject.SetActive(true);
             opponentPos2Btn.GetComponentInChildren<TextMeshProUGUI>()?.SetText(secondaryTerraBattlePositions[1].GetTerra().ToString());
         }
-        else
-            opponentPos2Btn.gameObject.SetActive(false);
-        if (allyPosition != null) {
-            allyPosBtn.gameObject.SetActive(true);
-            allyPosBtn.GetComponentInChildren<TextMeshProUGUI>()?.SetText(allyPosition.GetTerra().ToString());
+        if (allyPositionIndex != null) {
+            if(allyPositionIndex == 0) {
+                allyPos1Btn.gameObject.SetActive(true);
+                allyPos1Btn.GetComponentInChildren<TextMeshProUGUI>()?.SetText(primaryTerraBattlePositions[0].GetTerra().ToString());
+            }
+            else if(allyPositionIndex == 1) {
+                allyPos2Btn.gameObject.SetActive(true);
+                allyPos2Btn.GetComponentInChildren<TextMeshProUGUI>()?.SetText(primaryTerraBattlePositions[1].GetTerra().ToString());
+            }
         }
         else
-            allyPosBtn.gameObject.SetActive(false);
+            allyPos1Btn.gameObject.SetActive(false);
 
         gameObject.SetActive(true);
+    }
+
+    private void SetAllButtonActives(bool isActive)
+    {
+        opponentPos1Btn.gameObject.SetActive(isActive);
+        opponentPos2Btn.gameObject.SetActive(isActive);
+        allyPos1Btn.gameObject.SetActive(isActive);
+        allyPos2Btn.gameObject.SetActive(isActive);
     }
 }

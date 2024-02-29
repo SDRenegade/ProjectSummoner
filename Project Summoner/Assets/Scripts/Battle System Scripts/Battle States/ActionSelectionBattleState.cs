@@ -29,7 +29,7 @@ public class ActionSelectionBattleState : BattleState
         if (battleSystem.GetBattleActionManager().IsAllBattlePositionsReady())
             battleSystem.EndActionSelection();
         else
-            battleSystem.GetBattleHUD().OpenMenuSelectionUI();
+            battleSystem.GetBattleHUD().OpenMenuSelectionUI(battleSystem.GetBattleActionManager());
     }
 
     private void ProcessActionSelection(BattleAI battleAI, TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)

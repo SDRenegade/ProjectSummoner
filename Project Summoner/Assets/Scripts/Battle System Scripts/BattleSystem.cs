@@ -303,7 +303,7 @@ public class BattleSystem : MonoBehaviour
         if (battleActionManager.IsAllBattlePositionsReady())
             EndActionSelection();
         else if (battleActionManager.GetNextTerraActionSelection() != null)
-            battleHUD.OpenMenuSelectionUI();
+            battleHUD.OpenMenuSelectionUI(battleActionManager);
     }
 
     public void EndActionSelection()

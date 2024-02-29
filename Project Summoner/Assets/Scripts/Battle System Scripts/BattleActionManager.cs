@@ -160,6 +160,8 @@ public class BattleActionManager
         return (terraActionSelectionQueue.Count > 0) ? terraActionSelectionQueue[0] : null;
     }
 
+    public Stack<BattleAction> GetSelectedActionStack() { return selectedActionStack; }
+
     public List<List<TerraAttack>> GetAttackLog() { return attackLog; }
 
     public List<TerraAttack> GetTerraAttackList() { return terraAttackList; }

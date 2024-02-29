@@ -7,7 +7,7 @@ public class BattleHUD : MonoBehaviour
 {
     [SerializeField] private List<TerraBattleStatusBar> primarySideTerraStatusBarList;
     [SerializeField] private List<TerraBattleStatusBar> secondarySideTerraStatusBarList;
-    [SerializeField] private GameObject menuSelectionObject;
+    [SerializeField] private MenuSelectionUI menuSelectionUI;
     [SerializeField] private MoveSelectionUI moveSelectionUI;
     [SerializeField] private TargetSelectionUI targetSelectionUI;
 
@@ -44,10 +44,10 @@ public class BattleHUD : MonoBehaviour
         }
     }
 
-    public void OpenMenuSelectionUI()
+    public void OpenMenuSelectionUI(BattleActionManager battleActionManager)
     {
         CloseAllSelectionUI();
-        menuSelectionObject.SetActive(true);
+        menuSelectionUI.OpenMenuSelectionUI(battleActionManager);
     }
 
     //TODO Move to MoveSelectionUI class
@@ -80,7 +80,7 @@ public class BattleHUD : MonoBehaviour
 
     public void CloseAllSelectionUI()
     {
-        menuSelectionObject.SetActive(false);
+        menuSelectionUI.gameObject.SetActive(false);
         moveSelectionUI.gameObject.SetActive(false);
         targetSelectionUI.gameObject.SetActive(false);
     }
