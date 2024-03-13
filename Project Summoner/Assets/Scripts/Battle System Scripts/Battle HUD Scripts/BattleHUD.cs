@@ -10,6 +10,7 @@ public class BattleHUD : MonoBehaviour
     [SerializeField] private MenuSelectionUI menuSelectionUI;
     [SerializeField] private MoveSelectionUI moveSelectionUI;
     [SerializeField] private TargetSelectionUI targetSelectionUI;
+    [SerializeField] private PartyMenuUI partyMenuUI;
 
     public void Start()
     {
@@ -50,26 +51,15 @@ public class BattleHUD : MonoBehaviour
         menuSelectionUI.OpenMenuSelectionUI(battleActionManager);
     }
 
-    //TODO Move to MoveSelectionUI class
+    public void ExitMenuSelection(BattleActionManager battleActionManger)
+    {
+        menuSelectionUI.ExitMenuSelection(battleActionManger);
+    }
+
     public void OpenMoveSelectionUI(List<TerraMove> terraMoves, List<int> disabledMoves)
     {
         CloseAllSelectionUI();
-
-        for (int i = 0; i < Terra.MOVE_SLOTS; i++) {
-            if (moveSelectionUI.GetMoveBtns().Length <= i)
-                break;
-
-            string moveBtnName = MoveSelectionUI.EMPTY_SLOT_NAME;
-            if (i < terraMoves.Count && terraMoves[i] != null)
-                moveBtnName = terraMoves[i] + " " + terraMoves[i].GetCurrentPP() + "/" + terraMoves[i].GetMaxPP();
-            moveSelectionUI.GetMoveBtns()[i].GetComponentInChildren<TextMeshProUGUI>().SetText(moveBtnName);
-
-            if(i >= terraMoves.Count || terraMoves[i] == null || disabledMoves.Contains(i))
-                moveSelectionUI.GetMoveBtns()[i].interactable = false;
-            else
-                moveSelectionUI.GetMoveBtns()[i].interactable = true;
-        }
-        moveSelectionUI.gameObject.SetActive(true);
+        moveSelectionUI.OpenMoveSelectionUI(terraMoves, disabledMoves);
     }
 
     public void OpenTargetSelectionUI(TerraBattlePosition terraBattlePosition, Battlefield battlefield)
@@ -78,10 +68,17 @@ public class BattleHUD : MonoBehaviour
         targetSelectionUI.OpenTargetSelectionUI(terraBattlePosition, battlefield);
     }
 
+    public void OpenPartyMenuUI(List<Terra> terraList, BattleSystem battleSystem)
+    {
+        CloseAllSelectionUI();
+        partyMenuUI.OpenPartyMenuUI(terraList, battleSystem);
+    }
+
     public void CloseAllSelectionUI()
     {
         menuSelectionUI.gameObject.SetActive(false);
         moveSelectionUI.gameObject.SetActive(false);
         targetSelectionUI.gameObject.SetActive(false);
+        partyMenuUI.gameObject.SetActive(false);
     }
 }

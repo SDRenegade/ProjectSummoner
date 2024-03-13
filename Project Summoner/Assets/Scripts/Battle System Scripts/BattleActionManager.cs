@@ -10,8 +10,8 @@ public class BattleActionManager
     private Stack<BattleAction> selectedActionStack;
     private List<List<TerraAttack>> attackLog;
     private List<TerraAttack> terraAttackList;
-    //private List<TerraSwitchBattleAction> TerraSwitchList;
-    //private SummonerDie nextCatchAttemptDie;
+    //private List<TerraSwitchAction> terraSwitchList;
+    //private List<CatchAttemptAction> catchAttemptDieList;
     private bool isAttemptingEscape;
 
     private TerraAttack pendingTerraAttack;

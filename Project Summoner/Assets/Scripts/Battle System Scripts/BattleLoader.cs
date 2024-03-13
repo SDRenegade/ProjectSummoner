@@ -7,8 +7,8 @@ using UnityEngine.SceneManagement;
 public class BattleLoader : MonoBehaviour
 {
     private static BattleLoader instance;
-    private List<Terra> primarySummonerTerraList;
-    private List<Terra> secondarySummonerTerraList;
+    private List<Terra> primaryTerraList;
+    private List<Terra> secondaryTerraList;
     private BattleType battleType;
     private BattleFormat battleFormat;
 
@@ -25,8 +25,8 @@ public class BattleLoader : MonoBehaviour
 
     public void LoadWildBattle(List<Terra> playerTerraList, Terra wildTerra)
     {
-        primarySummonerTerraList = playerTerraList;
-        secondarySummonerTerraList = new List<Terra> { wildTerra };
+        primaryTerraList = playerTerraList;
+        secondaryTerraList = new List<Terra> { wildTerra };
         battleType = BattleType.WILD;
         battleFormat = BattleFormat.DOUBLE;
 
@@ -40,15 +40,15 @@ public class BattleLoader : MonoBehaviour
 
     public void Clear()
     {
-        primarySummonerTerraList = null;
-        secondarySummonerTerraList = null;
+        primaryTerraList = null;
+        secondaryTerraList = null;
     }
 
     public static BattleLoader GetInstance() { return instance; }
 
-    public List<Terra> GetPrimarySummonerTerraList() { return primarySummonerTerraList; }
+    public List<Terra> GetPrimaryTerraList() { return primaryTerraList; }
 
-    public List<Terra> GetSecondarySummonerTerraList() { return secondarySummonerTerraList; }
+    public List<Terra> GetSecondaryTerraList() { return secondaryTerraList; }
 
     public BattleType GetBattleType() {  return battleType; }
 

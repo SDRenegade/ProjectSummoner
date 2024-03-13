@@ -14,22 +14,21 @@ public class WildTerraAI : BattleAI
             if (availableMoveIndicies[i] >= terraBattlePosition.GetTerra().GetMoves().Count || terraBattlePosition.GetTerra().GetMoves()[availableMoveIndicies[i]].GetCurrentPP() <= 0)
                 availableMoveIndicies.RemoveAt(i);
         }
+
+        int targetPositionIndex = Random.Range(0, battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr().Length);
+        TerraBattlePosition targetPosition = battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr()[targetPositionIndex];
         
         //Choose a valid move index at random. If there are no valid move indicies, use struggle.
         if(availableMoveIndicies.Count == 0) {
             TerraMove struggle = new TerraMove(SODatabase.GetInstance().GetTerraMoveByName("Struggle"));
             battleSystem.GetBattleActionManager().GetTerraAttackList().Add(
-            new TerraAttack(
-                terraBattlePosition,
-                battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr()[0],
-                struggle));
+                new TerraAttack(terraBattlePosition, targetPosition, struggle));
         }
         else {
+            int selectedMoveIndex = availableMoveIndicies[Random.Range(0, availableMoveIndicies.Count)];
+            TerraMove selectedMove = terraBattlePosition.GetTerra().GetMoves()[selectedMoveIndex];
             battleSystem.GetBattleActionManager().GetTerraAttackList().Add(
-            new TerraAttack(
-                terraBattlePosition,
-                battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr()[0],
-                terraBattlePosition.GetTerra().GetMoves()[availableMoveIndicies[Random.Range(0, availableMoveIndicies.Count)]]));
+                new TerraAttack(terraBattlePosition, targetPosition, selectedMove));
         }
     }
 }

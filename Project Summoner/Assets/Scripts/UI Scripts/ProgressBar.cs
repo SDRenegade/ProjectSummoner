@@ -7,12 +7,12 @@ public class ProgressBar : MonoBehaviour
 {
     [SerializeField] private Image progressImage;
     [SerializeField] private Image backgroundImage;
-    [Range(0f, 1f)]
-    [SerializeField] private float progress;
 
+    private float progress;
 
-    void Start()
+    public void Start()
     {
+        progress = 1f;
         SetProgress(progress);
     }
 

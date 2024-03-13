@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public enum BattleType
 {
@@ -48,8 +47,8 @@ public class BattleSystem : MonoBehaviour
     [SerializeField] private BattleHUD battleHUD;
     [SerializeField] private BattleStage battleStage;
     
-    private List<Terra> primarySummonerTerraList;
-    private List<Terra> secondarySummonerTerraList;
+    private List<Terra> primaryTerraList;
+    private List<Terra> secondaryTerraList;
 
     private bool isMatchFinished;
     private BattleType battleType;
@@ -66,15 +65,15 @@ public class BattleSystem : MonoBehaviour
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
-        primarySummonerTerraList = BattleLoader.GetInstance().GetPrimarySummonerTerraList();
-        secondarySummonerTerraList = BattleLoader.GetInstance().GetSecondarySummonerTerraList();
+        primaryTerraList = BattleLoader.GetInstance().GetPrimaryTerraList();
+        secondaryTerraList = BattleLoader.GetInstance().GetSecondaryTerraList();
 
         isMatchFinished = false;
         battleType = BattleLoader.GetInstance().GetBattleType();
         battleFormat = BattleLoader.GetInstance().GetBattleFormat();
         primarySideAI = null;
         secondarySideAI = new WildTerraAI();
-        battlefield = new Battlefield(battleFormat, primarySummonerTerraList, secondarySummonerTerraList);
+        battlefield = new Battlefield(battleFormat, primaryTerraList, secondaryTerraList);
 
         InitBattleStage();
         InitBattleActions();
@@ -88,15 +87,15 @@ public class BattleSystem : MonoBehaviour
     private void InitBattleStage()
     {
         TerraBattlePosition[] primarySummonerTerraPositionList = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
-        for (int i = 0; i < primarySummonerTerraPositionList.Length && i < primarySummonerTerraList.Count; i++) {
-            if (primarySummonerTerraList[i] != null)
-                battleStage.SetTerraAtPosition(primarySummonerTerraList[i], battleFormat, true, i);
+        for (int i = 0; i < primarySummonerTerraPositionList.Length && i < primaryTerraList.Count; i++) {
+            if (primaryTerraList[i] != null)
+                battleStage.SetTerraAtPosition(primaryTerraList[i], battleFormat, true, i);
         }
 
         TerraBattlePosition[] secondarySummonerTerraPositionList = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
-        for (int i = 0; i < secondarySummonerTerraPositionList.Length && i < secondarySummonerTerraList.Count; i++) {
-            if (secondarySummonerTerraList[i] != null)
-                battleStage.SetTerraAtPosition(secondarySummonerTerraList[i], battleFormat, false, i);
+        for (int i = 0; i < secondarySummonerTerraPositionList.Length && i < secondaryTerraList.Count; i++) {
+            if (secondaryTerraList[i] != null)
+                battleStage.SetTerraAtPosition(secondaryTerraList[i], battleFormat, false, i);
         }
     }
 
@@ -134,10 +133,24 @@ public class BattleSystem : MonoBehaviour
         }
     }
 
-    //Might not be needed. Could just call the battleHUD method directly
     public void UpdateTerraStatusBars()
     {
         battleHUD.UpdateTerraStatusBars(battlefield, battleFormat);
+    }
+
+    public void OpenMenuSelectionUI()
+    {
+        battleHUD.OpenMenuSelectionUI(battleActionManager);
+    }
+
+    public void ExitMenuSelectionUI()
+    {
+        battleHUD.ExitMenuSelection(battleActionManager);
+    }
+
+    public void OpenPartyMenuUI()
+    {
+        battleHUD.OpenPartyMenuUI(primaryTerraList, this);
     }
 
     public void OpenMoveSelectionUI()
@@ -303,7 +316,7 @@ public class BattleSystem : MonoBehaviour
         if (battleActionManager.IsAllBattlePositionsReady())
             EndActionSelection();
         else if (battleActionManager.GetNextTerraActionSelection() != null)
-            battleHUD.OpenMenuSelectionUI(battleActionManager);
+            OpenMenuSelectionUI();
     }
 
     public void EndActionSelection()
@@ -337,15 +350,14 @@ public class BattleSystem : MonoBehaviour
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 
-    public void SwitchTerraAction(int switchingTerraPartyIndex)
+    public void SwitchTerraAction(int terraPartyIndex)
     {
         if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
             return;
 
-        //Switching Terra Animation
-        //Switch Logic
-        UpdateTerraStatusBars();
-        battleStateManager.SwitchState(battleStateManager.GetCombatState());
+        Debug.Log("The terra " + primaryTerraList[terraPartyIndex] + " level " + primaryTerraList[terraPartyIndex].GetLevel() + " has been selected");
+        //UpdateTerraStatusBars();
+        //battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 
     //Method used when a terra is dealt damage that is not from a terra attack

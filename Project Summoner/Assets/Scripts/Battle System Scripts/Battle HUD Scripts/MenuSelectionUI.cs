@@ -19,4 +19,10 @@ public class MenuSelectionUI : MonoBehaviour
         else
             exitActionBtn.interactable = false;
     }
+
+    public void ExitMenuSelection(BattleActionManager battleActionManager)
+    {
+        battleActionManager.CancelLastSelectedAction();
+        OpenMenuSelectionUI(battleActionManager);
+    }
 }
