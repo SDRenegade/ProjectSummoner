@@ -153,6 +153,11 @@ public class BattleSystem : MonoBehaviour
         battleHUD.OpenPartyMenuUI(primaryTerraList, this);
     }
 
+    public void ExitPartyMenuUI()
+    {
+        battleHUD.ExitPartyMenuUI(battlefield, battleFormat, battleActionManager);
+    }
+
     public void OpenMoveSelectionUI()
     {
         TerraBattlePosition terraBattlePosition = battleActionManager.GetNextTerraActionSelection();

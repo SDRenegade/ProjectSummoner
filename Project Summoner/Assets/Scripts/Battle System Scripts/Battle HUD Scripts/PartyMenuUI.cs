@@ -11,6 +11,8 @@ public class PartyMenuUI : MonoBehaviour
     [Header("Stack Panels")]
     [SerializeField] private GameObject leadingStackPanel;
     [SerializeField] private GameObject benchStackPanel;
+    [Header("Option Selection Menu")]
+    [SerializeField] private PartyOptionSelectionUI optionSelectionUI;
 
     private GameObject[] leadingBannerList;
     private GameObject[] benchBannerList;
@@ -23,6 +25,7 @@ public class PartyMenuUI : MonoBehaviour
         benchBannerList = (battleFormat == BattleFormat.SINGLE) ? new GameObject[5] : new GameObject[4];
 
         InitPartyObjects();
+        optionSelectionUI.gameObject.SetActive(false);
     }
 
     private void InitPartyObjects()
@@ -42,20 +45,20 @@ public class PartyMenuUI : MonoBehaviour
     {
         for (int i = 0; i < leadingBannerList.Length; i++) {
             if (terraList.Count <= i) {
-                leadingBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(null, null, battleSystem);
+                leadingBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(null, null, optionSelectionUI, battleSystem);
                 continue;
             }
 
-            leadingBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(terraList[i], i, battleSystem);
+            leadingBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(terraList[i], i, optionSelectionUI, battleSystem);
         }
 
         for (int i = 0; i < benchBannerList.Length; i++) {
             if (terraList.Count <= i + leadingBannerList.Length) {
-                benchBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(null, null, battleSystem);
+                benchBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(null, null, optionSelectionUI, battleSystem);
                 continue;
             }
 
-            benchBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(terraList[i + leadingBannerList.Length], i + leadingBannerList.Length, battleSystem);
+            benchBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(terraList[i + leadingBannerList.Length], i + leadingBannerList.Length, optionSelectionUI, battleSystem);
         }
         
         gameObject.SetActive(true);

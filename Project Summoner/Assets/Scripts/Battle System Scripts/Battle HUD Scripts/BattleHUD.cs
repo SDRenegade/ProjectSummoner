@@ -71,7 +71,22 @@ public class BattleHUD : MonoBehaviour
     public void OpenPartyMenuUI(List<Terra> terraList, BattleSystem battleSystem)
     {
         CloseAllSelectionUI();
+        HideTerraStatusBars();
         partyMenuUI.OpenPartyMenuUI(terraList, battleSystem);
+    }
+
+    public void ExitPartyMenuUI(Battlefield battlefield, BattleFormat battleFormat, BattleActionManager battleActionManager)
+    {
+        UpdateTerraStatusBars(battlefield, battleFormat);
+        OpenMenuSelectionUI(battleActionManager);
+    }
+
+    public void HideTerraStatusBars()
+    {
+        for(int i = 0; i < primarySideTerraStatusBarList.Count; i++)
+            primarySideTerraStatusBarList[i].gameObject.SetActive(false);
+        for(int i = 0; i < secondarySideTerraStatusBarList.Count; i++)
+            secondarySideTerraStatusBarList[i].gameObject.SetActive(false);
     }
 
     public void CloseAllSelectionUI()

@@ -9,6 +9,7 @@ public class PartyBanner : MonoBehaviour
     private static readonly Color32 HIGH_HP_RANGE_COLOR = new Color32(20, 200, 0, 255);
     private static readonly Color32 MEDIUM_HP_RANGE_COLOR = new Color32(240, 250, 0, 255);
     private static readonly Color32 LOW_HP_RANGE_COLOR = new Color32(210, 0, 0, 255);
+    private static readonly Color32 EMPTY_BANNER_IMAGE_COLOR = new Color32(0, 0, 0, 255);
 
     [SerializeField] private GameObject detailPanelLayer;
     [SerializeField] private Image image;
@@ -18,7 +19,7 @@ public class PartyBanner : MonoBehaviour
     [SerializeField] private TextMeshProUGUI terraCurrentHealth;
     [SerializeField] private TextMeshProUGUI terraMaxHealth;
 
-    public void UpdatePartyBanner(Terra terra, int? terraPartyIndex, BattleSystem battleSystem)
+    public void UpdatePartyBanner(Terra terra, int? terraPartyIndex, PartyOptionSelectionUI optionSelectionUI, BattleSystem battleSystem)
     {
         if (terra == null || terraPartyIndex == null) {
             SetEmptyBanner();
@@ -43,13 +44,15 @@ public class PartyBanner : MonoBehaviour
         terraMaxHealth.SetText(terra.GetMaxHP().ToString());
 
         Button partyBannerBtn = GetComponent<Button>();
-        partyBannerBtn.onClick.AddListener(delegate { battleSystem.SwitchTerraAction((int)terraPartyIndex); });
+        partyBannerBtn.onClick.AddListener(delegate {
+            optionSelectionUI.OpenOptionSelctionUI(terra, terraPartyIndex, battleSystem);
+        });
     }
 
     private void SetEmptyBanner()
     {
         image.sprite = null;
-        image.color = new Color32(0, 0, 0, 255);
+        image.color = EMPTY_BANNER_IMAGE_COLOR;
 
         detailPanelLayer.gameObject.SetActive(false);
         Button partyBannerBtn = GetComponent<Button>();
