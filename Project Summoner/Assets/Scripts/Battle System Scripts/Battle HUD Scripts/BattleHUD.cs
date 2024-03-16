@@ -94,6 +94,6 @@ public class BattleHUD : MonoBehaviour
         menuSelectionUI.gameObject.SetActive(false);
         moveSelectionUI.gameObject.SetActive(false);
         targetSelectionUI.gameObject.SetActive(false);
-        partyMenuUI.gameObject.SetActive(false);
+        partyMenuUI.ClosePartyMenuUI();
     }
 }

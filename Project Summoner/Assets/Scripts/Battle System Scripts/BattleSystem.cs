@@ -89,13 +89,13 @@ public class BattleSystem : MonoBehaviour
         TerraBattlePosition[] primarySummonerTerraPositionList = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
         for (int i = 0; i < primarySummonerTerraPositionList.Length && i < primaryTerraList.Count; i++) {
             if (primaryTerraList[i] != null)
-                battleStage.SetTerraAtPosition(primaryTerraList[i], battleFormat, true, i);
+                battleStage.SetTerraAtPosition(primaryTerraList[i], true, i);
         }
 
         TerraBattlePosition[] secondarySummonerTerraPositionList = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
         for (int i = 0; i < secondarySummonerTerraPositionList.Length && i < secondaryTerraList.Count; i++) {
             if (secondaryTerraList[i] != null)
-                battleStage.SetTerraAtPosition(secondaryTerraList[i], battleFormat, false, i);
+                battleStage.SetTerraAtPosition(secondaryTerraList[i], false, i);
         }
     }
 
@@ -160,7 +160,7 @@ public class BattleSystem : MonoBehaviour
 
     public void OpenMoveSelectionUI()
     {
-        TerraBattlePosition terraBattlePosition = battleActionManager.GetNextTerraActionSelection();
+        TerraBattlePosition terraBattlePosition = battleActionManager.GetCurrentTerraActionSelection();
 
         //*** Opening Move Selection UI Event ***
         OpeningMoveSelectionUIEventArgs openingMoveSelectionUIEventArgs = InvokeOnOpeningMoveSelectionUI(terraBattlePosition);
@@ -200,7 +200,7 @@ public class BattleSystem : MonoBehaviour
         if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
             return;
 
-        TerraBattlePosition terraBattlePosition = battleActionManager.GetNextTerraActionSelection();
+        TerraBattlePosition terraBattlePosition = battleActionManager.GetCurrentTerraActionSelection();
         TerraMove selectedMove = terraBattlePosition.GetTerra().GetMoves()[moveIndex];
         if (selectedMove == null)
             return;
@@ -312,6 +312,12 @@ public class BattleSystem : MonoBehaviour
             Debug.LogError("The position index " + positionIndex + " is not a valid target.");
     }
 
+    public void SwitchTerraSelection(SwitchBattleAction switchBattleAction)
+    {
+        battleActionManager.AddBattleActionToStack(switchBattleAction);
+        AddReadyBattlePosition();
+    }
+
     private void AddReadyBattlePosition()
     {
         battleActionManager.AddReadyBattlePosition();
@@ -320,7 +326,7 @@ public class BattleSystem : MonoBehaviour
         //next terra action selection.
         if (battleActionManager.IsAllBattlePositionsReady())
             EndActionSelection();
-        else if (battleActionManager.GetNextTerraActionSelection() != null)
+        else if (battleActionManager.GetCurrentTerraActionSelection() != null)
             OpenMenuSelectionUI();
     }
 
@@ -333,10 +339,8 @@ public class BattleSystem : MonoBehaviour
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 
-    public void AttemptEscapeAction()
+    public void AttemptEscape()
     {
-        if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
-            return;
         if(battleType != BattleType.WILD) {
             Debug.Log(BattleDialog.ATTEMPT_ESCAPE_SUMMONER_BATTLE);
             return;
@@ -346,23 +350,21 @@ public class BattleSystem : MonoBehaviour
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 
-    public void UseSelectedItemAction(int itemIndex)
+    public void UseSelectedItem(int itemIndex)
     {
-        if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
-            return;
-
-        //Add item to the queued item list
-        battleStateManager.SwitchState(battleStateManager.GetCombatState());
+        //TODO Implement item active
     }
 
-    public void SwitchTerraAction(int terraPartyIndex)
+    public void SwitchTerra(TerraSwitch terraSwitch)
     {
-        if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
-            return;
-
-        Debug.Log("The terra " + primaryTerraList[terraPartyIndex] + " level " + primaryTerraList[terraPartyIndex].GetLevel() + " has been selected");
-        //UpdateTerraStatusBars();
-        //battleStateManager.SwitchState(battleStateManager.GetCombatState());
+        //TODO Add this to the BattleDialog class
+        Debug.Log("Switch action for " + primaryTerraList[terraSwitch.GetLeadingPositionIndex()] + " and " + primaryTerraList[terraSwitch.GetBenchPositionIndex()] + " has been triggered");
+        Terra tmp = primaryTerraList[terraSwitch.GetLeadingPositionIndex()];
+        primaryTerraList[terraSwitch.GetLeadingPositionIndex()] = primaryTerraList[terraSwitch.GetBenchPositionIndex()];
+        primaryTerraList[terraSwitch.GetBenchPositionIndex()] = tmp;
+        battlefield.GetPrimaryBattleSide().UpdateLeadingTerra(primaryTerraList);
+        battleStage.SetTerraAtPosition(primaryTerraList[terraSwitch.GetLeadingPositionIndex()], terraSwitch.IsPrimarySide(), terraSwitch.GetLeadingPositionIndex());
+        UpdateTerraStatusBars();
     }
 
     //Method used when a terra is dealt damage that is not from a terra attack

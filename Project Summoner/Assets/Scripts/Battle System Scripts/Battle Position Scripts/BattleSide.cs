@@ -37,5 +37,15 @@ public class BattleSide
             terraBattlePositionArr[0].SetTerra(terra);
     }
 
+    public void UpdateLeadingTerra(List<Terra> terraList)
+    {
+        for(int i = 0; i < terraBattlePositionArr.Length; i++) {
+            if (i >= terraList.Count)
+                break;
+
+            terraBattlePositionArr[i].SetTerra(terraList[i]);
+        }
+    }
+
     public TerraBattlePosition[] GetTerraBattlePositionArr() { return terraBattlePositionArr; }
 }

@@ -63,4 +63,10 @@ public class PartyMenuUI : MonoBehaviour
         
         gameObject.SetActive(true);
     }
+
+    public void ClosePartyMenuUI()
+    {
+        optionSelectionUI.CloseOptionSelection();
+        gameObject.SetActive(false);
+    }
 }

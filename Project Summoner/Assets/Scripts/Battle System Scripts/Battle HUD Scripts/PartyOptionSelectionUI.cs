@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,7 +26,7 @@ public class PartyOptionSelectionUI : MonoBehaviour
         });
     }
 
-    public void OpenOptionSelctionUI(Terra terra, int? terraPartyIndex, BattleSystem battleSystem)
+    public void OpenOptionSelctionUI(Terra terra, int terraPartyIndex, BattleSystem battleSystem)
     {
         RemoveListeners();
         Vector3 optionSelectionPosition = new Vector3(
@@ -34,12 +36,18 @@ public class PartyOptionSelectionUI : MonoBehaviour
         buttonPanel.gameObject.transform.position = optionSelectionPosition;
 
         summaryBtn.onClick.AddListener(delegate {
-            Debug.Log("Summary for " + terra);
+            Debug.Log("Summary action selected for " + terra);
             CloseOptionSelection();
         });
+
         switchBtn.onClick.AddListener(delegate {
-            Debug.Log("Switching with " + terra);
+            Debug.Log("Switching action selected for " + battleSystem.GetBattleActionManager().GetCurrentTerraActionSelection().GetTerra() + " and " + terra);
             CloseOptionSelection();
+            battleSystem.ExitPartyMenuUI();
+            BattleActionManager battleActionManager = battleSystem.GetBattleActionManager();
+            TerraBattlePosition[] terraBattlePositionArr = battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
+            TerraSwitch terraSwitch = new TerraSwitch(Array.IndexOf(terraBattlePositionArr, battleActionManager.GetCurrentTerraActionSelection()), terraPartyIndex, true);
+            battleSystem.SwitchTerraSelection(new SwitchBattleAction(battleActionManager.GetCurrentTerraActionSelection(), terraSwitch));
         });
 
         gameObject.SetActive(true);

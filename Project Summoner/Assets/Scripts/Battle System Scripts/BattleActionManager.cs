@@ -10,7 +10,7 @@ public class BattleActionManager
     private Stack<BattleAction> selectedActionStack;
     private List<List<TerraAttack>> attackLog;
     private List<TerraAttack> terraAttackList;
-    //private List<TerraSwitchAction> terraSwitchList;
+    private List<TerraSwitch> terraSwitchList;
     //private List<CatchAttemptAction> catchAttemptDieList;
     private bool isAttemptingEscape;
 
@@ -23,6 +23,7 @@ public class BattleActionManager
         selectedActionStack = new Stack<BattleAction>();
         attackLog = new List<List<TerraAttack>>();
         terraAttackList = new List<TerraAttack>();
+        terraSwitchList = new List<TerraSwitch>();
         isAttemptingEscape = false;
         pendingTerraAttack = null;
 
@@ -56,6 +57,8 @@ public class BattleActionManager
                 terraAttackList.RemoveAt(i);
             }
         }
+
+        terraSwitchList.Clear();
         isAttemptingEscape = false;
     }
 
@@ -155,7 +158,7 @@ public class BattleActionManager
         return attackLog[attackLog.Count - 2];
     }
 
-    public TerraBattlePosition GetNextTerraActionSelection()
+    public TerraBattlePosition GetCurrentTerraActionSelection()
     {
         return (terraActionSelectionQueue.Count > 0) ? terraActionSelectionQueue[0] : null;
     }
@@ -166,7 +169,7 @@ public class BattleActionManager
 
     public List<TerraAttack> GetTerraAttackList() { return terraAttackList; }
 
-    public void SetTerraAttackList(List<TerraAttack> terraAttackList) { this.terraAttackList = terraAttackList; }
+    public List<TerraSwitch> GetTerraSwitchList() { return terraSwitchList; }
 
     public bool IsAttemptingEscape() { return isAttemptingEscape; }
 

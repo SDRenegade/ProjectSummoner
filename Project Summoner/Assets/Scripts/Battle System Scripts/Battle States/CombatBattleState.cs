@@ -13,7 +13,7 @@ public class CombatBattleState : BattleState
         battleSystem.InvokeOnEnteringCombatState();
 
         //PlayerEscapeCheck(battleSystem);
-        //TerraSwitchCheck(battleSystem);
+        ProcessTerraSwitches(battleSystem);
 
         List<TerraAttack> queuedTerraAttackList = battleSystem.GetBattleActionManager().GetTerraAttackList();
         SortTerraAttackList(queuedTerraAttackList);
@@ -39,6 +39,14 @@ public class CombatBattleState : BattleState
             //TODO Add logic for determining if you were able to escape and then exit battle
         }
     }*/
+
+    private void ProcessTerraSwitches(BattleSystem battleSystem)
+    {
+        BattleActionManager battleActionManger = battleSystem.GetBattleActionManager();
+        for(int i = 0; i < battleActionManger.GetTerraSwitchList().Count; i++) {
+            battleSystem.SwitchTerra(battleActionManger.GetTerraSwitchList()[i]);
+        }
+    }
 
     private void SortTerraAttackList(List<TerraAttack> queuedTerraAttackList)
     {

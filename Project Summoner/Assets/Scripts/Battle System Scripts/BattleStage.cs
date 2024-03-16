@@ -66,12 +66,12 @@ public class BattleStage : MonoBehaviour
 
     public GameObject[] GetSecondaryTerraGOArr() { return secondaryTerraGOArr; }
 
-    public Vector3 GetTerraPosition(BattleFormat battleFormat, bool isPrimarySide, int positionIndex)
+    public Vector3 GetTerraPosition(bool isPrimarySide, int positionIndex)
     {
         Vector3 terraPosition = isPrimarySide ? primaryTerraFieldCenterPos : secondaryTerraFieldCenterPos;
 
         //This could be generalized to account for any number of terra positions
-        if(battleFormat == BattleFormat.DOUBLE) {
+        if(BattleLoader.GetInstance().GetBattleFormat() == BattleFormat.DOUBLE) {
             if (positionIndex < 0 || positionIndex >= primaryTerraGOArr.Length)
                 positionIndex = 0;
 
@@ -89,14 +89,14 @@ public class BattleStage : MonoBehaviour
         return terraPosition;
     }
 
-    public void SetTerraAtPosition(Terra terra, BattleFormat battleFormat, bool isPrimarySide, int positionIndex)
+    public void SetTerraAtPosition(Terra terra, bool isPrimarySide, int positionIndex)
     {
         if (positionIndex >= primaryTerraGOArr.Length) {
             Debug.Log("position index " + positionIndex + " is out of bounds for SetTerraAtPosition in BattleStage.");
             return;
         }
 
-        Vector3 terraPos = GetTerraPosition(battleFormat, isPrimarySide, positionIndex);
+        Vector3 terraPos = GetTerraPosition(isPrimarySide, positionIndex);
         Vector3 terraRot = Vector3.zero;
         terraRot.y = isPrimarySide ? battlefieldOrigin.eulerAngles.y : battlefieldOrigin.eulerAngles.y - 180f;
         GameObject[] terraGOList = isPrimarySide ? primaryTerraGOArr : secondaryTerraGOArr;

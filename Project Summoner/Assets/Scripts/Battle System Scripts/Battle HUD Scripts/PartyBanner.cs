@@ -45,7 +45,7 @@ public class PartyBanner : MonoBehaviour
 
         Button partyBannerBtn = GetComponent<Button>();
         partyBannerBtn.onClick.AddListener(delegate {
-            optionSelectionUI.OpenOptionSelctionUI(terra, terraPartyIndex, battleSystem);
+            optionSelectionUI.OpenOptionSelctionUI(terra, (int)terraPartyIndex, battleSystem);
         });
     }
 
