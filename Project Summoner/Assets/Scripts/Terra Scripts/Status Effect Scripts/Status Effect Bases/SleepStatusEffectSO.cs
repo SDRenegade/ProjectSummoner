@@ -26,14 +26,14 @@ public class SleepStatusEffect : StatusEffectBase
         turnCounter = 0;
     }
 
-    public override void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
+    public override void AddStatusListeners(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
 
         battleSystem.OnAttackDeclaration += SleepActive;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveStatusListeners(BattleSystem battleSystem)
     {
         battleSystem.OnAttackDeclaration -= SleepActive;
     }
@@ -51,7 +51,7 @@ public class SleepStatusEffect : StatusEffectBase
         else {
             Debug.Log(BattleDialog.TerraWokeUpMsg(terraBattlePosition.GetTerra()));
             terraBattlePosition.GetTerra().SetStatusEffect(null);
-            RemoveBattleActions(eventArgs.GetBattleSystem());
+            RemoveStatusListeners(eventArgs.GetBattleSystem());
         }
     }
 }

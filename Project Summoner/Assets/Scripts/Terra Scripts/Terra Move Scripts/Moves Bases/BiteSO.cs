@@ -26,7 +26,7 @@ public class Bite : TerraMoveBase
             FLINCH_CHANCE);
     }
 
-    public override void AddBattleActions(BattleSystem battleSystem) {}
+    public override void AddMoveListeners(BattleSystem battleSystem) {}
 
-    public override void RemoveBattleActions(BattleSystem battleSystem) {}
+    public override void RemoveMoveListeners(BattleSystem battleSystem) {}
 }

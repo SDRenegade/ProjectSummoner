@@ -15,9 +15,9 @@ public abstract class TerraMoveBase
 
     public abstract void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem);
 
-    public abstract void AddBattleActions(BattleSystem battleSystem);
+    public abstract void AddMoveListeners(BattleSystem battleSystem);
 
-    public abstract void RemoveBattleActions(BattleSystem battleSystem);
+    public abstract void RemoveMoveListeners(BattleSystem battleSystem);
 
     public TerraAttack GetTerraAttack() { return terraAttack; }
 

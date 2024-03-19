@@ -18,14 +18,14 @@ public class Dig : TerraMoveBase
 
     public override void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem) {}
 
-    public override void AddBattleActions(BattleSystem battleSystem)
+    public override void AddMoveListeners(BattleSystem battleSystem)
     {
         terraAttack.SetPersistent(true);
         battleSystem.OnDirectAttack += FirstTurnAction;
         battleSystem.OnEnteringActionSelection += QueueSecondAttack;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveMoveListeners(BattleSystem battleSystem)
     {
         terraAttack.SetPersistent(false);
         battleSystem.OnEnteringActionSelection -= QueueSecondAttack;

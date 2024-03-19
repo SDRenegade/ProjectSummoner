@@ -20,14 +20,14 @@ public class FlameOrb : ItemBase
 
     public override void OnOverworldUse() {}
 
-    public override void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
+    public override void AddItemListeners(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
         isFirstInteraction = true;
         battleSystem.OnStartOfTurn += InflictBurn;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveItemListeners(BattleSystem battleSystem)
     {
         battleSystem.OnStartOfTurn -= InflictBurn;
     }

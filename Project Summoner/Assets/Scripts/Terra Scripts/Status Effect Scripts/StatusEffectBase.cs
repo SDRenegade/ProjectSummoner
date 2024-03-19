@@ -11,9 +11,9 @@ public abstract class StatusEffectBase
         this.statusEffectSO = statusEffectSO;
     }
 
-    public abstract void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem);
+    public abstract void AddStatusListeners(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem);
 
-    public abstract void RemoveBattleActions(BattleSystem battleSystem);
+    public abstract void RemoveStatusListeners(BattleSystem battleSystem);
 
     public StatusEffectSO GetStatusEffectSO() { return statusEffectSO; }
 }

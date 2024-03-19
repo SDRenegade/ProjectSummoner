@@ -11,9 +11,13 @@ public class TerraAttackBattleAction : BattleAction
         this.terraAttack = terraAttack;
     }
 
-    public override void ProcessBattleAction(BattleSystem battleSystem, BattleActionManager battleActionManager)
+    public override void Execute(BattleActionManager battleActionManager)
     {
         battleActionManager.GetTerraAttackList().Add(terraAttack);
-        terraAttack.GetTerraMoveBase()?.AddBattleActions(battleSystem);
+    }
+
+    public override void Undo(BattleActionManager battleActionManager)
+    {
+        battleActionManager.GetTerraAttackList().Remove(terraAttack);
     }
 }

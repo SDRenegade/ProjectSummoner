@@ -27,14 +27,14 @@ public class Bide : TerraMoveBase
 
     public override void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem) {}
 
-    public override void AddBattleActions(BattleSystem battleSystem)
+    public override void AddMoveListeners(BattleSystem battleSystem)
     {
         terraAttack.SetPersistent(true);
         battleSystem.OnTerraDamageByTerra += AccumulateDamage;
         battleSystem.OnEnteringActionSelection += QueueNextAttack;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveMoveListeners(BattleSystem battleSystem)
     {
         terraAttack.SetPersistent(false);
         battleSystem.OnTerraDamageByTerra -= AccumulateDamage;
@@ -73,6 +73,6 @@ public class Bide : TerraMoveBase
 
         eventArgs.GetDirectAttackLog().SetDamage((int)(totalDamageRecieved * DAMAGE_MULTIPLIER));
 
-        RemoveBattleActions(eventArgs.GetBattleSystem());
+        RemoveMoveListeners(eventArgs.GetBattleSystem());
     }
 }

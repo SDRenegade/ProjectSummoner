@@ -25,13 +25,13 @@ public class SpecialBarrierVolatileStatusEffect : VolatileStatusEffectBase
         turnCounter = 0;
     }
 
-    public override void AddBattleActions(BattleSystem battleSystem)
+    public override void AddVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         battleSystem.OnTerraDamageByTerra += HalfIncommingSpecialDamage;
         battleSystem.OnEndOfTurn += IncrementTurnCounter;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         battleSystem.OnTerraDamageByTerra -= HalfIncommingSpecialDamage;
         battleSystem.OnEndOfTurn -= IncrementTurnCounter;

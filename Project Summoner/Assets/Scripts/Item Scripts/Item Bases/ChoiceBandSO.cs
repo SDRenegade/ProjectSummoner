@@ -24,7 +24,7 @@ public class ChoiceBand : ItemBase
 
     public override void OnOverworldUse() {}
 
-    public override void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
+    public override void AddItemListeners(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
         chosenMoveIndex = null;
@@ -35,7 +35,7 @@ public class ChoiceBand : ItemBase
         battleSystem.OnDirectAttack += ApplyDamageModifier;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveItemListeners(BattleSystem battleSystem)
     {
         battleSystem.OnAttackDeclaration -= SetChosenAttack;
         battleSystem.OnOpeningMoveSelectionUI -= RepeatAttack;

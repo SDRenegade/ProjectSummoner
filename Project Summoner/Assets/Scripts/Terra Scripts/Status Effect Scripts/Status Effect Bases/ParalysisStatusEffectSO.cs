@@ -19,14 +19,14 @@ public class ParalysisStatusEffect : StatusEffectBase
 
     public ParalysisStatusEffect(StatusEffectSO statusEffectSO) : base(statusEffectSO) {}
 
-    public override void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
+    public override void AddStatusListeners(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
 
         battleSystem.OnAttackDeclaration += ParalysisActive;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveStatusListeners(BattleSystem battleSystem)
     {
         battleSystem.OnAttackDeclaration -= ParalysisActive;
     }

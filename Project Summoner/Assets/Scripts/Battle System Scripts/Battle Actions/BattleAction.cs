@@ -11,7 +11,9 @@ public abstract class BattleAction
         this.terraBattlePosition = terraBattlePosition;
     }
 
-    public abstract void ProcessBattleAction(BattleSystem battleSystem, BattleActionManager battleActionManager);
+    public abstract void Execute(BattleActionManager battleActionManager);
+
+    public abstract void Undo(BattleActionManager battleActionManager);
     
     public TerraBattlePosition GetTerraBattlePosition() { return terraBattlePosition; }
 }

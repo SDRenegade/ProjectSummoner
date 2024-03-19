@@ -23,12 +23,12 @@ public class SubstitutedVolatileStatusEffect : VolatileStatusEffectBase
         substituteCurrentHealth = (int)(terraBattlePosition.GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_SUBSTITUTE);
     }
 
-    public override void AddBattleActions(BattleSystem battleSystem)
+    public override void AddVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         battleSystem.OnTerraDamaged += AbsorbDamage;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         battleSystem.OnTerraDamaged -= AbsorbDamage;
     }

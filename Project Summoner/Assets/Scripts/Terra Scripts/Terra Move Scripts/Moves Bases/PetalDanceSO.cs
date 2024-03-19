@@ -33,17 +33,17 @@ public class PetalDance : TerraMoveBase
         if (!battleSystem.AddVolatileStatusEffect(directAttackLog.GetAttackerPosition(), SODatabase.GetInstance().GetVolatileStatusEffectByName("Confusion")))
             Debug.Log(BattleDialog.ATTACK_FAILED);
 
-        RemoveBattleActions(battleSystem);
+        RemoveMoveListeners(battleSystem);
     }
 
-    public override void AddBattleActions(BattleSystem battleSystem)
+    public override void AddMoveListeners(BattleSystem battleSystem)
     {
         terraAttack.SetPersistent(true);
         battleSystem.OnEnteringActionSelection += QueueNextAttack;
         battleSystem.OnEndOfTurn += EndOfTurnCounterIncrement;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveMoveListeners(BattleSystem battleSystem)
     {
         terraAttack.SetPersistent(false);
         battleSystem.OnEnteringActionSelection -= QueueNextAttack;

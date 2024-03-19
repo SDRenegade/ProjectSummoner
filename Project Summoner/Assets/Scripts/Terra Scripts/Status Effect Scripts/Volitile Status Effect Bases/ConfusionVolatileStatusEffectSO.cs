@@ -26,13 +26,13 @@ public class ConfusionVolatileStatusEffect : VolatileStatusEffectBase
         turnCounter = 0;
     }
 
-    public override void AddBattleActions(BattleSystem battleSystem)
+    public override void AddVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         battleSystem.OnAttackDeclaration += TerraAttackConfusionActive;
         battleSystem.OnEndOfTurn += EndOfTurnCounterIncrement;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         battleSystem.OnAttackDeclaration -= TerraAttackConfusionActive;
         battleSystem.OnEndOfTurn -= EndOfTurnCounterIncrement;

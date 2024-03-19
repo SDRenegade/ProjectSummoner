@@ -9,7 +9,7 @@ public class BattleSide
 
     public BattleSide(BattleFormat battleFormat, List<Terra> terraList)
     {
-        int numBattlePositions = (battleFormat == BattleFormat.SINGLE) ? 1 : 2;
+        int numBattlePositions = battleFormat.NumberOfLeadingPositions();
         terraBattlePositionArr = new TerraBattlePosition[numBattlePositions];
         for (int i = 0; i < numBattlePositions; i++)
             terraBattlePositionArr[i] = new TerraBattlePosition(this);
@@ -28,7 +28,7 @@ public class BattleSide
 
     public BattleSide(BattleFormat battleFormat, Terra terra)
     {
-        int numBattlePositions = (battleFormat == BattleFormat.SINGLE) ? 1 : 2;
+        int numBattlePositions = battleFormat.NumberOfLeadingPositions();
         terraBattlePositionArr = new TerraBattlePosition[numBattlePositions];
         for (int i = 0; i < numBattlePositions; i++)
             terraBattlePositionArr[i] = new TerraBattlePosition(this);

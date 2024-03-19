@@ -84,7 +84,7 @@ public class CombatBattleState : BattleState
         //If the attack is canceled, remove battle actions on the canceled attack and
         //continue to the next attack
         if (terraAttack.IsCanceled()) {
-            terraAttack.GetTerraMoveBase()?.RemoveBattleActions(battleSystem);
+            terraAttack.GetTerraMoveBase()?.RemoveMoveListeners(battleSystem);
             return;
         }
 
@@ -131,7 +131,7 @@ public class CombatBattleState : BattleState
                 //*** Attack Missed Event ***
                 battleSystem.InvokeOnAttackMissed(directAttackLogList[i]);
 
-                terraAttack.GetTerraMoveBase().RemoveBattleActions(battleSystem);
+                terraAttack.GetTerraMoveBase().RemoveMoveListeners(battleSystem);
                 continue;
             }
 

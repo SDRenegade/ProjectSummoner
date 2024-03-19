@@ -27,7 +27,7 @@ public class BattleHUD : MonoBehaviour
         TerraBattlePosition[] primaryTerraBattlePositionArr = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
         TerraBattlePosition[] secondaryTerraBattlePositionArr = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
 
-        int numStatusBars = (battleFormat == BattleFormat.SINGLE) ? 1 : 2;
+        int numStatusBars = battleFormat.NumberOfLeadingPositions();
         for(int i = 0; i < numStatusBars; i++) {
             if (primaryTerraBattlePositionArr[i].GetTerra() == null)
                 primarySideTerraStatusBarList[i].gameObject.SetActive(false);

@@ -26,13 +26,13 @@ public class Counter : TerraMoveBase
 
     public override void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem) {}
 
-    public override void AddBattleActions(BattleSystem battleSystem)
+    public override void AddMoveListeners(BattleSystem battleSystem)
     {
         battleSystem.OnTerraDamageByTerra += AccumulateDamage;
         battleSystem.OnTerraDamageByTerra += UnleashDamage;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveMoveListeners(BattleSystem battleSystem)
     {
         battleSystem.OnTerraDamageByTerra -= AccumulateDamage;
         battleSystem.OnTerraDamageByTerra -= UnleashDamage;
@@ -60,6 +60,6 @@ public class Counter : TerraMoveBase
         else
             eventArgs.GetDirectAttackLog().SetDamage((int)(physicalDamageRecieved * DAMAGE_MULTIPLIER));
 
-        RemoveBattleActions(eventArgs.GetBattleSystem());
+        RemoveMoveListeners(eventArgs.GetBattleSystem());
     }
 }

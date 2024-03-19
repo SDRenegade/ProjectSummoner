@@ -104,7 +104,7 @@ public class TerraBattlePosition
         }
 
         vStatusEffectList.Add(vStatusEffectBase);
-        vStatusEffectBase.AddBattleActions(battleSystem);
+        vStatusEffectBase.AddVolatileStatusEffectListeners(battleSystem);
 
         return true;
     }
@@ -113,7 +113,7 @@ public class TerraBattlePosition
     {
         for(int i = vStatusEffectList.Count - 1; i >= 0; i--) {
             if (vStatusEffectList[i].GetVolatileStatusEffectSO().GetStatusName() == vStatusEffectSO.GetStatusName()) {
-                vStatusEffectList[i].RemoveBattleActions(battleSystem);
+                vStatusEffectList[i].RemoveVolatileStatusEffectListeners(battleSystem);
                 vStatusEffectList.RemoveAt(i);
                 return true;
             }

@@ -21,7 +21,7 @@ public class IronBall : ItemBase
 
     public override void OnOverworldUse() {}
 
-    public override void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
+    public override void AddItemListeners(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
 
@@ -29,7 +29,7 @@ public class IronBall : ItemBase
         battleSystem.OnDirectAttack += GroundFlyingTerra;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveItemListeners(BattleSystem battleSystem)
     {
         battleSystem.OnEnteringCombatState -= SetSpeedPriority;
         battleSystem.OnDirectAttack -= GroundFlyingTerra;

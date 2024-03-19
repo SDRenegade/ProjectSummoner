@@ -17,12 +17,12 @@ public class Metronome : TerraMoveBase
 
     public override void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem) {}
 
-    public override void AddBattleActions(BattleSystem battleSystem)
+    public override void AddMoveListeners(BattleSystem battleSystem)
     {
         battleSystem.OnAttackDeclaration += PickRandomMove;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveMoveListeners(BattleSystem battleSystem)
     {
         battleSystem.OnAttackDeclaration -= PickRandomMove;
     }
@@ -34,9 +34,9 @@ public class Metronome : TerraMoveBase
 
         TerraMove randomMove = new TerraMove(SODatabase.GetInstance().GetRandomMetronomeMove());
         terraAttack.SetMove(randomMove);
-        terraAttack.GetTerraMoveBase()?.AddBattleActions(eventArgs.GetBattleSystem());
+        terraAttack.GetTerraMoveBase()?.AddMoveListeners(eventArgs.GetBattleSystem());
         Debug.Log(BattleDialog.MetronomeMoveMsg(randomMove));
 
-        RemoveBattleActions(eventArgs.GetBattleSystem());
+        RemoveMoveListeners(eventArgs.GetBattleSystem());
     }
 }

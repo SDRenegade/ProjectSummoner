@@ -23,7 +23,7 @@ public class SleepSpore : TerraMoveBase
             Debug.Log(BattleDialog.ATTACK_FAILED);
     }
 
-    public override void AddBattleActions(BattleSystem battleSystem) {}
+    public override void AddMoveListeners(BattleSystem battleSystem) {}
 
-    public override void RemoveBattleActions(BattleSystem battleSystem) {}
+    public override void RemoveMoveListeners(BattleSystem battleSystem) {}
 }

@@ -15,13 +15,13 @@ public class FlinchedVolatileStatusEffect : VolatileStatusEffectBase
 {
     public FlinchedVolatileStatusEffect(TerraBattlePosition terraBattlePosition, VolatileStatusEffectSO vStatusEffectSO) : base(terraBattlePosition, vStatusEffectSO) {}
 
-    public override void AddBattleActions(BattleSystem battleSystem)
+    public override void AddVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         battleSystem.OnAttackDeclaration += CancelAttack;
         battleSystem.OnEndOfTurn += EndOfTurnStatusRemoval;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         battleSystem.OnAttackDeclaration -= CancelAttack;
         battleSystem.OnEndOfTurn -= EndOfTurnStatusRemoval;

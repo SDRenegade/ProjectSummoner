@@ -25,7 +25,7 @@ public class ComboCuffs : ItemBase
 
     public override void OnOverworldUse() {}
 
-    public override void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
+    public override void AddItemListeners(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
         previousAttack = null;
@@ -33,7 +33,7 @@ public class ComboCuffs : ItemBase
         battleSystem.OnDirectAttack += AddDamageModifier;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveItemListeners(BattleSystem battleSystem)
     {
         battleSystem.OnDirectAttack -= AddDamageModifier;
     }

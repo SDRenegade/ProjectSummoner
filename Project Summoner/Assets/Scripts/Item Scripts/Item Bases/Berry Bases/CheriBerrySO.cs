@@ -19,14 +19,14 @@ public class CheriBerry : ItemBase
 
     public override void OnOverworldUse() {}
 
-    public override void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
+    public override void AddItemListeners(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
 
         battleSystem.OnPostStatusEffectAdded += RemoveParalysis;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveItemListeners(BattleSystem battleSystem)
     {
         battleSystem.OnPostStatusEffectAdded -= RemoveParalysis;
     }

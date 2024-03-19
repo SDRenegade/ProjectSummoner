@@ -17,12 +17,11 @@ public class PartyMenuUI : MonoBehaviour
     private GameObject[] leadingBannerList;
     private GameObject[] benchBannerList;
 
-    //TODO Figure out how to not use magic numbers for number of banners
     public void Start()
     {
         BattleFormat battleFormat = BattleLoader.GetInstance().GetBattleFormat();
-        leadingBannerList = (battleFormat == BattleFormat.SINGLE) ? new GameObject[1] : new GameObject[2];
-        benchBannerList = (battleFormat == BattleFormat.SINGLE) ? new GameObject[5] : new GameObject[4];
+        leadingBannerList = new GameObject[battleFormat.NumberOfLeadingPositions()];
+        benchBannerList = new GameObject[6 - battleFormat.NumberOfLeadingPositions()];
 
         InitPartyObjects();
         optionSelectionUI.gameObject.SetActive(false);

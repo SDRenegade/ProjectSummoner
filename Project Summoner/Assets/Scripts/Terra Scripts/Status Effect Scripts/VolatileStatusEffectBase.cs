@@ -13,9 +13,9 @@ public abstract class VolatileStatusEffectBase
         this.vStatusEffectSO = vStatusEffectSO;
     }
 
-    public abstract void AddBattleActions(BattleSystem battleSystem);
+    public abstract void AddVolatileStatusEffectListeners(BattleSystem battleSystem);
 
-    public abstract void RemoveBattleActions(BattleSystem battleSystem);
+    public abstract void RemoveVolatileStatusEffectListeners(BattleSystem battleSystem);
 
     public TerraBattlePosition GetTerraBattlePosition() { return terraBattlePosition; }
 

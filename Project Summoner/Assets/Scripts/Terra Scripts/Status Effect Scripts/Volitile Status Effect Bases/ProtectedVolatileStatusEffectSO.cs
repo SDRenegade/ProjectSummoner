@@ -21,13 +21,13 @@ public class ProtectedVolatileStatusEffect : VolatileStatusEffectBase
         isOnCooldown = false;
     }
 
-    public override void AddBattleActions(BattleSystem battleSystem)
+    public override void AddVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         battleSystem.OnDirectAttack += ProtectActivate;
         battleSystem.OnEndOfTurn += EndOfTurnSetCooldown;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         battleSystem.OnDirectAttack -= ProtectActivate;
         battleSystem.OnEndOfTurn -= EndOfTurnSetCooldown;

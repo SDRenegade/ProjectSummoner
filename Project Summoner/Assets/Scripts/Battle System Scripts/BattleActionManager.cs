@@ -11,14 +11,14 @@ public class BattleActionManager
     private List<List<TerraAttack>> attackLog;
     private List<TerraAttack> terraAttackList;
     private List<TerraSwitch> terraSwitchList;
-    //private List<CatchAttemptAction> catchAttemptDieList;
+    //private List<CatchAttempt> catchAttemptDieList;
     private bool isAttemptingEscape;
 
     private TerraAttack pendingTerraAttack;
 
-    public BattleActionManager(BattleSystem battleSystem, int numBattlePositions)
+    public BattleActionManager(BattleSystem battleSystem)
     {
-        readyActionList = new bool[numBattlePositions];
+        readyActionList = new bool[battleSystem.GetBattleFormat().NumberOfLeadingPositions() * 2];
         terraActionSelectionQueue = new List<TerraBattlePosition>();
         selectedActionStack = new Stack<BattleAction>();
         attackLog = new List<List<TerraAttack>>();
@@ -53,7 +53,7 @@ public class BattleActionManager
             if (terraAttackList[i].IsCharging())
                 terraAttackList[i].SetCharging(false);
             else if (!terraAttackList[i].IsPersistent() && !terraAttackList[i].IsRecharging()) {
-                terraAttackList[i].GetTerraMoveBase()?.RemoveBattleActions(battleSystem);
+                terraAttackList[i].GetTerraMoveBase()?.RemoveMoveListeners(battleSystem);
                 terraAttackList.RemoveAt(i);
             }
         }
@@ -75,6 +75,7 @@ public class BattleActionManager
         }
 
         terraActionSelectionQueue.RemoveAt(0);
+        battleAction.Execute(this);
         selectedActionStack.Push(battleAction);
     }
 
@@ -83,6 +84,7 @@ public class BattleActionManager
         if (selectedActionStack.Count <= 0)
             return false;
 
+        selectedActionStack.Peek().Undo(this);
         terraActionSelectionQueue.Insert(0, selectedActionStack.Pop().GetTerraBattlePosition());
         RemoveReadyBattlePosition();
         return true;
@@ -95,13 +97,11 @@ public class BattleActionManager
         pendingTerraAttack = null;
     }
 
-    public void ProcessSelectedActionStack(BattleSystem battleSystem)
+    //Processes any necessary battle action stacks
+    public void ProcessActionStacks(BattleSystem battleSystem)
     {
-        if (selectedActionStack.Count <= 0)
-            return;
-
-        while (selectedActionStack.Count > 0)
-            selectedActionStack.Pop().ProcessBattleAction(battleSystem, this);
+        for(int i = 0; i < terraAttackList.Count; i++)
+            terraAttackList[i].GetTerraMoveBase()?.AddMoveListeners(battleSystem);
     }
 
     //Returns true if all battle positions are ready

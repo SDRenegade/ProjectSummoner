@@ -25,7 +25,7 @@ public class DisabledVolatileStatusEffect : VolatileStatusEffectBase
         turnCounter = 0;
     }
 
-    public override void AddBattleActions(BattleSystem battleSystem)
+    public override void AddVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         FindMoveIndex(battleSystem.GetBattleActionManager().GetCurrentTurnLog());
         if (disabledMoveIndex == null)
@@ -38,7 +38,7 @@ public class DisabledVolatileStatusEffect : VolatileStatusEffectBase
         }
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         battleSystem.OnEnteringActionSelection -= EnteringActionSelectionAction;
         battleSystem.OnOpeningMoveSelectionUI -= OpeningMoveSelectionUIAction;

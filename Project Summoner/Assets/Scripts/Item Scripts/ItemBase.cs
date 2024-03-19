@@ -13,14 +13,14 @@ public abstract class ItemBase
 
     public abstract void OnOverworldUse();
 
-    public abstract void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem);
+    public abstract void AddItemListeners(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem);
 
-    public abstract void RemoveBattleActions(BattleSystem battleSystem);
+    public abstract void RemoveItemListeners(BattleSystem battleSystem);
 
     protected void ConsumeOnUse(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
         Debug.Log(BattleDialog.ItemConsumedMsg(this));
-        RemoveBattleActions(battleSystem);
+        RemoveItemListeners(battleSystem);
         terraBattlePosition.GetTerra().SetHeldItem(null);
     }
 

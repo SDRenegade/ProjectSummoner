@@ -19,12 +19,12 @@ public class Earthquake : TerraMoveBase
 
     public override void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem) {}
 
-    public override void AddBattleActions(BattleSystem battleSystem)
+    public override void AddMoveListeners(BattleSystem battleSystem)
     {
         battleSystem.OnTerraDamageByTerra += CheckForDiggingOpponent;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveMoveListeners(BattleSystem battleSystem)
     {
         battleSystem.OnTerraDamageByTerra -= CheckForDiggingOpponent;
     }

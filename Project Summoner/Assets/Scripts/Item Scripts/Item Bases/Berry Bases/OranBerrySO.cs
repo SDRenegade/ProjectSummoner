@@ -22,7 +22,7 @@ public class OranBerry : ItemBase
 
     public override void OnOverworldUse() {}
 
-    public override void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
+    public override void AddItemListeners(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
 
@@ -30,7 +30,7 @@ public class OranBerry : ItemBase
         battleSystem.OnPostTerraDamaged += AfterOtherDamageProke;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveItemListeners(BattleSystem battleSystem)
     {
         battleSystem.OnPostTerraDamageByTerra -= AfterTerraAttackDamageProke;
         battleSystem.OnPostTerraDamaged -= AfterOtherDamageProke;

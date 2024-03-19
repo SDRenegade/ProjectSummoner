@@ -27,12 +27,12 @@ public class BoundVolatileStatusEffect : VolatileStatusEffectBase
         turnCounter = 0;
     }
 
-    public override void AddBattleActions(BattleSystem battleSystem)
+    public override void AddVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         battleSystem.OnEndOfTurn += EndOfTurnDamage;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         battleSystem.OnEndOfTurn -= EndOfTurnDamage;
     }

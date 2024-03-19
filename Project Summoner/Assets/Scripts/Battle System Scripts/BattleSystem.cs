@@ -9,12 +9,6 @@ public enum BattleType
     SUMMONER
 }
 
-public enum BattleFormat
-{
-    SINGLE,
-    DOUBLE
-}
-
 public class BattleSystem : MonoBehaviour
 {
     public event EventHandler<BattleEventArgs> OnStartOfTurn;
@@ -79,8 +73,7 @@ public class BattleSystem : MonoBehaviour
         InitBattleActions();
         UpdateTerraStatusBars(); //Might not be needed. Could be getting called elsewhere
 
-        int numBattlePositions = (battleFormat == BattleFormat.SINGLE) ? 2 : 4;
-        battleActionManager = new BattleActionManager(this, numBattlePositions);
+        battleActionManager = new BattleActionManager(this);
         battleStateManager = new BattleStateManager(this);
     }
 
@@ -107,10 +100,10 @@ public class BattleSystem : MonoBehaviour
             if (terraBattlePosition.GetTerra() == null)
                 continue;
 
-            terraBattlePosition.GetTerra().GetStatusEffect()?.AddBattleActions(terraBattlePosition, this);
+            terraBattlePosition.GetTerra().GetStatusEffect()?.AddStatusListeners(terraBattlePosition, this);
             //--- (Temp) Hard-coding the leading terra held item until new system is added ---
             terraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Persim Berry").CreateItemBase());
-            terraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(terraBattlePosition, this);
+            terraBattlePosition.GetTerra().GetHeldItem()?.AddItemListeners(terraBattlePosition, this);
 
             //Logging the item that each leading terra is holding
             if (terraBattlePosition.GetTerra().GetHeldItem() != null)
@@ -122,10 +115,10 @@ public class BattleSystem : MonoBehaviour
             if (terraBattlePosition.GetTerra() == null)
                 continue;
 
-            terraBattlePosition.GetTerra().GetStatusEffect()?.AddBattleActions(terraBattlePosition, this);
+            terraBattlePosition.GetTerra().GetStatusEffect()?.AddStatusListeners(terraBattlePosition, this);
             //--- (Temp) Hard-coding the leading terra held item until new system is added ---
             //terraBattlePosition.GetTerra().SetHeldItem(SODatabase.GetInstance().GetItemByName("Leftovers").CreateItemBase());
-            terraBattlePosition.GetTerra().GetHeldItem()?.AddBattleActions(terraBattlePosition, this);
+            terraBattlePosition.GetTerra().GetHeldItem()?.AddItemListeners(terraBattlePosition, this);
 
             //Logging the item that each leading terra is holding
             if (terraBattlePosition.GetTerra().GetHeldItem() != null)
@@ -278,7 +271,7 @@ public class BattleSystem : MonoBehaviour
         TerraAttack terraAttack = new TerraAttack(attackerPosition, defenderList, selectedMove);
         battleActionManager.GetTerraAttackList().Add(terraAttack);
         //Add the selected moves battle actions into the event system
-        terraAttack.GetTerraMoveBase()?.AddBattleActions(this);
+        terraAttack.GetTerraMoveBase()?.AddMoveListeners(this);
     }
 
     public void OpenTargetSelectionUI(TerraBattlePosition terraBattlePosition, Battlefield battlefield)
@@ -335,11 +328,11 @@ public class BattleSystem : MonoBehaviour
         if (battleStateManager.GetCurrentState() != battleStateManager.GetActionSelectionState())
             return;
 
-        battleActionManager.ProcessSelectedActionStack(this);
+        battleActionManager.ProcessActionStacks(this);
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 
-    public void AttemptEscape()
+    public void EscapeAttempt()
     {
         if(battleType != BattleType.WILD) {
             Debug.Log(BattleDialog.ATTEMPT_ESCAPE_SUMMONER_BATTLE);
@@ -350,7 +343,7 @@ public class BattleSystem : MonoBehaviour
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 
-    public void UseSelectedItem(int itemIndex)
+    public void CatchTerraAttempt(int itemIndex)
     {
         //TODO Implement item active
     }
@@ -700,6 +693,8 @@ public class BattleSystem : MonoBehaviour
     public BattleStage GetBattleStage() { return battleStage; }
 
     public BattleType GetBattleType() { return battleType; }
+
+    public BattleFormat GetBattleFormat() { return battleFormat; }
 
     public BattleAI GetPrimarySideAI() { return primarySideAI; }
 

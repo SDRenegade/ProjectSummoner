@@ -20,7 +20,7 @@ class BurnStatusEffect : StatusEffectBase
 
     public BurnStatusEffect(StatusEffectSO statusEffectSO) : base(statusEffectSO) {}
 
-    public override void AddBattleActions(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
+    public override void AddStatusListeners(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
 
@@ -28,7 +28,7 @@ class BurnStatusEffect : StatusEffectBase
         battleSystem.OnDirectAttack += AttackReductionActive;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveStatusListeners(BattleSystem battleSystem)
     {
         battleSystem.OnEndOfTurn -= BurnActive;
         battleSystem.OnDirectAttack -= AttackReductionActive;

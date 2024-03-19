@@ -22,7 +22,7 @@ public class Explosion : TerraMoveBase
         battleSystem.DamageTerra(terraBattlePosition, terraBattlePosition.GetTerra().GetCurrentHP());
     }
 
-    public override void AddBattleActions(BattleSystem battleSystem) {}
+    public override void AddMoveListeners(BattleSystem battleSystem) {}
 
-    public override void RemoveBattleActions(BattleSystem battleSystem) {}
+    public override void RemoveMoveListeners(BattleSystem battleSystem) {}
 }

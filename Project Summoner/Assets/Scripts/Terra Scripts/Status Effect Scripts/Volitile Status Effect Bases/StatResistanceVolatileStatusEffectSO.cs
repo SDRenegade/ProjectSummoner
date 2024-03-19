@@ -23,13 +23,13 @@ public class StatResistanceVolatileStatusEffect : VolatileStatusEffectBase
         turnCounter = 0;
     }
 
-    public override void AddBattleActions(BattleSystem battleSystem)
+    public override void AddVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         battleSystem.OnStatChange += CancelStatChange;
         battleSystem.OnEndOfTurn += EndOfTurnIncrement;
     }
 
-    public override void RemoveBattleActions(BattleSystem battleSystem)
+    public override void RemoveVolatileStatusEffectListeners(BattleSystem battleSystem)
     {
         battleSystem.OnStatChange -= CancelStatChange;
         battleSystem.OnEndOfTurn -= EndOfTurnIncrement;

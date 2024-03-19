@@ -11,8 +11,13 @@ public class SwitchBattleAction : BattleAction
         this.terraSwitch = terraSwitch;
     }
 
-    public override void ProcessBattleAction(BattleSystem battleSystem, BattleActionManager battleActionManager)
+    public override void Execute(BattleActionManager battleActionManager)
     {
         battleActionManager.GetTerraSwitchList().Add(terraSwitch);
+    }
+
+    public override void Undo(BattleActionManager battleActionManager)
+    {
+        battleActionManager.GetTerraSwitchList().Remove(terraSwitch);
     }
 }
