@@ -16,8 +16,8 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<OpeningMoveSelectionUIEventArgs> OnOpeningMoveSelectionUI;
     public event EventHandler<BattleEventArgs> OnActionSelection;
     public event EventHandler<BattleEventArgs> OnEnteringCombatState;
-    public event EventHandler<BattleEventArgs> OnTerraSwitch; //Include BattleSide and the two Terra being switched
     public event EventHandler<BattleEventArgs> OnPlayerAttemptEscape; //Include Escape chance
+    public event EventHandler<SwitchTerraEventArgs> OnSwitchTerra;
     public event EventHandler<AttackDeclarationEventArgs> OnAttackDeclaration;
     public event EventHandler<DirectAttackEventArgs> OnDirectAttack;
     public event EventHandler<DirectAttackLogEventArgs> OnAttackMissed;
@@ -44,7 +44,7 @@ public class BattleSystem : MonoBehaviour
     private List<Terra> primaryTerraList;
     private List<Terra> secondaryTerraList;
 
-    private bool isMatchFinished;
+    private bool isBattleFinished;
     private BattleType battleType;
     private BattleFormat battleFormat;
     private BattleAI primarySideAI;
@@ -59,14 +59,19 @@ public class BattleSystem : MonoBehaviour
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
-        primaryTerraList = BattleLoader.GetInstance().GetPrimaryTerraList();
-        secondaryTerraList = BattleLoader.GetInstance().GetSecondaryTerraList();
+        primaryTerraList = new List<Terra>();
+        for(int i = 0; i < BattleLoader.GetInstance().GetPrimaryTerraList().Count; i++)
+            primaryTerraList.Add(BattleLoader.GetInstance().GetPrimaryTerraList()[i]);
 
-        isMatchFinished = false;
+        secondaryTerraList = new List<Terra>();
+        for (int i = 0; i < BattleLoader.GetInstance().GetSecondaryTerraList().Count; i++)
+            secondaryTerraList.Add(BattleLoader.GetInstance().GetSecondaryTerraList()[i]);
+
+        isBattleFinished = false;
         battleType = BattleLoader.GetInstance().GetBattleType();
         battleFormat = BattleLoader.GetInstance().GetBattleFormat();
         primarySideAI = null;
-        secondarySideAI = new WildTerraAI();
+        secondarySideAI = new WildTerraAI(secondaryTerraList);
         battlefield = new Battlefield(battleFormat, primaryTerraList, secondaryTerraList);
 
         InitBattleStage();
@@ -149,6 +154,15 @@ public class BattleSystem : MonoBehaviour
     public void ExitPartyMenuUI()
     {
         battleHUD.ExitPartyMenuUI(battlefield, battleFormat, battleActionManager);
+    }
+
+    public void SwitchTerraAfterFainting(int faintedTerraIndex, bool isPrimarySide)
+    {
+        if (isPrimarySide) {
+            //TODO Open PartyMenuUI with no cancel button. (Add a new open menu method in PartyMenuUI)
+        }
+        else
+            secondarySideAI.SwitchFaintedTerra(faintedTerraIndex);
     }
 
     public void OpenMoveSelectionUI()
@@ -350,13 +364,22 @@ public class BattleSystem : MonoBehaviour
 
     public void SwitchTerra(TerraSwitch terraSwitch)
     {
-        //TODO Add this to the BattleDialog class
-        Debug.Log("Switch action for " + primaryTerraList[terraSwitch.GetLeadingPositionIndex()] + " and " + primaryTerraList[terraSwitch.GetBenchPositionIndex()] + " has been triggered");
+        //*** Switch Terra Event ***
+        SwitchTerraEventArgs eventArgs = InvokeOnSwitchTerra(terraSwitch);
+
+        if (eventArgs.IsCanceled())
+            return;
+
+        List<Terra> terraList = terraSwitch.IsPrimarySide() ? primaryTerraList : secondaryTerraList;
+        Debug.Log(BattleDialog.SwitchTerraMsg(terraSwitch, terraList));
         Terra tmp = primaryTerraList[terraSwitch.GetLeadingPositionIndex()];
-        primaryTerraList[terraSwitch.GetLeadingPositionIndex()] = primaryTerraList[terraSwitch.GetBenchPositionIndex()];
-        primaryTerraList[terraSwitch.GetBenchPositionIndex()] = tmp;
-        battlefield.GetPrimaryBattleSide().UpdateLeadingTerra(primaryTerraList);
-        battleStage.SetTerraAtPosition(primaryTerraList[terraSwitch.GetLeadingPositionIndex()], terraSwitch.IsPrimarySide(), terraSwitch.GetLeadingPositionIndex());
+        terraList[terraSwitch.GetLeadingPositionIndex()] = terraList[terraSwitch.GetBenchPositionIndex()];
+        terraList[terraSwitch.GetBenchPositionIndex()] = tmp;
+        if(terraSwitch.IsPrimarySide())
+            battlefield.GetPrimaryBattleSide().UpdateLeadingTerra(terraList);
+        else
+            battlefield.GetSecondaryBattleSide().UpdateLeadingTerra(terraList);
+        battleStage.SetTerraAtPosition(terraList[terraSwitch.GetLeadingPositionIndex()], terraSwitch.IsPrimarySide(), terraSwitch.GetLeadingPositionIndex());
         UpdateTerraStatusBars();
     }
 
@@ -391,7 +414,7 @@ public class BattleSystem : MonoBehaviour
             //*** Terra Faint Event ***
             InvokeOnTerraFainted(terraBattlePosition);
             //--- (Temp) Match ends once a single terra faints, until parties are added ---
-            isMatchFinished = true;
+            isBattleFinished = true;
         }
     }
 
@@ -478,6 +501,11 @@ public class BattleSystem : MonoBehaviour
         return UnityEngine.Random.Range(0, 1f) < rollOdds;
     }
 
+    public void EndBattle()
+    {
+        isBattleFinished = true;
+    }
+
     public BattleEventArgs InvokeOnStartOfTurn()
     {
         BattleEventArgs eventArgs = new BattleEventArgs(this);
@@ -518,18 +546,18 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
-    public BattleEventArgs InvokeOnTerraSwitch()
-    {
-        BattleEventArgs eventArgs = new BattleEventArgs(this);
-        OnTerraSwitch?.Invoke(this, eventArgs);
-
-        return eventArgs;
-    }
-
     public BattleEventArgs InvokeOnPlayerAttemptEscape()
     {
         BattleEventArgs eventArgs = new BattleEventArgs(this);
         OnPlayerAttemptEscape?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public SwitchTerraEventArgs InvokeOnSwitchTerra(TerraSwitch terraSwitch)
+    {
+        SwitchTerraEventArgs eventArgs = new SwitchTerraEventArgs(terraSwitch, this);
+        OnSwitchTerra?.Invoke(this, eventArgs);
 
         return eventArgs;
     }
@@ -684,9 +712,9 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
-    public bool IsMatchFinished() { return isMatchFinished; }
+    public bool IsBattleFinished() { return isBattleFinished; }
 
-    public void SetMatchFinished(bool isMatchFinished) { this.isMatchFinished = isMatchFinished; }
+    public void SetBattleFinished(bool isBattleFinished) { this.isBattleFinished = isBattleFinished; }
 
     public BattleHUD GetBattleHUD() { return battleHUD; }
 

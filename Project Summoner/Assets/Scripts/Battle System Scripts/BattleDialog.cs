@@ -14,6 +14,10 @@ public static class BattleDialog
     public static readonly string CRITICAL_HIT = "It was a critical hit!";
 
     // ================== Combat Messages ==================
+    public static string SwitchTerraMsg(TerraSwitch terraSwitch, List<Terra> terraList) {
+        return terraList[terraSwitch.GetLeadingPositionIndex()] + " has been switched out for " + terraList[terraSwitch.GetBenchPositionIndex()];
+    }
+
     public static string AttackUsedMsg(Terra attackingTerra, TerraMove move) {
         return attackingTerra + " has used " + move;
     }

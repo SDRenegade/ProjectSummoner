@@ -21,11 +21,11 @@ public class CombatBattleState : BattleState
         //Loops through and executes all the attacks in the sorted list
         for (int i = 0; i < queuedTerraAttackList.Count; i++) {
             ProcessTerraAttack(queuedTerraAttackList[i], battleSystem);
-            if (battleSystem.IsMatchFinished())
+            if (battleSystem.IsBattleFinished())
                 break;
         }
 
-        if(battleSystem.IsMatchFinished())
+        if(battleSystem.IsBattleFinished())
             battleManager.SwitchState(battleManager.GetFinishedMatchBattleState());
         else
             battleManager.SwitchState(battleManager.GetEndTurnState());

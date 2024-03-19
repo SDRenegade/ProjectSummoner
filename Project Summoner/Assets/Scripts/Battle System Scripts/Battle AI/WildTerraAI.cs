@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class WildTerraAI : BattleAI
 {
+    private List<Terra> terraList;
+
+    public WildTerraAI(List<Terra> terraList)
+    {
+        this.terraList = terraList;
+    }
+
     public void PerformAction(TerraBattlePosition terraBattlePosition, List<int> disabledMoveIndicies, BattleSystem battleSystem)
     {
         //Create a list of available moves indicies after acounting for null move slots and disabled moves
@@ -30,5 +37,10 @@ public class WildTerraAI : BattleAI
             battleSystem.GetBattleActionManager().GetTerraAttackList().Add(
                 new TerraAttack(terraBattlePosition, targetPosition, selectedMove));
         }
+    }
+
+    public int? SwitchFaintedTerra(int faintedTerraIndex)
+    {
+        return null;
     }
 }
