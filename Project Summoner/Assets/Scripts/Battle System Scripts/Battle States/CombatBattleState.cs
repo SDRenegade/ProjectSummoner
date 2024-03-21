@@ -177,7 +177,7 @@ public class CombatBattleState : BattleState
 
         if (directAttackLog.IsCrit())
             Debug.Log(BattleDialog.CRITICAL_HIT);
-        battleSystem.ApplyTerraDamage(directAttackLog.GetDefenderPosition(), directAttackLog.GetDamage());
+        battleSystem.ApplyDamage(directAttackLog.GetDefenderPosition(), directAttackLog.GetDamage());
 
         //*** Post Terra Damaged by Terra Event ***
         battleSystem.InvokeOnPostTerraDamageByTerra(terraDamageByTerraEventArgs);

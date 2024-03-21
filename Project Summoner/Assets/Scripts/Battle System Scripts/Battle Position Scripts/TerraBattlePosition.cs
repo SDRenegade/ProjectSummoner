@@ -30,8 +30,8 @@ public class TerraBattlePosition
 
     public TerraBattlePosition(BattleSide battleSide)
     {
-        terra = null;
         this.battleSide = battleSide;
+        terra = null;
         statStagesMap = new Dictionary<Stats, StatStages> {
             { Stats.ATK, StatStages.NEUTRAL },
             { Stats.DEF, StatStages.NEUTRAL },
@@ -47,8 +47,8 @@ public class TerraBattlePosition
 
     public TerraBattlePosition(Terra terra, BattleSide battleSide)
     {
-        this.terra = terra;
         this.battleSide = battleSide;
+        this.terra = terra;
         statStagesMap = new Dictionary<Stats, StatStages> {
             { Stats.ATK, StatStages.NEUTRAL },
             { Stats.DEF, StatStages.NEUTRAL },
@@ -68,13 +68,11 @@ public class TerraBattlePosition
             statStagesMap[entry.Key] = StatStages.NEUTRAL;
     }
 
+    public BattleSide GetBattleSide() { return battleSide; }
+
     public Terra GetTerra() { return terra; }
 
     public void SetTerra(Terra terra) {  this.terra = terra; }
-
-    public BattleSide GetBattleSide() { return battleSide; }
-
-    public void SetBattleSide(BattleSide battleSide) { this.battleSide = battleSide; }
 
     public StatStages GetStatStage(Stats stat) { return statStagesMap[stat]; }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -68,11 +69,11 @@ public class BattleHUD : MonoBehaviour
         targetSelectionUI.OpenTargetSelectionUI(terraBattlePosition, battlefield);
     }
 
-    public void OpenPartyMenuUI(List<Terra> terraList, BattleSystem battleSystem)
+    public void OpenPartyMenuUI(TerraBattlePosition activeTerraPosition, List<Terra> terraList, bool isMustSwitch, Action<TerraBattlePosition, TerraSwitch> switchAction, BattleSystem battleSystem)
     {
         CloseAllSelectionUI();
         HideTerraStatusBars();
-        partyMenuUI.OpenPartyMenuUI(terraList, battleSystem);
+        partyMenuUI.OpenPartyMenuUI(activeTerraPosition, terraList, isMustSwitch, switchAction, battleSystem);
     }
 
     public void ExitPartyMenuUI(Battlefield battlefield, BattleFormat battleFormat, BattleActionManager battleActionManager)

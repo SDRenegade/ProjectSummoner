@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -19,12 +20,14 @@ public class PartyBanner : MonoBehaviour
     [SerializeField] private TextMeshProUGUI terraCurrentHealth;
     [SerializeField] private TextMeshProUGUI terraMaxHealth;
 
-    public void UpdatePartyBanner(Terra terra, int? terraPartyIndex, PartyOptionSelectionUI optionSelectionUI, BattleSystem battleSystem)
+    public void UpdatePartyBanner(TerraBattlePosition activeTerraPosition, int? terraPartyIndex, PartyOptionSelectionUI optionSelectionUI, Action<TerraBattlePosition, TerraSwitch> switchAction, BattleSystem battleSystem)
     {
-        if (terra == null || terraPartyIndex == null) {
+        if (terraPartyIndex == null || battleSystem.GetPrimaryTerraList().Count <= terraPartyIndex || battleSystem.GetPrimaryTerraList()[(int)terraPartyIndex] == null) {
             SetEmptyBanner();
             return;
         }
+
+        Terra terra = battleSystem.GetPrimaryTerraList()[(int)terraPartyIndex];
 
         //TODO Set Image to sprite of terra
 
@@ -45,7 +48,7 @@ public class PartyBanner : MonoBehaviour
 
         Button partyBannerBtn = GetComponent<Button>();
         partyBannerBtn.onClick.AddListener(delegate {
-            optionSelectionUI.OpenOptionSelctionUI(terra, (int)terraPartyIndex, battleSystem);
+            optionSelectionUI.OpenOptionSelctionUI(activeTerraPosition, (int)terraPartyIndex, switchAction, battleSystem);
         });
     }
 

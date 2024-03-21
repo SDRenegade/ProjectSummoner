@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,8 +12,9 @@ public class PartyMenuUI : MonoBehaviour
     [Header("Stack Panels")]
     [SerializeField] private GameObject leadingStackPanel;
     [SerializeField] private GameObject benchStackPanel;
-    [Header("Option Selection Menu")]
+    [Space]
     [SerializeField] private PartyOptionSelectionUI optionSelectionUI;
+    [SerializeField] private Button cancelBtn;
 
     private GameObject[] leadingBannerList;
     private GameObject[] benchBannerList;
@@ -40,26 +42,31 @@ public class PartyMenuUI : MonoBehaviour
         }
     }
 
-    public void OpenPartyMenuUI(List<Terra> terraList, BattleSystem battleSystem)
+    public void OpenPartyMenuUI(TerraBattlePosition activeTerraPosition, List<Terra> terraList, bool isMustSwitch, Action<TerraBattlePosition, TerraSwitch> switchAction, BattleSystem battleSystem)
     {
         for (int i = 0; i < leadingBannerList.Length; i++) {
             if (terraList.Count <= i) {
-                leadingBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(null, null, optionSelectionUI, battleSystem);
+                leadingBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(activeTerraPosition, null, optionSelectionUI, switchAction, battleSystem);
                 continue;
             }
 
-            leadingBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(terraList[i], i, optionSelectionUI, battleSystem);
+            leadingBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(activeTerraPosition, i, optionSelectionUI, switchAction, battleSystem);
         }
 
         for (int i = 0; i < benchBannerList.Length; i++) {
             if (terraList.Count <= i + leadingBannerList.Length) {
-                benchBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(null, null, optionSelectionUI, battleSystem);
+                benchBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(activeTerraPosition, null, optionSelectionUI, switchAction, battleSystem);
                 continue;
             }
 
-            benchBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(terraList[i + leadingBannerList.Length], i + leadingBannerList.Length, optionSelectionUI, battleSystem);
+            benchBannerList[i].GetComponent<PartyBanner>().UpdatePartyBanner(activeTerraPosition, i + leadingBannerList.Length, optionSelectionUI, switchAction, battleSystem);
         }
-        
+
+        if (isMustSwitch)
+            cancelBtn.interactable = false;
+        else
+            cancelBtn.interactable = true;
+
         gameObject.SetActive(true);
     }
 

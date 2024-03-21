@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class BattleSide
 {
+    private bool isPrimarySide;
     private TerraBattlePosition[] terraBattlePositionArr;
     //private List<BattleHazard> hazardList;
 
-    public BattleSide(BattleFormat battleFormat, List<Terra> terraList)
+    public BattleSide(BattleFormat battleFormat, List<Terra> terraList, bool isPrimarySide)
     {
+        this.isPrimarySide = isPrimarySide;
         int numBattlePositions = battleFormat.NumberOfLeadingPositions();
         terraBattlePositionArr = new TerraBattlePosition[numBattlePositions];
         for (int i = 0; i < numBattlePositions; i++)
@@ -26,8 +28,9 @@ public class BattleSide
         }
     }
 
-    public BattleSide(BattleFormat battleFormat, Terra terra)
+    public BattleSide(BattleFormat battleFormat, Terra terra, bool isPrimarySide)
     {
+        this.isPrimarySide = isPrimarySide;
         int numBattlePositions = battleFormat.NumberOfLeadingPositions();
         terraBattlePositionArr = new TerraBattlePosition[numBattlePositions];
         for (int i = 0; i < numBattlePositions; i++)
@@ -46,6 +49,8 @@ public class BattleSide
             terraBattlePositionArr[i].SetTerra(terraList[i]);
         }
     }
+
+    public bool IsPrimarySide() { return isPrimarySide; }
 
     public TerraBattlePosition[] GetTerraBattlePositionArr() { return terraBattlePositionArr; }
 }

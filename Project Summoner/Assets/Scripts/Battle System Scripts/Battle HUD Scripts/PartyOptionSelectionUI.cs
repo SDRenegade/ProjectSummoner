@@ -16,17 +16,15 @@ public class PartyOptionSelectionUI : MonoBehaviour
     public void Start()
     {
         backgroundPanel.onClick.AddListener(delegate {
-            Debug.Log("Background clicked and canceled");
             CloseOptionSelection();
         });
 
         cancelBtn.onClick.AddListener(delegate {
-            Debug.Log("Cancel button clicked");
             CloseOptionSelection();
         });
     }
 
-    public void OpenOptionSelctionUI(Terra terra, int terraPartyIndex, BattleSystem battleSystem)
+    public void OpenOptionSelctionUI(TerraBattlePosition activeTerraPosition, int selectedTerraIndex, Action<TerraBattlePosition, TerraSwitch> switchAction, BattleSystem battleSystem)
     {
         RemoveListeners();
         Vector3 optionSelectionPosition = new Vector3(
@@ -36,21 +34,42 @@ public class PartyOptionSelectionUI : MonoBehaviour
         buttonPanel.gameObject.transform.position = optionSelectionPosition;
 
         summaryBtn.onClick.AddListener(delegate {
-            Debug.Log("Summary action selected for " + terra);
+            Debug.Log("Summary action selected for " + battleSystem.GetPrimaryTerraList()[selectedTerraIndex]);
             CloseOptionSelection();
         });
         
-        if(IsValidSwitchIndex(terraPartyIndex, battleSystem)) {
+        if(IsValidSwitchIndex(selectedTerraIndex, battleSystem)) {
             switchBtn.gameObject.SetActive(true);
             switchBtn.onClick.AddListener(delegate {
-                Debug.Log("Switching action selected for " + battleSystem.GetBattleActionManager().GetCurrentTerraActionSelection().GetTerra() + " and " + terra);
+                Debug.Log("Switching action selected for " + activeTerraPosition.GetTerra() + " and " + battleSystem.GetPrimaryTerraList()[selectedTerraIndex]);
                 CloseOptionSelection();
                 battleSystem.ExitPartyMenuUI();
-                BattleActionManager battleActionManager = battleSystem.GetBattleActionManager();
                 TerraBattlePosition[] terraBattlePositionArr = battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
-                TerraSwitch terraSwitch = new TerraSwitch(Array.IndexOf(terraBattlePositionArr, battleActionManager.GetCurrentTerraActionSelection()), terraPartyIndex, true);
-                battleSystem.SwitchTerraSelection(new SwitchBattleAction(battleActionManager.GetCurrentTerraActionSelection(), terraSwitch));
+                TerraSwitch terraSwitch = new TerraSwitch(Array.IndexOf(terraBattlePositionArr, activeTerraPosition), selectedTerraIndex, true);
+                switchAction?.Invoke(activeTerraPosition, terraSwitch);
             });
+
+            /*
+            if(isMustSwitch) {
+                switchBtn.onClick.AddListener(delegate {
+                    Debug.Log("Force switch performed for " + battleSystem.GetBattleActionManager().GetCurrentTerraActionSelection().GetTerra() + " and " + battleSystem.GetPrimaryTerraList()[terraPartyIndex]);
+                    CloseOptionSelection();
+                    battleSystem.ExitPartyMenuUI();
+                    TerraBattlePosition[] terraBattlePositionArr = battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
+                    TerraSwitch terraSwitch = new TerraSwitch(Array.IndexOf(terraBattlePositionArr, activeTerraPosition), terraPartyIndex, true);
+                    battleSystem.SwitchTerra(terraSwitch);
+                });
+            }
+            else {
+                switchBtn.onClick.AddListener(delegate {
+                    Debug.Log("Switching action selected for " + battleSystem.GetBattleActionManager().GetCurrentTerraActionSelection().GetTerra() + " and " + battleSystem.GetPrimaryTerraList()[terraPartyIndex]);
+                    CloseOptionSelection();
+                    battleSystem.ExitPartyMenuUI();
+                    TerraBattlePosition[] terraBattlePositionArr = battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
+                    TerraSwitch terraSwitch = new TerraSwitch(Array.IndexOf(terraBattlePositionArr, activeTerraPosition), terraPartyIndex, true);
+                    battleSystem.SwitchTerraSelection(new SwitchBattleAction(activeTerraPosition, terraSwitch));
+                });
+            }*/
         }
         else
             switchBtn.gameObject.SetActive(false);

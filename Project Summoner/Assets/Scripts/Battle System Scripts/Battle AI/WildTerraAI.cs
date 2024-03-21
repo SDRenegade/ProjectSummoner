@@ -39,7 +39,7 @@ public class WildTerraAI : BattleAI
         }
     }
 
-    public int? SwitchFaintedTerra(int faintedTerraIndex)
+    public int? SwitchFaintedTerra(FaintedTerra faintedTerra)
     {
         return null;
     }

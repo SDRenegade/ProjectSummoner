@@ -14,6 +14,8 @@ public class BattleActionManager
     //private List<CatchAttempt> catchAttemptDieList;
     private bool isAttemptingEscape;
 
+    private Queue<FaintedTerra> faintedTerraQueue;
+
     private TerraAttack pendingTerraAttack;
 
     public BattleActionManager(BattleSystem battleSystem)
@@ -25,6 +27,7 @@ public class BattleActionManager
         terraAttackList = new List<TerraAttack>();
         terraSwitchList = new List<TerraSwitch>();
         isAttemptingEscape = false;
+        faintedTerraQueue = new Queue<FaintedTerra>();
         pendingTerraAttack = null;
 
         battleSystem.OnEnteringCombatState += CreateNewTurnLog;
@@ -48,6 +51,7 @@ public class BattleActionManager
     {
         for(int i = 0; i < readyActionList.Length; i++)
             readyActionList[i] = false;
+
         //Removes all terra attacks from attack list that are not persistent
         for (int i = terraAttackList.Count - 1; i >= 0; i--) {
             if (terraAttackList[i].IsCharging())
@@ -58,6 +62,7 @@ public class BattleActionManager
             }
         }
 
+        selectedActionStack.Clear();
         terraSwitchList.Clear();
         isAttemptingEscape = false;
     }
@@ -174,6 +179,8 @@ public class BattleActionManager
     public bool IsAttemptingEscape() { return isAttemptingEscape; }
 
     public void SetAttemptingEscape(bool isAttemptingEscape) { this.isAttemptingEscape = isAttemptingEscape; }
+
+    public Queue<FaintedTerra> GetFaintedTerraQueue() {  return faintedTerraQueue; }
 
     public TerraAttack GetPendingTerraAttack() { return pendingTerraAttack; }
 

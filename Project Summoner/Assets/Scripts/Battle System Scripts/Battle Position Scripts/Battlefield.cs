@@ -12,20 +12,20 @@ public class Battlefield
     public Battlefield(BattleFormat battleFormat, List<Terra> primaryTerraList, Terra secondaryTerra)
     {
         if (primaryTerraList[0] != null)
-            primaryBattleSide = new BattleSide(battleFormat, primaryTerraList);
+            primaryBattleSide = new BattleSide(battleFormat, primaryTerraList, true);
         else
             Debug.LogError("Primary Battle Side Party does not have a leading Terra");
-        secondaryBattleSide = new BattleSide(battleFormat, secondaryTerra);
+        secondaryBattleSide = new BattleSide(battleFormat, secondaryTerra, false);
     }
 
     public Battlefield(BattleFormat battleFormat, List<Terra> primaryTerraList, List<Terra> secondaryTerraList)
     {
         if (primaryTerraList[0] != null)
-            primaryBattleSide = new BattleSide(battleFormat, primaryTerraList);
+            primaryBattleSide = new BattleSide(battleFormat, primaryTerraList, true);
         else
             Debug.LogError("Primary Battle Side Party does not have a leading Terra");
         if (secondaryTerraList[0] != null)
-            secondaryBattleSide = new BattleSide(battleFormat, secondaryTerraList);
+            secondaryBattleSide = new BattleSide(battleFormat, secondaryTerraList, false);
         else
             Debug.LogError("Secondary Battle Side Party does not have a leading Terra");
     }

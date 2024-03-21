@@ -146,23 +146,28 @@ public class BattleSystem : MonoBehaviour
         battleHUD.ExitMenuSelection(battleActionManager);
     }
 
+    //TODO Specify which side is opening the party menu
     public void OpenPartyMenuUI()
     {
-        battleHUD.OpenPartyMenuUI(primaryTerraList, this);
+        battleHUD.OpenPartyMenuUI(
+            battleActionManager.GetCurrentTerraActionSelection(),
+            primaryTerraList,
+            false,
+            (terraBattlePosition, terraSwitch) => {
+                SwitchTerraSelection(new SwitchBattleAction(terraBattlePosition, terraSwitch));
+            },
+            this);
+    }
+
+    public void OpenForceSwitchPartyMenuUI(TerraBattlePosition activeTerraPosition, bool isPrimarySide, Action<TerraBattlePosition, TerraSwitch> switchAction)
+    {
+        List<Terra> terraList = isPrimarySide ? primaryTerraList : secondaryTerraList;
+        battleHUD.OpenPartyMenuUI(activeTerraPosition, terraList, true, switchAction, this);
     }
 
     public void ExitPartyMenuUI()
     {
         battleHUD.ExitPartyMenuUI(battlefield, battleFormat, battleActionManager);
-    }
-
-    public void SwitchTerraAfterFainting(int faintedTerraIndex, bool isPrimarySide)
-    {
-        if (isPrimarySide) {
-            //TODO Open PartyMenuUI with no cancel button. (Add a new open menu method in PartyMenuUI)
-        }
-        else
-            secondarySideAI.SwitchFaintedTerra(faintedTerraIndex);
     }
 
     public void OpenMoveSelectionUI()
@@ -392,7 +397,7 @@ public class BattleSystem : MonoBehaviour
         //*** Terra Damaged Event ***
         TerraDamagedEventArgs terraDamagedEventArgs = InvokeOnTerraDamaged(terraBattlePosition, damage);
 
-        ApplyTerraDamage(terraBattlePosition, terraDamagedEventArgs.GetDamage());
+        ApplyDamage(terraBattlePosition, terraDamagedEventArgs.GetDamage());
 
         //*** Post Terra Damaged Event ***
         InvokeOnPostTerraDamaged(terraDamagedEventArgs);
@@ -401,7 +406,7 @@ public class BattleSystem : MonoBehaviour
     }
 
     //Method called after damage calculate and terra damage events are invoked to actually apply the damage
-    public void ApplyTerraDamage(TerraBattlePosition terraBattlePosition, int? damage)
+    public void ApplyDamage(TerraBattlePosition terraBattlePosition, int? damage)
     {
         if (damage == null)
             return;
@@ -409,13 +414,92 @@ public class BattleSystem : MonoBehaviour
         Debug.Log(BattleDialog.TerraDamagedMsg(terraBattlePosition.GetTerra(), (int)damage));
         terraBattlePosition.GetTerra().TakeDamage((int)damage);
 
-        if (terraBattlePosition.GetTerra().GetCurrentHP() <= 0) {
-            Debug.Log(BattleDialog.TerraFaintedMsg(terraBattlePosition.GetTerra()));
-            //*** Terra Faint Event ***
-            InvokeOnTerraFainted(terraBattlePosition);
-            //--- (Temp) Match ends once a single terra faints, until parties are added ---
-            isBattleFinished = true;
+        if (terraBattlePosition.GetTerra().GetCurrentHP() <= 0)
+            FaintTerra(terraBattlePosition);
+    }
+
+    private void FaintTerra(TerraBattlePosition terraBattlePosition)
+    {
+        Debug.Log(BattleDialog.TerraFaintedMsg(terraBattlePosition.GetTerra()));
+        //*** Terra Faint Event ***
+        InvokeOnTerraFainted(terraBattlePosition);
+
+        bool isPrimarySide = terraBattlePosition.GetBattleSide().IsPrimarySide();
+        List<Terra> terraList = isPrimarySide ? primaryTerraList : secondaryTerraList;
+        int faintedTerraIndex = 0;
+        for (int i = 0; i < battleFormat.NumberOfLeadingPositions(); i++) {
+            if (i >= terraList.Count)
+                break;
+            if (terraBattlePosition.GetTerra() == terraList[i]) {
+                faintedTerraIndex = i;
+                break;
+            }
         }
+
+        if (HasLivingTerra(isPrimarySide))
+            battleActionManager.GetFaintedTerraQueue().Enqueue(new FaintedTerra(terraBattlePosition, faintedTerraIndex, isPrimarySide));
+        else
+            EndBattle();
+    }
+
+    public void SwitchFaintedTerra()
+    {
+        if (battleActionManager.GetFaintedTerraQueue().Count == 0) {
+            UpdateTerraStatusBars();
+            battleActionManager.ResetActions(this);
+            battleStateManager.SwitchState(battleStateManager.GetStartTurnState());
+            return;
+        }
+
+        FaintedTerra faintedTerra = battleActionManager.GetFaintedTerraQueue().Dequeue();
+        if(HasLivingBenchTerra(faintedTerra.IsPrimarySide())) {
+            BattleAI battleAI = faintedTerra.IsPrimarySide() ? primarySideAI : secondarySideAI;
+            if (battleAI == null)
+                OpenForceSwitchPartyMenuUI(
+                    faintedTerra.GetTerraBattlePosition(),
+                    faintedTerra.IsPrimarySide(),
+                    (terraBattlePosition, terraSwitch) => {
+                        SwitchTerra(terraSwitch);
+                        SwitchFaintedTerra();
+                    });
+            else {
+                battleAI.SwitchFaintedTerra(faintedTerra);
+                SwitchFaintedTerra();
+            }
+        }
+        else
+            SwitchFaintedTerra();
+    }
+
+    //TODO Move to a utils class
+    private bool HasLivingTerra(bool isPrimarySide)
+    {
+        bool hasLivingTerra = false;
+        List<Terra> terraList = isPrimarySide ? primaryTerraList : secondaryTerraList;
+        for (int i = 0; i < terraList.Count; i++) {
+            if (terraList[i].GetCurrentHP() > 0) {
+                hasLivingTerra = true;
+                break;
+            }
+        }
+
+        return hasLivingTerra;
+    }
+
+    //TODO Move to a utils class
+    private bool HasLivingBenchTerra(bool isPrimarySide)
+    {
+        bool hasLivingBenchTerra = false;
+        List<Terra> terraList = isPrimarySide ? primaryTerraList : secondaryTerraList;
+        int leadingTerraPositions = battleFormat.NumberOfLeadingPositions();
+        for (int i = leadingTerraPositions; i < terraList.Count; i++) {
+            if (terraList[i].GetCurrentHP() > 0) {
+                hasLivingBenchTerra = true;
+                break;
+            }
+        }
+
+        return hasLivingBenchTerra;
     }
 
     public int? HealTerra(TerraBattlePosition terraBattlePosition, int? healAmt)
@@ -719,6 +803,10 @@ public class BattleSystem : MonoBehaviour
     public BattleHUD GetBattleHUD() { return battleHUD; }
 
     public BattleStage GetBattleStage() { return battleStage; }
+
+    public List<Terra> GetPrimaryTerraList() { return primaryTerraList; }
+
+    public List<Terra> GetSecondaryTerraList() { return secondaryTerraList; }
 
     public BattleType GetBattleType() { return battleType; }
 

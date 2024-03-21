@@ -1411,6 +1411,7 @@ MonoBehaviour:
   leadingStackPanel: {fileID: 1042743545}
   benchStackPanel: {fileID: 1210605191}
   optionSelectionUI: {fileID: 1509422892}
+  cancelBtn: {fileID: 2059828672}
 --- !u!1 &230746160
 GameObject:
   m_ObjectHideFlags: 0

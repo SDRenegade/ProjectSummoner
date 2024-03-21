@@ -8,14 +8,15 @@ public class EndOfTurnBattleState : BattleState
     {
         BattleSystem battleSystem = battleManager.GetBattleSystem();
 
+        Debug.Log("============== Entered End of Turn Battle State ==============");
         //*** End of Turn Event ***
         battleSystem.InvokeOnEndOfTurn();
 
-        battleSystem.UpdateTerraStatusBars();
-
-        Debug.Log("============== Entered End of Turn Battle State ==============");
-        battleSystem.GetBattleActionManager().ResetActions(battleSystem);
-
-        battleManager.SwitchState(battleManager.GetStartTurnState());
+        if(battleSystem.GetBattleActionManager().GetFaintedTerraQueue().Count > 0)
+            battleSystem.SwitchFaintedTerra();
+        else {
+            battleSystem.GetBattleActionManager().ResetActions(battleSystem);
+            battleManager.SwitchState(battleManager.GetStartTurnState());
+        }
     }
 }
