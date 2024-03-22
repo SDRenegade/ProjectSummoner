@@ -77,6 +77,9 @@ public class CombatBattleState : BattleState
 
     private void ProcessTerraAttack(TerraAttack terraAttack, BattleSystem battleSystem)
     {
+        if (terraAttack.GetAttackerPosition().GetTerra() == null)
+            return;
+
         Debug.Log(BattleDialog.AttackUsedMsg(terraAttack));
         //*** Terra Attack Declaration Event ***
         battleSystem.InvokeOnAttackDeclaration(terraAttack);
@@ -114,8 +117,10 @@ public class CombatBattleState : BattleState
         for (int i = 0; i < terraAttack.GetDefendersPositionList().Count; i++) {
             TerraBattlePosition attackerPosition = terraAttack.GetAttackerPosition();
             TerraBattlePosition defenderPosition = terraAttack.GetDefendersPositionList()[i];
-            if (defenderPosition.GetTerra() == null)
+            if (defenderPosition.GetTerra() == null) {
+                Debug.Log(BattleDialog.ATTACK_FAILED);
                 continue;
+            }
 
             directAttackLogList.Add(new DirectAttackLog(attackerPosition, defenderPosition, terraAttack.GetMove()));
 

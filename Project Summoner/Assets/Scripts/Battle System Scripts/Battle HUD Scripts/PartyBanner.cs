@@ -11,6 +11,8 @@ public class PartyBanner : MonoBehaviour
     private static readonly Color32 MEDIUM_HP_RANGE_COLOR = new Color32(240, 250, 0, 255);
     private static readonly Color32 LOW_HP_RANGE_COLOR = new Color32(210, 0, 0, 255);
     private static readonly Color32 EMPTY_BANNER_IMAGE_COLOR = new Color32(0, 0, 0, 255);
+    private static readonly Color32 NORMAL_BANNER_COLOR = new Color32(225, 225, 225, 255);
+    private static readonly Color32 FAINTED_BANNER_COLOR = new Color32(185, 85, 60, 255);
 
     [SerializeField] private GameObject detailPanelLayer;
     [SerializeField] private Image image;
@@ -27,12 +29,19 @@ public class PartyBanner : MonoBehaviour
             return;
         }
 
-        Terra terra = battleSystem.GetPrimaryTerraList()[(int)terraPartyIndex];
+        List<Terra> terraList = activeTerraPosition.GetBattleSide().IsPrimarySide() ? battleSystem.GetPrimaryTerraList() : battleSystem.GetSecondaryTerraList();
+        Terra terra = terraList[(int)terraPartyIndex];
 
         //TODO Set Image to sprite of terra
 
         terraName.SetText(terra.GetTerraBase().GetSpeciesName());
         terraLevel.SetText(terra.GetLevel().ToString());
+
+        Image bannerImage = GetComponent<Image>();
+        if (terra.GetCurrentHP() == 0)
+            bannerImage.color = FAINTED_BANNER_COLOR;
+        else
+            bannerImage.color = NORMAL_BANNER_COLOR;
 
         float progressValue = (float)terra.GetCurrentHP() / terra.GetMaxHP();
         healthBar.SetProgress(progressValue);

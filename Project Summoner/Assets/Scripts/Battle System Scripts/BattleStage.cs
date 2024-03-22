@@ -103,8 +103,11 @@ public class BattleStage : MonoBehaviour
 
         if (terraGOList[positionIndex] != null)
             Destroy(terraGOList[positionIndex]);
-        terraGOList[positionIndex] = Instantiate(terra.GetTerraBase().GetTerraGameObject());
-        terraGOList[positionIndex].transform.position = terraPos;
-        terraGOList[positionIndex].transform.eulerAngles = terraRot;
+
+        if(terra != null) {
+            terraGOList[positionIndex] = Instantiate(terra.GetTerraBase().GetTerraGameObject());
+            terraGOList[positionIndex].transform.position = terraPos;
+            terraGOList[positionIndex].transform.eulerAngles = terraRot;
+        }
     }
 }

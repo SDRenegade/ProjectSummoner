@@ -53,7 +53,6 @@ public class BattleSystem : MonoBehaviour
     private BattleStateManager battleStateManager;
     private BattleActionManager battleActionManager;
 
-
     public void Start()
     {
         Cursor.visible = true;
@@ -391,7 +390,7 @@ public class BattleSystem : MonoBehaviour
     //Method used when a terra is dealt damage that is not from a terra attack
     public int? DamageTerra(TerraBattlePosition terraBattlePosition, int? damage)
     {
-        if (damage == null)
+        if (terraBattlePosition.GetTerra() == null || damage == null)
             return null;
 
         //*** Terra Damaged Event ***
@@ -408,7 +407,7 @@ public class BattleSystem : MonoBehaviour
     //Method called after damage calculate and terra damage events are invoked to actually apply the damage
     public void ApplyDamage(TerraBattlePosition terraBattlePosition, int? damage)
     {
-        if (damage == null)
+        if (terraBattlePosition.GetTerra() == null || damage == null)
             return;
 
         Debug.Log(BattleDialog.TerraDamagedMsg(terraBattlePosition.GetTerra(), (int)damage));
@@ -435,6 +434,8 @@ public class BattleSystem : MonoBehaviour
                 break;
             }
         }
+
+        terraBattlePosition.ResetBattlePosition(this);
 
         if (HasLivingTerra(isPrimarySide))
             battleActionManager.GetFaintedTerraQueue().Enqueue(new FaintedTerra(terraBattlePosition, faintedTerraIndex, isPrimarySide));
@@ -467,8 +468,11 @@ public class BattleSystem : MonoBehaviour
                 SwitchFaintedTerra();
             }
         }
-        else
+        else {
+            faintedTerra.GetTerraBattlePosition().SetTerra(null);
+            battleStage.SetTerraAtPosition(null, faintedTerra.IsPrimarySide(), faintedTerra.GetFaintedTerraPartyIndex());
             SwitchFaintedTerra();
+        }
     }
 
     //TODO Move to a utils class
@@ -504,7 +508,7 @@ public class BattleSystem : MonoBehaviour
 
     public int? HealTerra(TerraBattlePosition terraBattlePosition, int? healAmt)
     {
-        if (healAmt == null)
+        if (terraBattlePosition.GetTerra() == null || healAmt == null)
             return null;
 
         //*** Terra Damaged Event ***
@@ -520,6 +524,9 @@ public class BattleSystem : MonoBehaviour
 
     public void ChanageTerraStat(TerraBattlePosition terraBattlePosition, Stats stat, int modification)
     {
+        if (terraBattlePosition.GetTerra() == null)
+            return;
+
         //*** Stat Change Event ***
         StatChangeEventArgs statChangeEventArgs = InvokeOnStatChange(terraBattlePosition, stat, modification);
 
@@ -531,7 +538,7 @@ public class BattleSystem : MonoBehaviour
 
     public bool AddStatusEffect(TerraBattlePosition terraBattlePosition, StatusEffectSO statusEffectSO)
     {
-        if (terraBattlePosition.GetTerra().HasStatusEffect())
+        if (terraBattlePosition.GetTerra() == null || terraBattlePosition.GetTerra().HasStatusEffect())
             return false;
 
         //*** Status Effect Added Event ***
@@ -559,7 +566,7 @@ public class BattleSystem : MonoBehaviour
 
     public bool AddVolatileStatusEffect(TerraBattlePosition terraBattlePosition, VolatileStatusEffectSO vStatusEffectSO)
     {
-        if (terraBattlePosition.HasVolatileStatusEffect(vStatusEffectSO))
+        if (terraBattlePosition.GetTerra() == null || terraBattlePosition.HasVolatileStatusEffect(vStatusEffectSO))
             return false;
 
         VolatileStatusEffectBase vStatusEffect = vStatusEffectSO.CreateVolatileStatusEffect(terraBattlePosition);

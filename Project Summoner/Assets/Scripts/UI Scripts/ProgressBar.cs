@@ -12,19 +12,19 @@ public class ProgressBar : MonoBehaviour
 
     public void Start()
     {
-        progress = 1f;
         SetProgress(progress);
     }
 
     public Image GetImage() { return progressImage; }
 
-    public void SetImage(Image image) {  progressImage = image; }
+    public void SetImage(Image image) { progressImage = image; }
 
     public float GetProgress() { return progress; }
 
     public void SetProgress(float progress)
     {
         this.progress = Mathf.Clamp(progress, 0f, 1f);
-        progressImage.rectTransform.sizeDelta = new Vector2(backgroundImage.rectTransform.sizeDelta.x * this.progress, backgroundImage.rectTransform.sizeDelta.y);
+        Vector2 vec2 = new Vector2(backgroundImage.rectTransform.sizeDelta.x * this.progress, backgroundImage.rectTransform.sizeDelta.y);
+        progressImage.rectTransform.sizeDelta = vec2;
     }
 }

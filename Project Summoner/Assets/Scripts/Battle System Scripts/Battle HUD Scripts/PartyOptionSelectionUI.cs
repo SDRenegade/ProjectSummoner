@@ -38,7 +38,7 @@ public class PartyOptionSelectionUI : MonoBehaviour
             CloseOptionSelection();
         });
         
-        if(IsValidSwitchIndex(selectedTerraIndex, battleSystem)) {
+        if(IsValidSwitchIndex(selectedTerraIndex, activeTerraPosition.GetBattleSide().IsPrimarySide(), battleSystem)) {
             switchBtn.gameObject.SetActive(true);
             switchBtn.onClick.AddListener(delegate {
                 Debug.Log("Switching action selected for " + activeTerraPosition.GetTerra() + " and " + battleSystem.GetPrimaryTerraList()[selectedTerraIndex]);
@@ -48,28 +48,6 @@ public class PartyOptionSelectionUI : MonoBehaviour
                 TerraSwitch terraSwitch = new TerraSwitch(Array.IndexOf(terraBattlePositionArr, activeTerraPosition), selectedTerraIndex, true);
                 switchAction?.Invoke(activeTerraPosition, terraSwitch);
             });
-
-            /*
-            if(isMustSwitch) {
-                switchBtn.onClick.AddListener(delegate {
-                    Debug.Log("Force switch performed for " + battleSystem.GetBattleActionManager().GetCurrentTerraActionSelection().GetTerra() + " and " + battleSystem.GetPrimaryTerraList()[terraPartyIndex]);
-                    CloseOptionSelection();
-                    battleSystem.ExitPartyMenuUI();
-                    TerraBattlePosition[] terraBattlePositionArr = battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
-                    TerraSwitch terraSwitch = new TerraSwitch(Array.IndexOf(terraBattlePositionArr, activeTerraPosition), terraPartyIndex, true);
-                    battleSystem.SwitchTerra(terraSwitch);
-                });
-            }
-            else {
-                switchBtn.onClick.AddListener(delegate {
-                    Debug.Log("Switching action selected for " + battleSystem.GetBattleActionManager().GetCurrentTerraActionSelection().GetTerra() + " and " + battleSystem.GetPrimaryTerraList()[terraPartyIndex]);
-                    CloseOptionSelection();
-                    battleSystem.ExitPartyMenuUI();
-                    TerraBattlePosition[] terraBattlePositionArr = battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
-                    TerraSwitch terraSwitch = new TerraSwitch(Array.IndexOf(terraBattlePositionArr, activeTerraPosition), terraPartyIndex, true);
-                    battleSystem.SwitchTerraSelection(new SwitchBattleAction(activeTerraPosition, terraSwitch));
-                });
-            }*/
         }
         else
             switchBtn.gameObject.SetActive(false);
@@ -77,9 +55,12 @@ public class PartyOptionSelectionUI : MonoBehaviour
         gameObject.SetActive(true);
     }
 
-    private bool IsValidSwitchIndex(int terraPartyIndex, BattleSystem battleSystem)
+    private bool IsValidSwitchIndex(int terraPartyIndex, bool isPrimarySide, BattleSystem battleSystem)
     {
         if (terraPartyIndex < battleSystem.GetBattleFormat().NumberOfLeadingPositions())
+            return false;
+        List<Terra> terraList = isPrimarySide ? battleSystem.GetPrimaryTerraList() : battleSystem.GetSecondaryTerraList();
+        if (terraList[terraPartyIndex].GetCurrentHP() <= 0)
             return false;
         foreach(TerraSwitch terraSwitch in battleSystem.GetBattleActionManager().GetTerraSwitchList()) {
             if (!terraSwitch.IsPrimarySide())

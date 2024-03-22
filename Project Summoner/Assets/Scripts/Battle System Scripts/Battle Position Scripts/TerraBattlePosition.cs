@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum Stats
@@ -62,10 +63,18 @@ public class TerraBattlePosition
         vStatusEffectList = new List<VolatileStatusEffectBase>();
     }
 
+    public void ResetBattlePosition(BattleSystem battleSystem)
+    {
+        SetTerra(null);
+        ResetStatStages();
+        ClearVolatileStatusEffects(battleSystem);
+    }
+
     public void ResetStatStages()
     {
-        foreach(KeyValuePair<Stats, StatStages> entry in statStagesMap)
-            statStagesMap[entry.Key] = StatStages.NEUTRAL;
+        List<Stats> statKeys = new List<Stats>(statStagesMap.Keys);
+        foreach(Stats stat in statKeys)
+            statStagesMap[stat] = StatStages.NEUTRAL;
     }
 
     public BattleSide GetBattleSide() { return battleSide; }
@@ -118,6 +127,14 @@ public class TerraBattlePosition
         }
 
         return false;
+    }
+
+    public void ClearVolatileStatusEffects(BattleSystem battleSystem)
+    {
+        for (int i = vStatusEffectList.Count - 1; i >= 0; i--) {
+            vStatusEffectList[i].RemoveVolatileStatusEffectListeners(battleSystem);
+            vStatusEffectList.RemoveAt(i);
+        }
     }
 
     public bool ContainsVolatileStatusEffect(VolatileStatusEffectSO vStatusEffectSO)
