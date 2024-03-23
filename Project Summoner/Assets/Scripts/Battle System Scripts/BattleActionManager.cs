@@ -12,7 +12,7 @@ public class BattleActionManager
     private List<TerraAttack> terraAttackList;
     private List<TerraSwitch> terraSwitchList;
     //private List<CatchAttempt> catchAttemptDieList;
-    private bool isAttemptingEscape;
+    private EscapeAttempt escapeAttempt;
 
     private Queue<FaintedTerra> faintedTerraQueue;
 
@@ -26,7 +26,7 @@ public class BattleActionManager
         attackLog = new List<List<TerraAttack>>();
         terraAttackList = new List<TerraAttack>();
         terraSwitchList = new List<TerraSwitch>();
-        isAttemptingEscape = false;
+        escapeAttempt = null;
         faintedTerraQueue = new Queue<FaintedTerra>();
         pendingTerraAttack = null;
 
@@ -64,7 +64,7 @@ public class BattleActionManager
 
         selectedActionStack.Clear();
         terraSwitchList.Clear();
-        isAttemptingEscape = false;
+        escapeAttempt = null;
     }
 
     public void AddTerraToActionSelectionQueue(TerraBattlePosition terraBattlePosition)
@@ -109,8 +109,7 @@ public class BattleActionManager
             terraAttackList[i].GetTerraMoveBase()?.AddMoveListeners(battleSystem);
     }
 
-    //Returns true if all battle positions are ready
-    public bool AddReadyBattlePosition()
+    public void AddReadyBattlePosition()
     {
         for (int i = 0; i < readyActionList.Length; i++) {
             if (readyActionList[i] == false) {
@@ -118,8 +117,6 @@ public class BattleActionManager
                 break;
             }
         }
-
-        return IsAllBattlePositionsReady();
     }
 
     public bool RemoveReadyBattlePosition()
@@ -176,9 +173,9 @@ public class BattleActionManager
 
     public List<TerraSwitch> GetTerraSwitchList() { return terraSwitchList; }
 
-    public bool IsAttemptingEscape() { return isAttemptingEscape; }
+    public EscapeAttempt GetEscapeAttempt() { return escapeAttempt; }
 
-    public void SetAttemptingEscape(bool isAttemptingEscape) { this.isAttemptingEscape = isAttemptingEscape; }
+    public void SetEscapeAttempt(EscapeAttempt escapeAttempt) { this.escapeAttempt = escapeAttempt; }
 
     public Queue<FaintedTerra> GetFaintedTerraQueue() {  return faintedTerraQueue; }
 

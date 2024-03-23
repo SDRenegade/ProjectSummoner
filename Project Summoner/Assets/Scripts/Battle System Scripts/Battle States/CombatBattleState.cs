@@ -12,13 +12,16 @@ public class CombatBattleState : BattleState
         //*** Entering Combat State Event ***
         battleSystem.InvokeOnEnteringCombatState();
 
-        //PlayerEscapeCheck(battleSystem);
+        ProcessEscapeAttempt(battleSystem);
+        if(battleSystem.IsBattleFinished()) {
+            battleManager.SwitchState(battleManager.GetFinishedMatchBattleState());
+            return;
+        }
+
         ProcessTerraSwitches(battleSystem);
 
         List<TerraAttack> queuedTerraAttackList = battleSystem.GetBattleActionManager().GetTerraAttackList();
         SortTerraAttackList(queuedTerraAttackList);
-
-        //Loops through and executes all the attacks in the sorted list
         for (int i = 0; i < queuedTerraAttackList.Count; i++) {
             ProcessTerraAttack(queuedTerraAttackList[i], battleSystem);
             if (battleSystem.IsBattleFinished())
@@ -31,14 +34,31 @@ public class CombatBattleState : BattleState
             battleManager.SwitchState(battleManager.GetEndTurnState());
     }
     
-    /*private void PlayerEscapeCheck(BattleSystem battleSystem)
+    private void ProcessEscapeAttempt(BattleSystem battleSystem)
     {
-        if (battleSystem.GetBattleType() == BattleType.WILD && battleSystem.GetBattleActionManager().GetIsAttemptEscape() == true) {
-            Debug.Log(BattleDialog.ATTEMPT_ESCAPE_FAIL);
-            battleSystem.GetBattleActionManager().SetAttemptEscape(false);
-            //TODO Add logic for determining if you were able to escape and then exit battle
+        EscapeAttempt escapeAttempt = battleSystem.GetBattleActionManager().GetEscapeAttempt();
+        if (escapeAttempt == null)
+            return;
+
+        List<Terra> escapingTerraList;
+        List<Terra> wildTerraList;
+        if(escapeAttempt.IsPrimarySide()) {
+            escapingTerraList = battleSystem.GetPrimaryTerraList();
+            wildTerraList = battleSystem.GetSecondaryTerraList();
         }
-    }*/
+        else {
+            escapingTerraList = battleSystem.GetSecondaryTerraList();
+            wildTerraList = battleSystem.GetPrimaryTerraList();
+        }
+
+        bool hasEscaped = CombatCalculator.EscapeAttemptCalculation(escapingTerraList, wildTerraList);
+        if (hasEscaped) {
+            Debug.Log(BattleDialog.ESCAPE_ATTEMPT_SUCCESS);
+            battleSystem.SetBattleFinished(true);
+        }
+        else
+            Debug.Log(BattleDialog.ESCAPE_ATTEMPT_FAILED);
+    }
 
     private void ProcessTerraSwitches(BattleSystem battleSystem)
     {
@@ -175,7 +195,7 @@ public class CombatBattleState : BattleState
             return;
 
         directAttackLog.SetCrit(CombatCalculator.CriticalHitCheck(directAttackLog.GetDirectAttackParams()));
-        directAttackLog.SetDamage(CombatCalculator.CalculateDamage(directAttackLog.GetDirectAttackParams(), directAttackLog.IsCrit()));
+        directAttackLog.SetDamage(CombatCalculator.DamageCalculation(directAttackLog.GetDirectAttackParams(), directAttackLog.IsCrit()));
 
         //*** Terra Damage by Terra Event ***
         TerraDamageByTerraEventArgs terraDamageByTerraEventArgs = battleSystem.InvokeOnTerraDamageByTerra(terraAttack, directAttackLog);

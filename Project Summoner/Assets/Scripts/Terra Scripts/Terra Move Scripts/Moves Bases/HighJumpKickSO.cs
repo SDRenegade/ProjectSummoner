@@ -36,7 +36,7 @@ public class HighJumpKick : TerraMoveBase
 
         DirectAttackLog directAttackLog = eventArgs.GetDirectAttackLog();
         directAttackLog.SetCrit(CombatCalculator.CriticalHitCheck(directAttackLog.GetDirectAttackParams()));
-        directAttackLog.SetDamage(CombatCalculator.CalculateDamage(directAttackLog.GetDirectAttackParams(), directAttackLog.IsCrit()));
+        directAttackLog.SetDamage(CombatCalculator.DamageCalculation(directAttackLog.GetDirectAttackParams(), directAttackLog.IsCrit()));
 
         //*** Terra Damage by Terra Event ***
         eventArgs.GetBattleSystem().InvokeOnTerraDamageByTerra(terraAttack, directAttackLog);

@@ -4,9 +4,10 @@ using UnityEngine;
 
 public static class BattleDialog
 {
-    public static readonly string ATTEMPT_ESCAPE_SUCCESS = "You have escaped from battle.";
-    public static readonly string ATTEMPT_ESCAPE_FAIL = "You were unable to flee.";
-    public static readonly string ATTEMPT_ESCAPE_SUMMONER_BATTLE = "You cannot flee from a summoner battle.";
+    public static readonly string ESCAPE_ATTEMPT_SUCCESS = "You have escaped from battle.";
+    public static readonly string ESCAPE_ATTEMPT_FAILED = "You were unable to flee.";
+    public static readonly string CANNOT_ESCAPE_SUMMONER_BATTLE = "You cannot escape from a summoner battle.";
+    public static readonly string MULTIPLE_ESCAPE_ATTEMPTS = "You can only attempt to escape from battle one a turn.";
     public static readonly string NOT_VERY_EFFECTIVE_ATTACK = "The attack was not very effective.";
     public static readonly string SUPER_EFFECTIVE_ATTACK = "The attack was super effective!";
     public static readonly string ATTACK_MISSED = "The attack missed.";

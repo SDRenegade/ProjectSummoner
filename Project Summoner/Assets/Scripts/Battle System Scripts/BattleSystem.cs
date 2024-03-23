@@ -169,6 +169,21 @@ public class BattleSystem : MonoBehaviour
         battleHUD.ExitPartyMenuUI(battlefield, battleFormat, battleActionManager);
     }
 
+    public void EscapeSelection()
+    {
+        if (battleType != BattleType.WILD) {
+            Debug.Log(BattleDialog.CANNOT_ESCAPE_SUMMONER_BATTLE);
+            return;
+        }
+        if(battleActionManager.GetEscapeAttempt() != null) {
+            Debug.Log(BattleDialog.MULTIPLE_ESCAPE_ATTEMPTS);
+            return;
+        }
+
+        EscapeAttempt escapeAttempt = new EscapeAttempt(battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide());
+        ReadyBattleAction(new EscapeAttemptBattleAction(battleActionManager.GetCurrentTerraActionSelection(), escapeAttempt));
+    }
+
     public void OpenMoveSelectionUI()
     {
         TerraBattlePosition terraBattlePosition = battleActionManager.GetCurrentTerraActionSelection();
@@ -177,7 +192,7 @@ public class BattleSystem : MonoBehaviour
         OpeningMoveSelectionUIEventArgs openingMoveSelectionUIEventArgs = InvokeOnOpeningMoveSelectionUI(terraBattlePosition);
 
         if (openingMoveSelectionUIEventArgs.IsMoveSelectionCanceled()) {
-            AddReadyBattlePosition();
+            ReadyBattleAction(null);
             return;
         }
 
@@ -198,9 +213,7 @@ public class BattleSystem : MonoBehaviour
                 terraBattlePosition,
                 battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0],
                 struggle);
-            battleActionManager.AddBattleActionToStack(new TerraAttackBattleAction(terraBattlePosition, terraAttack));
-
-            AddReadyBattlePosition();
+            ReadyBattleAction(new TerraAttackBattleAction(terraBattlePosition, terraAttack));
         }
         else
             battleHUD.OpenMoveSelectionUI(moveList, openingMoveSelectionUIEventArgs.GetDisabledMoveIndicies());
@@ -252,9 +265,7 @@ public class BattleSystem : MonoBehaviour
                 terraBattlePosition,
                 terraBattlePosition,
                 selectedMove);
-            battleActionManager.AddBattleActionToStack(new TerraAttackBattleAction(terraBattlePosition, terraAttack));
-
-            AddReadyBattlePosition();
+            ReadyBattleAction(new TerraAttackBattleAction(terraBattlePosition, terraAttack));
         }
         else {
             //Initializes the a new terra attack with the selected move and defender positions to be all
@@ -263,9 +274,7 @@ public class BattleSystem : MonoBehaviour
                 terraBattlePosition,
                 targetablePositionList,
                 selectedMove);
-            battleActionManager.AddBattleActionToStack(new TerraAttackBattleAction(terraBattlePosition, terraAttack));
-
-            AddReadyBattlePosition();
+            ReadyBattleAction(new TerraAttackBattleAction(terraBattlePosition, terraAttack));
         }
     }
 
@@ -325,14 +334,20 @@ public class BattleSystem : MonoBehaviour
 
     public void SwitchTerraSelection(SwitchBattleAction switchBattleAction)
     {
-        battleActionManager.AddBattleActionToStack(switchBattleAction);
+        ReadyBattleAction(switchBattleAction);
+    }
+
+    private void ReadyBattleAction(BattleAction battleAction)
+    {
+        if(battleAction != null)
+            battleActionManager.AddBattleActionToStack(battleAction);
+
         AddReadyBattlePosition();
     }
 
     private void AddReadyBattlePosition()
     {
         battleActionManager.AddReadyBattlePosition();
-
         //Check if all battle positions are ready. If so, switch to combat state. Else, transition to
         //next terra action selection.
         if (battleActionManager.IsAllBattlePositionsReady())
@@ -353,7 +368,7 @@ public class BattleSystem : MonoBehaviour
     public void EscapeAttempt()
     {
         if(battleType != BattleType.WILD) {
-            Debug.Log(BattleDialog.ATTEMPT_ESCAPE_SUMMONER_BATTLE);
+            Debug.Log(BattleDialog.CANNOT_ESCAPE_SUMMONER_BATTLE);
             return;
         }
 

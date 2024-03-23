@@ -39,7 +39,7 @@ public static class CombatCalculator
         return randomCritIndex <= CRIT_CHANCE * directAttackParams.GetCritModifier();
     }
 
-    public static int? CalculateDamage(DirectAttackParams directAttackParams, bool isCrit)
+    public static int? DamageCalculation(DirectAttackParams directAttackParams, bool isCrit)
     {
         DamageType damageType = directAttackParams.GetMove().GetMoveSO().GetDamageType();
         TerraMoveSO terraMoveBase = directAttackParams.GetMove().GetMoveSO();
@@ -103,5 +103,27 @@ public static class CombatCalculator
         int damage = (int)(((2 * attackerPosition.GetTerra().GetLevel() / 5f) + 2) * baseDamage * (attackingStat * attackStage.GetStatStageMultiplier() / (defendingStat * defenceStage.GetStatStageMultiplier())) / 50f + 2);
 
         return damage;
+    }
+
+    public static bool EscapeAttemptCalculation(List<Terra> playerTerraList, List<Terra> wildTerraList)
+    {
+        int highestPlayerTerraSpeed = 0;
+        for(int i = 0; i < playerTerraList.Count; i++) {
+            if (playerTerraList[i].GetSpeed() > highestPlayerTerraSpeed)
+                highestPlayerTerraSpeed = playerTerraList[i].GetSpeed();
+        }
+
+        int highestWildTerraSpeed = 0;
+        for (int i = 0; i < wildTerraList.Count; i++) {
+            if (wildTerraList[i].GetLevel() > highestWildTerraSpeed)
+                highestWildTerraSpeed = wildTerraList[i].GetSpeed();
+        }
+
+        if (highestPlayerTerraSpeed >= highestWildTerraSpeed)
+            return true;
+
+        float escapeOdds = ((float)highestPlayerTerraSpeed * 32 / ((float)highestWildTerraSpeed / 4) + 30) / 256;
+
+        return escapeOdds >= Random.Range(0f, 1f);
     }
 }
