@@ -36,28 +36,8 @@ public class CombatBattleState : BattleState
     
     private void ProcessEscapeAttempt(BattleSystem battleSystem)
     {
-        EscapeAttempt escapeAttempt = battleSystem.GetBattleActionManager().GetEscapeAttempt();
-        if (escapeAttempt == null)
-            return;
-
-        List<Terra> escapingTerraList;
-        List<Terra> wildTerraList;
-        if(escapeAttempt.IsPrimarySide()) {
-            escapingTerraList = battleSystem.GetPrimaryTerraList();
-            wildTerraList = battleSystem.GetSecondaryTerraList();
-        }
-        else {
-            escapingTerraList = battleSystem.GetSecondaryTerraList();
-            wildTerraList = battleSystem.GetPrimaryTerraList();
-        }
-
-        bool hasEscaped = CombatCalculator.EscapeAttemptCalculation(escapingTerraList, wildTerraList);
-        if (hasEscaped) {
-            Debug.Log(BattleDialog.ESCAPE_ATTEMPT_SUCCESS);
-            battleSystem.SetBattleFinished(true);
-        }
-        else
-            Debug.Log(BattleDialog.ESCAPE_ATTEMPT_FAILED);
+        if(battleSystem.GetBattleActionManager().GetEscapeAttempt() != null)
+            battleSystem.EscapeAttempt(battleSystem.GetBattleActionManager().GetEscapeAttempt());
     }
 
     private void ProcessTerraSwitches(BattleSystem battleSystem)

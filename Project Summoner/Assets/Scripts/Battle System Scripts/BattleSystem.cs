@@ -16,7 +16,7 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<OpeningMoveSelectionUIEventArgs> OnOpeningMoveSelectionUI;
     public event EventHandler<BattleEventArgs> OnActionSelection;
     public event EventHandler<BattleEventArgs> OnEnteringCombatState;
-    public event EventHandler<BattleEventArgs> OnPlayerAttemptEscape; //Include Escape chance
+    public event EventHandler<EscapeAttemptsEventArgs> OnEscapeAttempt;
     public event EventHandler<SwitchTerraEventArgs> OnSwitchTerra;
     public event EventHandler<AttackDeclarationEventArgs> OnAttackDeclaration;
     public event EventHandler<DirectAttackEventArgs> OnDirectAttack;
@@ -365,15 +365,41 @@ public class BattleSystem : MonoBehaviour
         battleStateManager.SwitchState(battleStateManager.GetCombatState());
     }
 
-    public void EscapeAttempt()
+    public void EscapeAttempt(EscapeAttempt escapeAttempt)
     {
-        if(battleType != BattleType.WILD) {
-            Debug.Log(BattleDialog.CANNOT_ESCAPE_SUMMONER_BATTLE);
+        if (escapeAttempt == null)
             return;
-        }
 
-        //Escape Logic
-        battleStateManager.SwitchState(battleStateManager.GetCombatState());
+        //*** Escape Attempt Event ***
+        EscapeAttemptsEventArgs escapeAttemptEventArgs = InvokeOnEscapeAttempt(escapeAttempt);
+
+        if(escapeAttemptEventArgs.IsCanceled()) {
+            Debug.Log(BattleDialog.ESCAPE_ATTEMPT_FAILED);
+        }
+        else if(escapeAttemptEventArgs.IsMustHit()) {
+            Debug.Log(BattleDialog.ESCAPE_ATTEMPT_SUCCESS);
+            isBattleFinished = true;
+        }
+        else {
+            List<Terra> escapingTerraList;
+            List<Terra> wildTerraList;
+            if (escapeAttempt.IsPrimarySide()) {
+                escapingTerraList = primaryTerraList;
+                wildTerraList = secondaryTerraList;
+            }
+            else {
+                escapingTerraList = secondaryTerraList;
+                wildTerraList = primaryTerraList;
+            }
+
+            bool hasEscaped = CombatCalculator.EscapeAttemptCalculation(escapingTerraList, wildTerraList);
+            if (hasEscaped) {
+                Debug.Log(BattleDialog.ESCAPE_ATTEMPT_SUCCESS);
+                isBattleFinished = true;
+            }
+            else
+                Debug.Log(BattleDialog.ESCAPE_ATTEMPT_FAILED);
+        }
     }
 
     public void CatchTerraAttempt(int itemIndex)
@@ -383,6 +409,9 @@ public class BattleSystem : MonoBehaviour
 
     public void SwitchTerra(TerraSwitch terraSwitch)
     {
+        if (terraSwitch == null)
+            return;
+
         //*** Switch Terra Event ***
         SwitchTerraEventArgs eventArgs = InvokeOnSwitchTerra(terraSwitch);
 
@@ -652,10 +681,10 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
-    public BattleEventArgs InvokeOnPlayerAttemptEscape()
+    public EscapeAttemptsEventArgs InvokeOnEscapeAttempt(EscapeAttempt escapeAttempt)
     {
-        BattleEventArgs eventArgs = new BattleEventArgs(this);
-        OnPlayerAttemptEscape?.Invoke(this, eventArgs);
+        EscapeAttemptsEventArgs eventArgs = new EscapeAttemptsEventArgs(escapeAttempt, this);
+        OnEscapeAttempt?.Invoke(this, eventArgs);
 
         return eventArgs;
     }
