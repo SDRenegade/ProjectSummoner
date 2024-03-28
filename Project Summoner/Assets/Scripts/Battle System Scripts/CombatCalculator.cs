@@ -126,4 +126,29 @@ public static class CombatCalculator
 
         return escapeOdds >= Random.Range(0f, 1f);
     }
+
+    public static bool CaptureAttemptCalculation(CaptureAttempt captureAttempt, BattleSystem battleSystem)
+    {
+        if (captureAttempt.GetSummonerDie().GetCaptureModifier(captureAttempt, battleSystem) == null)
+            return true;
+
+        Terra targetTerra = captureAttempt.GetTargetPosition().GetTerra();
+        int maxHP = targetTerra.GetMaxHP();
+        int currentHP = targetTerra.GetCurrentHP();
+        int baseCatchRate = targetTerra.GetTerraBase().GetBaseCatchRate();
+        float dieModifier = (float)captureAttempt.GetSummonerDie().GetCaptureModifier(captureAttempt, battleSystem);
+        float statusModifier = 1f;
+        if (targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Sleep")
+            || targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Freeze"))
+            statusModifier = 1.5f;
+        else if (targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Paralysis")
+            || targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Blight")
+            || targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Burn"))
+            statusModifier = 1.25f;
+
+        int catchRate = (int)((3 * (float)maxHP - 2 * (float)currentHP) / (3 * (float)maxHP) * baseCatchRate * dieModifier * statusModifier);
+        catchRate = Mathf.Clamp(catchRate, 0, TerraBase.MAX_CATCH_RATE);
+
+        return catchRate >= Random.Range(0, TerraBase.MAX_CATCH_RATE + 1);
+    }
 }

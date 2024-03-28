@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditorInternal;
 using UnityEngine;
 
 public static class BattleDialog
@@ -166,6 +167,15 @@ public static class BattleDialog
 
     public static string MistProkedMsg(Terra terra) {
         return terra + " is immune to stat changes with mist active.";
+    }
+
+    // ============= Capture Attempt Messages =============
+    public static string CaptureAttemptSuccess(Terra terra) {
+        return terra + " has been captured!";
+    }
+
+    public static string CaptureAttemptFailed(Terra terra) {
+        return terra + " has broken free.";
     }
 
     // ================== Item Messages ==================

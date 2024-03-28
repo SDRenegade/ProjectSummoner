@@ -29,4 +29,5 @@ MonoBehaviour:
   baseSpAttack: 50
   baseSpDefence: 70
   baseSpeed: 40
+  baseCatchRate: 100
   terraGameObject: {fileID: 3156000226517777618, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}

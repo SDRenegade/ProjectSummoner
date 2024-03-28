@@ -11,7 +11,7 @@ public class BattleActionManager
     private List<List<TerraAttack>> attackLog;
     private List<TerraAttack> terraAttackList;
     private List<TerraSwitch> terraSwitchList;
-    //private List<CatchAttempt> catchAttemptDieList;
+    private List<CaptureAttempt> captureAttemptList;
     private EscapeAttempt escapeAttempt;
 
     private Queue<FaintedTerra> faintedTerraQueue;
@@ -26,6 +26,7 @@ public class BattleActionManager
         attackLog = new List<List<TerraAttack>>();
         terraAttackList = new List<TerraAttack>();
         terraSwitchList = new List<TerraSwitch>();
+        captureAttemptList = new List<CaptureAttempt>();
         escapeAttempt = null;
         faintedTerraQueue = new Queue<FaintedTerra>();
         pendingTerraAttack = null;
@@ -64,6 +65,7 @@ public class BattleActionManager
 
         selectedActionStack.Clear();
         terraSwitchList.Clear();
+        captureAttemptList.Clear();
         escapeAttempt = null;
     }
 
@@ -172,6 +174,8 @@ public class BattleActionManager
     public List<TerraAttack> GetTerraAttackList() { return terraAttackList; }
 
     public List<TerraSwitch> GetTerraSwitchList() { return terraSwitchList; }
+
+    public List<CaptureAttempt> GetCaptureAttemptList() {  return captureAttemptList; }
 
     public EscapeAttempt GetEscapeAttempt() { return escapeAttempt; }
 

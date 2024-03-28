@@ -17,6 +17,7 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<BattleEventArgs> OnActionSelection;
     public event EventHandler<BattleEventArgs> OnEnteringCombatState;
     public event EventHandler<EscapeAttemptsEventArgs> OnEscapeAttempt;
+    public event EventHandler<CaptureAttemptEventArgs> OnCaptureAttempt;
     public event EventHandler<SwitchTerraEventArgs> OnSwitchTerra;
     public event EventHandler<AttackDeclarationEventArgs> OnAttackDeclaration;
     public event EventHandler<DirectAttackEventArgs> OnDirectAttack;
@@ -81,21 +82,23 @@ public class BattleSystem : MonoBehaviour
         battleStateManager = new BattleStateManager(this);
     }
 
+    //TODO Move this method to the BattleStage class
     private void InitBattleStage()
     {
-        TerraBattlePosition[] primarySummonerTerraPositionList = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
-        for (int i = 0; i < primarySummonerTerraPositionList.Length && i < primaryTerraList.Count; i++) {
+        TerraBattlePosition[] primaryTerraPositionList = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
+        for (int i = 0; i < primaryTerraPositionList.Length && i < primaryTerraList.Count; i++) {
             if (primaryTerraList[i] != null)
                 battleStage.SetTerraAtPosition(primaryTerraList[i], true, i);
         }
 
-        TerraBattlePosition[] secondarySummonerTerraPositionList = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
-        for (int i = 0; i < secondarySummonerTerraPositionList.Length && i < secondaryTerraList.Count; i++) {
+        TerraBattlePosition[] secondaryTerraPositionList = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
+        for (int i = 0; i < secondaryTerraPositionList.Length && i < secondaryTerraList.Count; i++) {
             if (secondaryTerraList[i] != null)
                 battleStage.SetTerraAtPosition(secondaryTerraList[i], false, i);
         }
     }
 
+    //TODO Make an initialization state and add this method to that state
     private void InitBattleActions()
     {
         //Initialize the existing status conditions and items on the terra in the event system
@@ -153,7 +156,7 @@ public class BattleSystem : MonoBehaviour
             primaryTerraList,
             false,
             (terraBattlePosition, terraSwitch) => {
-                SwitchTerraSelection(new SwitchBattleAction(terraBattlePosition, terraSwitch));
+                ReadyBattleAction(new SwitchBattleAction(terraBattlePosition, terraSwitch));
             },
             this);
     }
@@ -256,7 +259,7 @@ public class BattleSystem : MonoBehaviour
                 nullTarget,
                 selectedMove);
             battleActionManager.SetPendingTerraAttack(pendingTerraAttack);
-            OpenTargetSelectionUI(terraBattlePosition, battlefield);
+            battleHUD.OpenTargetSelectionUI(terraBattlePosition, battlefield);
         }
         else if(selectedMove.GetMoveSO().IsSelfTargeting()) {
             //Initializes the a new terra attack with the selected move and defender position to be the
@@ -301,11 +304,6 @@ public class BattleSystem : MonoBehaviour
         terraAttack.GetTerraMoveBase()?.AddMoveListeners(this);
     }
 
-    public void OpenTargetSelectionUI(TerraBattlePosition terraBattlePosition, Battlefield battlefield)
-    {
-        battleHUD.OpenTargetSelectionUI(terraBattlePosition, battlefield);
-    }
-
     public void TargetSelection(int positionIndex)
     {
         TerraBattlePosition targetTerraPosition = null;
@@ -330,11 +328,6 @@ public class BattleSystem : MonoBehaviour
         }
         else
             Debug.LogError("The position index " + positionIndex + " is not a valid target.");
-    }
-
-    public void SwitchTerraSelection(SwitchBattleAction switchBattleAction)
-    {
-        ReadyBattleAction(switchBattleAction);
     }
 
     private void ReadyBattleAction(BattleAction battleAction)
@@ -402,9 +395,25 @@ public class BattleSystem : MonoBehaviour
         }
     }
 
-    public void CatchTerraAttempt(int itemIndex)
+    public void CaptureAttempt(CaptureAttempt captureAttempt)
     {
-        //TODO Implement item active
+        if (captureAttempt == null)
+            return;
+
+        //*** Capture Attempt Event ***
+        CaptureAttemptEventArgs eventArgs = InvokeOnCaptureAttempt(captureAttempt);
+
+        if (eventArgs.IsCanceled())
+            return;
+
+        if(CombatCalculator.CaptureAttemptCalculation(captureAttempt, this)) {
+            Debug.Log(BattleDialog.CaptureAttemptSuccess(captureAttempt.GetTargetPosition().GetTerra()));
+            List<Terra> playerTerraList = captureAttempt.IsPrimarySide() ? BattleLoader.GetInstance().GetPrimaryTerraList() : BattleLoader.GetInstance().GetSecondaryTerraList();
+            playerTerraList.Add(captureAttempt.GetTargetPosition().GetTerra());
+            isBattleFinished = false;
+        }
+        else
+            Debug.Log(BattleDialog.CaptureAttemptFailed(captureAttempt.GetTargetPosition().GetTerra()));
     }
 
     public void SwitchTerra(TerraSwitch terraSwitch)
@@ -689,6 +698,14 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
+    public CaptureAttemptEventArgs InvokeOnCaptureAttempt(CaptureAttempt captureAttempt)
+    {
+        CaptureAttemptEventArgs eventArgs = new CaptureAttemptEventArgs(captureAttempt, this);
+        OnCaptureAttempt?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
     public SwitchTerraEventArgs InvokeOnSwitchTerra(TerraSwitch terraSwitch)
     {
         SwitchTerraEventArgs eventArgs = new SwitchTerraEventArgs(terraSwitch, this);
@@ -848,8 +865,6 @@ public class BattleSystem : MonoBehaviour
     }
 
     public bool IsBattleFinished() { return isBattleFinished; }
-
-    public void SetBattleFinished(bool isBattleFinished) { this.isBattleFinished = isBattleFinished; }
 
     public BattleHUD GetBattleHUD() { return battleHUD; }
 

@@ -5,6 +5,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "TerraBase", menuName = "Terra/Create new TerraBase")]
 public class TerraBase : ScriptableObject
 {
+    public const int MAX_CATCH_RATE = 255;
+
     [SerializeField] private string speciesName;
     [SerializeField] [TextArea] private string logEntry;
     [SerializeField] private List<TerraType> terraTypes;
@@ -17,6 +19,7 @@ public class TerraBase : ScriptableObject
     [SerializeField] private int baseSpAttack;
     [SerializeField] private int baseSpDefence;
     [SerializeField] private int baseSpeed;
+    [SerializeField] [Range(0, MAX_CATCH_RATE)] private int baseCatchRate;
 
     [SerializeField] private GameObject terraGameObject;
 
@@ -30,6 +33,7 @@ public class TerraBase : ScriptableObject
     public int GetBaseSpAttack() {  return baseSpAttack; }
     public int GetBaseSpDefence() { return baseSpDefence; }
     public int GetBaseSpeed() { return baseSpeed; } 
+    public int GetBaseCatchRate() { return baseCatchRate; }
     public GameObject GetTerraGameObject() {  return terraGameObject; }
 
 }
