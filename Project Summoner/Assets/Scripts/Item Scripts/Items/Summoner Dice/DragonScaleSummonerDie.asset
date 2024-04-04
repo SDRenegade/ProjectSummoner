@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22a2a08b3a6a0e4448118471a76d7b18, type: 3}
   m_Name: DragonScaleSummonerDie
   m_EditorClassIdentifier: 
-  itemName: Dragon Scale Summoner die
+  itemName: Dragon Scale Summoner Die
   description: A rare and powerful summoner die.
+  sprite: {fileID: 21300000, guid: 2639cf1888456104388cafa1a3bf64ea, type: 3}

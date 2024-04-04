@@ -148,12 +148,13 @@ public class BattleSystem : MonoBehaviour
         battleHUD.ExitMenuSelection(battleActionManager);
     }
 
-    //TODO Specify which side is opening the party menu
     public void OpenPartyMenuUI()
     {
+        List<Terra> terraList = battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide() ? primaryTerraList : secondaryTerraList;
+
         battleHUD.OpenPartyMenuUI(
             battleActionManager.GetCurrentTerraActionSelection(),
-            primaryTerraList,
+            terraList,
             false,
             (terraBattlePosition, terraSwitch) => {
                 ReadyBattleAction(new SwitchBattleAction(terraBattlePosition, terraSwitch));
@@ -169,7 +170,24 @@ public class BattleSystem : MonoBehaviour
 
     public void ExitPartyMenuUI()
     {
-        battleHUD.ExitPartyMenuUI(battlefield, battleFormat, battleActionManager);
+        battleHUD.ReturnToMenuSelection(battlefield, battleFormat, battleActionManager);
+    }
+
+    public void OpenSummonerDieMenuUI()
+    {
+        //TODO switch to getting the correct sides inventory for summoner die
+        bool isPrimarySide = battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide();
+
+        List<SummonerDieItemStack> summonerDieItemStackList = new List<SummonerDieItemStack> {
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Summoner Die")), 1),
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Worm Wood Summoner Die")), 2),
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Summoner Die")), 3),
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Dragon Scale Summoner Die")), 4),
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Dragon Scale Summoner Die")), 5),
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Worm Wood Summoner Die")), 6),
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Worm Wood Summoner Die")), 7)
+        };
+        battleHUD.OpenSummonerDieMenuUI(summonerDieItemStackList);
     }
 
     public void EscapeSelection()

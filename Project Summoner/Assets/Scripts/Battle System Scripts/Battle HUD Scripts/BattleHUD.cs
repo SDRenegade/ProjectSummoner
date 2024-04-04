@@ -12,6 +12,7 @@ public class BattleHUD : MonoBehaviour
     [SerializeField] private MoveSelectionUI moveSelectionUI;
     [SerializeField] private TargetSelectionUI targetSelectionUI;
     [SerializeField] private PartyMenuUI partyMenuUI;
+    [SerializeField] private SummonerDieMenuUI summonerDieMenuUI;
 
     public void Start()
     {
@@ -76,7 +77,15 @@ public class BattleHUD : MonoBehaviour
         partyMenuUI.OpenPartyMenuUI(activeTerraPosition, terraList, isMustSwitch, switchAction, battleSystem);
     }
 
-    public void ExitPartyMenuUI(Battlefield battlefield, BattleFormat battleFormat, BattleActionManager battleActionManager)
+
+    public void OpenSummonerDieMenuUI(List<SummonerDieItemStack> summonerDieItemStackList)
+    {
+        CloseAllSelectionUI();
+        HideTerraStatusBars();
+        summonerDieMenuUI.OpenSummonerDieMenuUI(summonerDieItemStackList);
+    }
+
+    public void ReturnToMenuSelection(Battlefield battlefield, BattleFormat battleFormat, BattleActionManager battleActionManager)
     {
         UpdateTerraStatusBars(battlefield, battleFormat);
         OpenMenuSelectionUI(battleActionManager);
@@ -96,5 +105,6 @@ public class BattleHUD : MonoBehaviour
         moveSelectionUI.gameObject.SetActive(false);
         targetSelectionUI.gameObject.SetActive(false);
         partyMenuUI.ClosePartyMenuUI();
+        summonerDieMenuUI.CloseSummonerDieMenuUI();
     }
 }
