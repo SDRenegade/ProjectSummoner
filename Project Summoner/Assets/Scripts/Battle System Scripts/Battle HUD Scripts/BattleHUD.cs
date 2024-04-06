@@ -24,6 +24,14 @@ public class BattleHUD : MonoBehaviour
         CloseAllSelectionUI();
     }
 
+    public void InitMenuButtonEvents(BattleSystem battleSystem)
+    {
+        targetSelectionUI.GetOpponenet1Btn().onClick.AddListener(() => battleSystem.TargetSelection(0));
+        targetSelectionUI.GetOpponenet2Btn().onClick.AddListener(() => battleSystem.TargetSelection(1));
+        targetSelectionUI.GetAlly1Btn().onClick.AddListener(() => battleSystem.TargetSelection(2));
+        targetSelectionUI.GetAlly2Btn().onClick.AddListener(() => battleSystem.TargetSelection(3));
+    }
+
     public void UpdateTerraStatusBars(Battlefield battlefield, BattleFormat battleFormat)
     {
         TerraBattlePosition[] primaryTerraBattlePositionArr = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
@@ -64,10 +72,10 @@ public class BattleHUD : MonoBehaviour
         moveSelectionUI.OpenMoveSelectionUI(terraMoves, disabledMoves);
     }
 
-    public void OpenTargetSelectionUI(TerraBattlePosition terraBattlePosition, Battlefield battlefield)
+    public void OpenTargetSelectionUI(TerraBattlePosition[] opponentTerraPositionss, TerraBattlePosition[] allyTerraPositions)
     {
         CloseAllSelectionUI();
-        targetSelectionUI.OpenTargetSelectionUI(terraBattlePosition, battlefield);
+        targetSelectionUI.OpenTargetSelectionUI(opponentTerraPositionss, allyTerraPositions);
     }
 
     public void OpenPartyMenuUI(TerraBattlePosition activeTerraPosition, List<Terra> terraList, bool isMustSwitch, Action<TerraBattlePosition, TerraSwitch> switchAction, BattleSystem battleSystem)

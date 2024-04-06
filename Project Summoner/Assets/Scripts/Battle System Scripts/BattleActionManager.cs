@@ -17,6 +17,7 @@ public class BattleActionManager
     private Queue<FaintedTerra> faintedTerraQueue;
 
     private TerraAttack pendingTerraAttack;
+    private CaptureAttempt pendingCaptureAttempt;
 
     public BattleActionManager(BattleSystem battleSystem)
     {

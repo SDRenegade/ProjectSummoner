@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum BattleType
@@ -87,6 +89,7 @@ public class BattleSystem : MonoBehaviour
         secondarySideAI = new WildTerraAI(secondaryTerraList);
         battlefield = new Battlefield(battleFormat, primaryTerraList, secondaryTerraList);
 
+        battleHUD.InitMenuButtonEvents(this);
         InitBattleStage();
         InitBattleActions();
         UpdateTerraStatusBars(); //Might not be needed. Could be getting called elsewhere
@@ -285,7 +288,7 @@ public class BattleSystem : MonoBehaviour
                 nullTarget,
                 selectedMove);
             battleActionManager.SetPendingTerraAttack(pendingTerraAttack);
-            battleHUD.OpenTargetSelectionUI(terraBattlePosition, battlefield);
+            OpenTargetSelectionUI();
         }
         else if(selectedMove.GetMoveSO().IsSelfTargeting()) {
             //Initializes the a new terra attack with the selected move and defender position to be the
@@ -330,23 +333,43 @@ public class BattleSystem : MonoBehaviour
         terraAttack.GetTerraMoveBase()?.AddMoveListeners(this);
     }
 
+    public void OpenTargetSelectionUI()
+    {
+        if (battleActionManager.GetPendingTerraAttack() == null)
+            return;
+
+        TerraBattlePosition[] targetableAllyTerraPositions = new TerraBattlePosition[battleFormat.NumberOfLeadingPositions()];
+        TerraBattlePosition[] targetableOpponentTerraPositions = new TerraBattlePosition[battleFormat.NumberOfLeadingPositions()];
+        if (battleActionManager.GetPendingTerraAttack() != null) {
+            TerraBattlePosition attackerPosition = battleActionManager.GetPendingTerraAttack().GetAttackerPosition();
+            TerraBattlePosition[] allyTerraPositions = attackerPosition.GetBattleSide().IsPrimarySide() ? battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr() : battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
+            TerraBattlePosition[] opponentTerraPositions = attackerPosition.GetBattleSide().IsPrimarySide() ? battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr() : battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
+            for (int i = 0; i < battleFormat.NumberOfLeadingPositions(); i++) {
+                if (allyTerraPositions[i] != attackerPosition)
+                    targetableAllyTerraPositions[i] = allyTerraPositions[i];
+                targetableOpponentTerraPositions[i] = opponentTerraPositions[i];
+            }
+        }
+        else {
+            //TODO Implement valid positions when choosing a capture target
+        }
+
+        battleHUD.OpenTargetSelectionUI(targetableOpponentTerraPositions, targetableAllyTerraPositions);
+    }
+
     public void TargetSelection(int positionIndex)
     {
         TerraBattlePosition targetTerraPosition = null;
-        if(positionIndex == 0) {
-            if (battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0] != battleActionManager.GetPendingTerraAttack().GetAttackerPosition())
-                targetTerraPosition = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[0];
-            else
-                targetTerraPosition = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[1];
-        }
-        else if(positionIndex == 1) {
-            if (battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0].GetTerra() != null)
-                targetTerraPosition = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[0];
-        }
-        else if(positionIndex == 2) {
-            if (battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[1].GetTerra() != null)
-                targetTerraPosition = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[1];
-        }
+        TerraBattlePosition[] opponentTerraPositions = battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide() ? battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr() : battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
+        TerraBattlePosition[] allyTerraPositions = battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide() ? battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr() : battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
+        if (positionIndex == 0)
+            targetTerraPosition = opponentTerraPositions[0];
+        else if(positionIndex == 1)
+            targetTerraPosition = opponentTerraPositions[1];
+        else if(positionIndex == 2)
+            targetTerraPosition = allyTerraPositions[0];
+        else if(positionIndex == 3)
+            targetTerraPosition = allyTerraPositions[1];
 
         if (targetTerraPosition != null) {
             battleActionManager.PushPendingTerraAttack(targetTerraPosition);

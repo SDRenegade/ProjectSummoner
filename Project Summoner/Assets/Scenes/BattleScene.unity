@@ -391,10 +391,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77b0ada6958f9c04395f9fe3d3af02ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  opponentPos1Btn: {fileID: 420615296}
-  opponentPos2Btn: {fileID: 1714242315}
-  allyPos1Btn: {fileID: 126998180}
-  allyPos2Btn: {fileID: 161471050}
+  opponent1Btn: {fileID: 420615296}
+  opponent2Btn: {fileID: 1714242315}
+  ally1Btn: {fileID: 126998180}
+  ally2Btn: {fileID: 161471050}
 --- !u!1 &91297882
 GameObject:
   m_ObjectHideFlags: 0
@@ -694,7 +694,7 @@ GameObject:
   - component: {fileID: 126998180}
   - component: {fileID: 126998183}
   m_Layer: 5
-  m_Name: AllyPos1Btn
+  m_Name: Ally1Btn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -764,19 +764,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 126998181}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2145235993}
-        m_TargetAssemblyTypeName: BattleSystem, Assembly-CSharp
-        m_MethodName: TargetSelection
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &126998181
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1081,7 +1069,7 @@ GameObject:
   - component: {fileID: 161471050}
   - component: {fileID: 161471053}
   m_Layer: 5
-  m_Name: AllyPos2Btn
+  m_Name: Ally2Btn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1151,19 +1139,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 161471051}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2145235993}
-        m_TargetAssemblyTypeName: BattleSystem, Assembly-CSharp
-        m_MethodName: TargetSelection
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &161471051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2686,7 +2662,7 @@ GameObject:
   - component: {fileID: 420615296}
   - component: {fileID: 420615299}
   m_Layer: 5
-  m_Name: OpponentPos1Btn
+  m_Name: Opponent1Btn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2756,19 +2732,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 420615297}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2145235993}
-        m_TargetAssemblyTypeName: BattleSystem, Assembly-CSharp
-        m_MethodName: TargetSelection
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &420615297
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7705,7 +7669,7 @@ GameObject:
   - component: {fileID: 1714242315}
   - component: {fileID: 1714242318}
   m_Layer: 5
-  m_Name: OpponentPos2Btn
+  m_Name: Opponent2Btn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7775,19 +7739,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1714242316}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2145235993}
-        m_TargetAssemblyTypeName: BattleSystem, Assembly-CSharp
-        m_MethodName: TargetSelection
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1714242316
 MonoBehaviour:
   m_ObjectHideFlags: 0
