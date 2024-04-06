@@ -43,7 +43,7 @@ public class PartyOptionSelectionUI : MonoBehaviour
             switchBtn.onClick.AddListener(delegate {
                 Debug.Log("Switching action selected for " + activeTerraPosition.GetTerra() + " and " + battleSystem.GetPrimaryTerraList()[selectedTerraIndex]);
                 CloseOptionSelection();
-                battleSystem.ExitPartyMenuUI();
+                battleSystem.ReturnToMenuSelection();
                 TerraBattlePosition[] terraBattlePositionArr = battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
                 TerraSwitch terraSwitch = new TerraSwitch(Array.IndexOf(terraBattlePositionArr, activeTerraPosition), selectedTerraIndex, true);
                 switchAction?.Invoke(activeTerraPosition, terraSwitch);

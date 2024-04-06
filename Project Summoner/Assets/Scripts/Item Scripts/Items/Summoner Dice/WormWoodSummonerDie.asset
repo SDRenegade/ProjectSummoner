@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b788b593302a3ba49a519edd8d3f72cb, type: 3}
   m_Name: WormWoodSummonerDie
   m_EditorClassIdentifier: 
-  itemName: Worm Wood Summoner Die
+  itemName: Worm Wood Die
   description: A slightly stronger summoner die compared to the basic summoner die.
   sprite: {fileID: 21300000, guid: 7d5ce5139537f1445947e929c60504ae, type: 3}

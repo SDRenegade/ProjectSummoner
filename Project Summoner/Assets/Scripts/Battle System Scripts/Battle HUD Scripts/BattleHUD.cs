@@ -82,7 +82,7 @@ public class BattleHUD : MonoBehaviour
     {
         CloseAllSelectionUI();
         HideTerraStatusBars();
-        summonerDieMenuUI.OpenSummonerDieMenuUI(summonerDieItemStackList);
+        summonerDieMenuUI.OpenSummonerDieMenuUI(summonerDieItemStackList, 0);
     }
 
     public void ReturnToMenuSelection(Battlefield battlefield, BattleFormat battleFormat, BattleActionManager battleActionManager)
@@ -107,4 +107,6 @@ public class BattleHUD : MonoBehaviour
         partyMenuUI.ClosePartyMenuUI();
         summonerDieMenuUI.CloseSummonerDieMenuUI();
     }
+
+    public SummonerDieMenuUI GetSummonerDieMenuUI() { return summonerDieMenuUI; }
 }

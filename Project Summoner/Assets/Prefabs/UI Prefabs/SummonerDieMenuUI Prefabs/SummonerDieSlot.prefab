@@ -53,7 +53,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   summonerDieImage: {fileID: 2556890162552735768}
-  dieQuanityPanel: {fileID: 2556890162575618533}
+  dieQuantityPanel: {fileID: 2556890162575618533}
   dieQuantityText: {fileID: 2556890162758615768}
 --- !u!1 &2556890162552735770
 GameObject:

@@ -45,6 +45,8 @@ public class BattleSystem : MonoBehaviour
     private List<Terra> primaryTerraList;
     private List<Terra> secondaryTerraList;
 
+    List<SummonerDieItemStack> summonerDieItemStackList;
+
     private bool isBattleFinished;
     private BattleType battleType;
     private BattleFormat battleFormat;
@@ -66,6 +68,17 @@ public class BattleSystem : MonoBehaviour
         secondaryTerraList = new List<Terra>();
         for (int i = 0; i < BattleLoader.GetInstance().GetSecondaryTerraList().Count; i++)
             secondaryTerraList.Add(BattleLoader.GetInstance().GetSecondaryTerraList()[i]);
+
+        //--- Temp variables ---
+        summonerDieItemStackList = new List<SummonerDieItemStack> {
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Dragon Scale Die")), 1),
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Worm Wood Die")), 2),
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Summoner Die")), 3),
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Dragon Scale Die")), 4),
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Dragon Scale Die")), 5),
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Worm Wood Die")), 6),
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Worm Wood Die")), 7)
+        };
 
         isBattleFinished = false;
         battleType = BattleLoader.GetInstance().GetBattleType();
@@ -168,7 +181,7 @@ public class BattleSystem : MonoBehaviour
         battleHUD.OpenPartyMenuUI(activeTerraPosition, terraList, true, switchAction, this);
     }
 
-    public void ExitPartyMenuUI()
+    public void ReturnToMenuSelection()
     {
         battleHUD.ReturnToMenuSelection(battlefield, battleFormat, battleActionManager);
     }
@@ -177,17 +190,12 @@ public class BattleSystem : MonoBehaviour
     {
         //TODO switch to getting the correct sides inventory for summoner die
         bool isPrimarySide = battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide();
-
-        List<SummonerDieItemStack> summonerDieItemStackList = new List<SummonerDieItemStack> {
-            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Summoner Die")), 1),
-            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Worm Wood Summoner Die")), 2),
-            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Summoner Die")), 3),
-            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Dragon Scale Summoner Die")), 4),
-            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Dragon Scale Summoner Die")), 5),
-            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Worm Wood Summoner Die")), 6),
-            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Worm Wood Summoner Die")), 7)
-        };
         battleHUD.OpenSummonerDieMenuUI(summonerDieItemStackList);
+    }
+
+    public void IterateSummonerDieSlider(int offset)
+    {
+        battleHUD.GetSummonerDieMenuUI().OpenSummonerDieMenuUI(summonerDieItemStackList, offset);
     }
 
     public void EscapeSelection()

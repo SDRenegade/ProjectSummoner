@@ -8,9 +8,9 @@ public class SummonerDieMenuUI : MonoBehaviour
 {
     [SerializeField] private SummonerDieSlider summonerDieSlider;
 
-    public void OpenSummonerDieMenuUI(List<SummonerDieItemStack> summonerDieItemStackList)
+    public void OpenSummonerDieMenuUI(List<SummonerDieItemStack> summonerDieItemStackList, int offset)
     {
-        summonerDieSlider.UpdateSummonerDieSlider(summonerDieItemStackList);
+        summonerDieSlider.UpdateSummonerDieSlider(summonerDieItemStackList, offset);
         gameObject.SetActive(true);
     }
 
