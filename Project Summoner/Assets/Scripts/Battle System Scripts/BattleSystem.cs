@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -47,7 +48,8 @@ public class BattleSystem : MonoBehaviour
     private List<Terra> primaryTerraList;
     private List<Terra> secondaryTerraList;
 
-    List<SummonerDieItemStack> summonerDieItemStackList;
+    private List<SummonerDieItemStack> primarySummonerDieItemStackList;
+    private List<SummonerDieItemStack> secondarySummonerDieItemStackList;
 
     private bool isBattleFinished;
     private BattleType battleType;
@@ -72,7 +74,7 @@ public class BattleSystem : MonoBehaviour
             secondaryTerraList.Add(BattleLoader.GetInstance().GetSecondaryTerraList()[i]);
 
         //--- Temp variables ---
-        summonerDieItemStackList = new List<SummonerDieItemStack> {
+        primarySummonerDieItemStackList = new List<SummonerDieItemStack> {
             new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Dragon Scale Die")), 1),
             new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Worm Wood Die")), 2),
             new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Summoner Die")), 3),
@@ -80,6 +82,10 @@ public class BattleSystem : MonoBehaviour
             new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Dragon Scale Die")), 5),
             new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Worm Wood Die")), 6),
             new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Worm Wood Die")), 7)
+        };
+        secondarySummonerDieItemStackList = new List<SummonerDieItemStack> {
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Dragon Scale Die")), 1),
+            new SummonerDieItemStack(new SummonerDie(SODatabase.GetInstance().GetItemByName("Worm Wood Die")), 2)
         };
 
         isBattleFinished = false;
@@ -90,28 +96,12 @@ public class BattleSystem : MonoBehaviour
         battlefield = new Battlefield(battleFormat, primaryTerraList, secondaryTerraList);
 
         battleHUD.InitMenuButtonEvents(this);
-        InitBattleStage();
+        battleStage.InitBattleStage(battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr(), battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr());
         InitBattleActions();
         UpdateTerraStatusBars(); //Might not be needed. Could be getting called elsewhere
 
         battleActionManager = new BattleActionManager(this);
         battleStateManager = new BattleStateManager(this);
-    }
-
-    //TODO Move this method to the BattleStage class
-    private void InitBattleStage()
-    {
-        TerraBattlePosition[] primaryTerraPositionList = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
-        for (int i = 0; i < primaryTerraPositionList.Length && i < primaryTerraList.Count; i++) {
-            if (primaryTerraList[i] != null)
-                battleStage.SetTerraAtPosition(primaryTerraList[i], true, i);
-        }
-
-        TerraBattlePosition[] secondaryTerraPositionList = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
-        for (int i = 0; i < secondaryTerraPositionList.Length && i < secondaryTerraList.Count; i++) {
-            if (secondaryTerraList[i] != null)
-                battleStage.SetTerraAtPosition(secondaryTerraList[i], false, i);
-        }
     }
 
     //TODO Make an initialization state and add this method to that state
@@ -164,6 +154,11 @@ public class BattleSystem : MonoBehaviour
         battleHUD.ExitMenuSelection(battleActionManager);
     }
 
+    public void ReturnToMenuSelection()
+    {
+        battleHUD.ReturnToMenuSelection(battlefield, battleFormat, battleActionManager);
+    }
+
     public void OpenPartyMenuUI()
     {
         List<Terra> terraList = battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide() ? primaryTerraList : secondaryTerraList;
@@ -184,21 +179,27 @@ public class BattleSystem : MonoBehaviour
         battleHUD.OpenPartyMenuUI(activeTerraPosition, terraList, true, switchAction, this);
     }
 
-    public void ReturnToMenuSelection()
-    {
-        battleHUD.ReturnToMenuSelection(battlefield, battleFormat, battleActionManager);
-    }
-
     public void OpenSummonerDieMenuUI()
     {
-        //TODO switch to getting the correct sides inventory for summoner die
-        bool isPrimarySide = battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide();
-        battleHUD.OpenSummonerDieMenuUI(summonerDieItemStackList);
+        List<SummonerDieItemStack> summonerDieList = battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide() ? primarySummonerDieItemStackList : secondarySummonerDieItemStackList;
+        battleHUD.OpenSummonerDieMenuUI(summonerDieList);
     }
 
     public void IterateSummonerDieSlider(int offset)
     {
-        battleHUD.GetSummonerDieMenuUI().OpenSummonerDieMenuUI(summonerDieItemStackList, offset);
+        battleHUD.GetSummonerDieMenuUI().OpenSummonerDieMenuUI(primarySummonerDieItemStackList, offset);
+    }
+
+    public void SummonerDieSelection(int summonerDieIndex)
+    {
+        bool isPrimarySide = battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide();
+        List<SummonerDieItemStack> summonerDieList = isPrimarySide ? primarySummonerDieItemStackList : secondarySummonerDieItemStackList;
+        if (summonerDieIndex >= summonerDieList.Count)
+            return;
+
+        CaptureAttempt captureAttempt = new CaptureAttempt(null, summonerDieList[summonerDieIndex].GetSummonerDieBase(), isPrimarySide);
+        battleActionManager.SetPendingCaptureAttempt(captureAttempt);
+        OpenTargetSelectionUI();
     }
 
     public void EscapeSelection()
@@ -335,7 +336,7 @@ public class BattleSystem : MonoBehaviour
 
     public void OpenTargetSelectionUI()
     {
-        if (battleActionManager.GetPendingTerraAttack() == null)
+        if (battleActionManager.GetPendingTerraAttack() == null && battleActionManager.GetPendingCaptureAttempt() == null)
             return;
 
         TerraBattlePosition[] targetableAllyTerraPositions = new TerraBattlePosition[battleFormat.NumberOfLeadingPositions()];
@@ -351,9 +352,13 @@ public class BattleSystem : MonoBehaviour
             }
         }
         else {
-            //TODO Implement valid positions when choosing a capture target
+            bool isPrimarySide = battleActionManager.GetPendingCaptureAttempt().IsPrimarySide();
+            TerraBattlePosition[] opponentTerraPositions = isPrimarySide ? battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr() : battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
+            for (int i = 0; i < opponentTerraPositions.Length; i++)
+                targetableOpponentTerraPositions[i] = opponentTerraPositions[i];
         }
 
+        UpdateTerraStatusBars();
         battleHUD.OpenTargetSelectionUI(targetableOpponentTerraPositions, targetableAllyTerraPositions);
     }
 
@@ -372,11 +377,31 @@ public class BattleSystem : MonoBehaviour
             targetTerraPosition = allyTerraPositions[1];
 
         if (targetTerraPosition != null) {
-            battleActionManager.PushPendingTerraAttack(targetTerraPosition);
-            AddReadyBattlePosition();
+            if(battleActionManager.GetPendingTerraAttack() != null) {
+                battleActionManager.PushPendingTerraAttack(targetTerraPosition);
+                AddReadyBattlePosition();
+            }
+            else if(battleActionManager.GetPendingCaptureAttempt() != null) {
+                battleActionManager.PushPendingCaptureAttempt(targetTerraPosition);
+                AddReadyBattlePosition();
+            }
         }
         else
             Debug.LogError("The position index " + positionIndex + " is not a valid target.");
+    }
+
+    public void ExitTargetSelectionUI()
+    {
+        if (battleActionManager.GetPendingTerraAttack() != null) {
+            battleActionManager.SetPendingTerraAttack(null);
+            OpenMoveSelectionUI();
+        }
+        else if (battleActionManager.GetPendingCaptureAttempt() != null) {
+            battleActionManager.SetPendingCaptureAttempt(null);
+            OpenSummonerDieMenuUI();
+        }
+        else
+            OpenMenuSelectionUI();
     }
 
     private void ReadyBattleAction(BattleAction battleAction)
@@ -457,9 +482,14 @@ public class BattleSystem : MonoBehaviour
 
         if(CombatCalculator.CaptureAttemptCalculation(captureAttempt, this)) {
             Debug.Log(BattleDialog.CaptureAttemptSuccess(captureAttempt.GetTargetPosition().GetTerra()));
-            List<Terra> playerTerraList = captureAttempt.IsPrimarySide() ? BattleLoader.GetInstance().GetPrimaryTerraList() : BattleLoader.GetInstance().GetSecondaryTerraList();
-            playerTerraList.Add(captureAttempt.GetTargetPosition().GetTerra());
-            isBattleFinished = false;
+            List<Terra> playerPermanentTerraList = captureAttempt.IsPrimarySide() ? BattleLoader.GetInstance().GetPrimaryTerraList() : BattleLoader.GetInstance().GetSecondaryTerraList();
+            List<Terra> opponentTerraList = captureAttempt.IsPrimarySide() ? secondaryTerraList : primaryTerraList;
+            playerPermanentTerraList.Add(captureAttempt.GetTargetPosition().GetTerra());
+            opponentTerraList.Remove(captureAttempt.GetTargetPosition().GetTerra());
+            captureAttempt.GetTargetPosition().SetTerra(null);
+
+            if (!HasLivingTerra(!captureAttempt.IsPrimarySide()))
+                EndBattle();
         }
         else
             Debug.Log(BattleDialog.CaptureAttemptFailed(captureAttempt.GetTargetPosition().GetTerra()));

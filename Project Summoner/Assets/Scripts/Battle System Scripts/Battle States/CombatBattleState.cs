@@ -17,7 +17,11 @@ public class CombatBattleState : BattleState
             battleManager.SwitchState(battleManager.GetFinishedMatchBattleState());
             return;
         }
-
+        ProcessCaptureAttempts(battleSystem);
+        if (battleSystem.IsBattleFinished()) {
+            battleManager.SwitchState(battleManager.GetFinishedMatchBattleState());
+            return;
+        }
         ProcessTerraSwitches(battleSystem);
 
         List<TerraAttack> queuedTerraAttackList = battleSystem.GetBattleActionManager().GetTerraAttackList();
@@ -42,9 +46,18 @@ public class CombatBattleState : BattleState
 
     private void ProcessTerraSwitches(BattleSystem battleSystem)
     {
-        BattleActionManager battleActionManger = battleSystem.GetBattleActionManager();
-        for(int i = 0; i < battleActionManger.GetTerraSwitchList().Count; i++) {
-            battleSystem.SwitchTerra(battleActionManger.GetTerraSwitchList()[i]);
+        BattleActionManager battleActionManager = battleSystem.GetBattleActionManager();
+        for(int i = 0; i < battleActionManager.GetTerraSwitchList().Count; i++)
+            battleSystem.SwitchTerra(battleActionManager.GetTerraSwitchList()[i]);
+    }
+
+    private void ProcessCaptureAttempts(BattleSystem battleSystem)
+    {
+        BattleActionManager battleActionManager = battleSystem.GetBattleActionManager();
+        for (int i = 0; i < battleActionManager.GetCaptureAttemptList().Count; i++) {
+            battleSystem.CaptureAttempt(battleActionManager.GetCaptureAttemptList()[i]);
+            if (battleSystem.IsBattleFinished())
+                break;
         }
     }
 

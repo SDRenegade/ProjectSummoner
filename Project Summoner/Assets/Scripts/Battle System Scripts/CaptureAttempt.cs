@@ -17,6 +17,8 @@ public class CaptureAttempt
 
     public TerraBattlePosition GetTargetPosition() { return targetPosition; }
 
+    public void SetTargetPosition(TerraBattlePosition targetPosition) { this.targetPosition = targetPosition; }
+
     public SummonerDieBase GetSummonerDie() { return summonerDie; }
 
     public bool IsPrimarySide() {  return isPrimarySide; }

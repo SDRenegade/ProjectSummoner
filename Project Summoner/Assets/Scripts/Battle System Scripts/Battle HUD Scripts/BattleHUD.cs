@@ -30,6 +30,7 @@ public class BattleHUD : MonoBehaviour
         targetSelectionUI.GetOpponenet2Btn().onClick.AddListener(() => battleSystem.TargetSelection(1));
         targetSelectionUI.GetAlly1Btn().onClick.AddListener(() => battleSystem.TargetSelection(2));
         targetSelectionUI.GetAlly2Btn().onClick.AddListener(() => battleSystem.TargetSelection(3));
+        summonerDieMenuUI.InitButtonEvents(battleSystem);
     }
 
     public void UpdateTerraStatusBars(Battlefield battlefield, BattleFormat battleFormat)

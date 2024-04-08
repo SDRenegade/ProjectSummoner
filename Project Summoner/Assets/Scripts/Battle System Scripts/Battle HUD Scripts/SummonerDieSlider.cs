@@ -11,6 +11,7 @@ public class SummonerDieSlider : MonoBehaviour
     [SerializeField] private TextMeshProUGUI dieTitleText;
     [SerializeField] private Button backIterationBtn;
     [SerializeField] private Button forwardIterationBtn;
+    [SerializeField] private Button selectionBtn;
     [SerializeField] private int maxDicePreview;
     [SerializeField] private float selectedSlotSpacing;
     [SerializeField] private float previewSlotSpacing;
@@ -102,4 +103,7 @@ public class SummonerDieSlider : MonoBehaviour
             selectedSlotIndex = tempSelectionIndex;
     }
 
+    public Button GetSelectionBtn() { return selectionBtn; }
+
+    public int GetSelectedSlotIndex() {  return selectedSlotIndex; }
 }

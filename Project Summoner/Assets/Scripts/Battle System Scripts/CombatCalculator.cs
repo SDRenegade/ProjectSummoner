@@ -138,17 +138,21 @@ public static class CombatCalculator
         int baseCatchRate = targetTerra.GetTerraBase().GetBaseCatchRate();
         float dieModifier = (float)captureAttempt.GetSummonerDie().GetCaptureModifier(captureAttempt, battleSystem);
         float statusModifier = 1f;
-        if (targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Sleep")
-            || targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Freeze"))
-            statusModifier = 1.5f;
-        else if (targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Paralysis")
-            || targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Blight")
-            || targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Burn"))
-            statusModifier = 1.25f;
+        if(targetTerra.GetStatusEffect() != null) {
+            if (targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Sleep")
+                || targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Freeze"))
+                statusModifier = 1.5f;
+            else if (targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Paralysis")
+                || targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Blight")
+                || targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Burn"))
+                statusModifier = 1.25f;
+        }
 
         int catchRate = (int)((3 * (float)maxHP - 2 * (float)currentHP) / (3 * (float)maxHP) * baseCatchRate * dieModifier * statusModifier);
         catchRate = Mathf.Clamp(catchRate, 0, TerraBase.MAX_CATCH_RATE);
+        int randCatchIndex = Random.Range(0, TerraBase.MAX_CATCH_RATE + 1);
+        Debug.Log("Catch Rate: " + catchRate + " Random Catch Index: " + randCatchIndex);
 
-        return catchRate >= Random.Range(0, TerraBase.MAX_CATCH_RATE + 1);
+        return catchRate >= randCatchIndex;
     }
 }

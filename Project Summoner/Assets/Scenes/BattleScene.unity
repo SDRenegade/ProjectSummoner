@@ -4061,6 +4061,7 @@ MonoBehaviour:
   dieTitleText: {fileID: 792806438}
   backIterationBtn: {fileID: 179491449}
   forwardIterationBtn: {fileID: 469103920}
+  selectionBtn: {fileID: 463819261}
   maxDicePreview: 3
   selectedSlotSpacing: 160
   previewSlotSpacing: 125
@@ -7592,7 +7593,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2145235993}
         m_TargetAssemblyTypeName: BattleSystem, Assembly-CSharp
-        m_MethodName: OpenMoveSelectionUI
+        m_MethodName: ExitTargetSelectionUI
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

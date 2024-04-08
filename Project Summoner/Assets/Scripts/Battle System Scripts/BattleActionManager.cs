@@ -101,8 +101,15 @@ public class BattleActionManager
     public void PushPendingTerraAttack(TerraBattlePosition targetTerraPosition)
     {
         pendingTerraAttack.GetDefendersPositionList().Add(targetTerraPosition);
-        AddBattleActionToStack(new TerraAttackBattleAction(pendingTerraAttack.GetAttackerPosition(), pendingTerraAttack));
+        AddBattleActionToStack(new TerraAttackBattleAction(GetCurrentTerraActionSelection(), pendingTerraAttack));
         pendingTerraAttack = null;
+    }
+
+    public void PushPendingCaptureAttempt(TerraBattlePosition targetTerraPosition)
+    {
+        pendingCaptureAttempt.SetTargetPosition(targetTerraPosition);
+        AddBattleActionToStack(new CaptureAttemptBattleAction(GetCurrentTerraActionSelection(), pendingCaptureAttempt));
+        pendingCaptureAttempt = null;
     }
 
     //Processes any necessary battle action stacks
@@ -187,4 +194,8 @@ public class BattleActionManager
     public TerraAttack GetPendingTerraAttack() { return pendingTerraAttack; }
 
     public void SetPendingTerraAttack(TerraAttack pendingTerraAttack) { this.pendingTerraAttack = pendingTerraAttack; }
+
+    public CaptureAttempt GetPendingCaptureAttempt() { return pendingCaptureAttempt; }
+
+    public void SetPendingCaptureAttempt(CaptureAttempt pendingCaptureAttempt) { this.pendingCaptureAttempt = pendingCaptureAttempt; }
 }

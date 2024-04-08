@@ -58,6 +58,19 @@ public class BattleStage : MonoBehaviour
         secondaryTerraGOArr = new GameObject[numTerraPositions];
     }
 
+    public void InitBattleStage(TerraBattlePosition[] primaryTerraPositionList, TerraBattlePosition[] secondaryTerraPositionList)
+    {
+        for (int i = 0; i < primaryTerraPositionList.Length; i++) {
+            if (primaryTerraPositionList[i].GetTerra() != null)
+                SetTerraAtPosition(primaryTerraPositionList[i].GetTerra(), true, i);
+        }
+
+        for (int i = 0; i < secondaryTerraPositionList.Length; i++) {
+            if (secondaryTerraPositionList[i].GetTerra() != null)
+                SetTerraAtPosition(secondaryTerraPositionList[i].GetTerra(), false, i);
+        }
+    }
+
     public GameObject GetPrimarySummonerGO() { return primarySummonerGO; }
 
     public GameObject GetSecondarySummonerGO() { return secondarySummonerGO; }
