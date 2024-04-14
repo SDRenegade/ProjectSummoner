@@ -14,12 +14,12 @@ public class CombatBattleState : BattleState
 
         ProcessEscapeAttempt(battleSystem);
         if(battleSystem.IsBattleFinished()) {
-            battleManager.SwitchState(battleManager.GetFinishedMatchBattleState());
+            battleManager.SwitchState(battleManager.GetFinishedMatchState());
             return;
         }
         ProcessCaptureAttempts(battleSystem);
         if (battleSystem.IsBattleFinished()) {
-            battleManager.SwitchState(battleManager.GetFinishedMatchBattleState());
+            battleManager.SwitchState(battleManager.GetFinishedMatchState());
             return;
         }
         ProcessTerraSwitches(battleSystem);
@@ -33,7 +33,7 @@ public class CombatBattleState : BattleState
         }
 
         if(battleSystem.IsBattleFinished())
-            battleManager.SwitchState(battleManager.GetFinishedMatchBattleState());
+            battleManager.SwitchState(battleManager.GetFinishedMatchState());
         else
             battleManager.SwitchState(battleManager.GetEndTurnState());
     }

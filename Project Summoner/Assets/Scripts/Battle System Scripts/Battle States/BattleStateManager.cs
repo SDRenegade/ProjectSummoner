@@ -6,6 +6,7 @@ public class BattleStateManager
 {
     private BattleSystem battleSystem;
 
+    private InitBattleState initBattleState;
     private StartOfTurnBattleState startTurnState;
     private ActionSelectionBattleState actionSelectionState;
     private CombatBattleState damageCalculationState;
@@ -18,13 +19,14 @@ public class BattleStateManager
     {
         this.battleSystem = battleSystem;
 
+        initBattleState = new InitBattleState();
         startTurnState = new StartOfTurnBattleState();
         actionSelectionState = new ActionSelectionBattleState();
         damageCalculationState = new CombatBattleState();
         endTurnState = new EndOfTurnBattleState();
         finishedMatchState = new FinishedMatchBattleState();
 
-        currentState = startTurnState;
+        currentState = initBattleState;
         currentState.EnterState(this);
     }
 
@@ -37,6 +39,8 @@ public class BattleStateManager
     public BattleSystem GetBattleSystem() { return battleSystem; }
 
     public BattleState GetCurrentState() { return currentState; }
+    
+    public InitBattleState GetInitState() { return initBattleState; }
 
     public StartOfTurnBattleState GetStartTurnState() { return startTurnState; }
 
@@ -46,5 +50,5 @@ public class BattleStateManager
 
     public EndOfTurnBattleState GetEndTurnState() { return endTurnState; }
 
-    public FinishedMatchBattleState GetFinishedMatchBattleState() {  return finishedMatchState; }
+    public FinishedMatchBattleState GetFinishedMatchState() {  return finishedMatchState; }
 }

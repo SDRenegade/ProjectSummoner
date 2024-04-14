@@ -15,7 +15,6 @@ public class StartOfTurnBattleState : BattleState
         battleSystem.UpdateTerraStatusBars();
 
         Debug.Log("============== Entered Start of Turn Battle State ==============");
-        //TODO Set main camera to start moving along track
         battleManager.SwitchState(battleManager.GetActionSelectionState());
     }
 }

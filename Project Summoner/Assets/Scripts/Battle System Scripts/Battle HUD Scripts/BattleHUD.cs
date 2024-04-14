@@ -1,13 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 public class BattleHUD : MonoBehaviour
 {
-    [SerializeField] private List<TerraBattleStatusBar> primarySideTerraStatusBarList;
-    [SerializeField] private List<TerraBattleStatusBar> secondarySideTerraStatusBarList;
+    [SerializeField] private TerraBattleStatusBarGroupUI terraBattleStatusBarGroupUI;
     [SerializeField] private MenuSelectionUI menuSelectionUI;
     [SerializeField] private MoveSelectionUI moveSelectionUI;
     [SerializeField] private TargetSelectionUI targetSelectionUI;
@@ -16,16 +14,13 @@ public class BattleHUD : MonoBehaviour
 
     public void Start()
     {
-        for(int i = 0; i < primarySideTerraStatusBarList.Count; i++)
-            primarySideTerraStatusBarList[i].gameObject.SetActive(false);
-        for (int i = 0; i < secondarySideTerraStatusBarList.Count; i++)
-            secondarySideTerraStatusBarList[i].gameObject.SetActive(false);
-
         CloseAllSelectionUI();
     }
 
-    public void InitMenuButtonEvents(BattleSystem battleSystem)
+    public void InitBattleHUD(BattleSystem battleSystem)
     {
+        terraBattleStatusBarGroupUI.InitStatusBars(battleSystem.GetBattleFormat());
+
         targetSelectionUI.GetOpponenet1Btn().onClick.AddListener(() => battleSystem.TargetSelection(0));
         targetSelectionUI.GetOpponenet2Btn().onClick.AddListener(() => battleSystem.TargetSelection(1));
         targetSelectionUI.GetAlly1Btn().onClick.AddListener(() => battleSystem.TargetSelection(2));
@@ -33,27 +28,14 @@ public class BattleHUD : MonoBehaviour
         summonerDieMenuUI.InitButtonEvents(battleSystem);
     }
 
-    public void UpdateTerraStatusBars(Battlefield battlefield, BattleFormat battleFormat)
+    public void UpdateTerraStatusBars(Battlefield battlefield)
     {
-        TerraBattlePosition[] primaryTerraBattlePositionArr = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
-        TerraBattlePosition[] secondaryTerraBattlePositionArr = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
+        terraBattleStatusBarGroupUI.UpdateTerraStatusBars(battlefield);
+    }
 
-        int numStatusBars = battleFormat.NumberOfLeadingPositions();
-        for(int i = 0; i < numStatusBars; i++) {
-            if (primaryTerraBattlePositionArr[i].GetTerra() == null)
-                primarySideTerraStatusBarList[i].gameObject.SetActive(false);
-            else {
-                primarySideTerraStatusBarList[i].gameObject.SetActive(true);
-                primarySideTerraStatusBarList[i].UpdateStatusBar(primaryTerraBattlePositionArr[i].GetTerra());
-            }
-
-            if (secondaryTerraBattlePositionArr[i].GetTerra() == null)
-                secondarySideTerraStatusBarList[i].gameObject.SetActive(false);
-            else {
-                secondarySideTerraStatusBarList[i].gameObject.SetActive(true);
-                secondarySideTerraStatusBarList[i].UpdateStatusBar(secondaryTerraBattlePositionArr[i].GetTerra());
-            }
-        }
+    public void HideTerraStatusBars()
+    {
+        terraBattleStatusBarGroupUI.HideTerraStatusBars();
     }
 
     public void OpenMenuSelectionUI(BattleActionManager battleActionManager)
@@ -94,18 +76,10 @@ public class BattleHUD : MonoBehaviour
         summonerDieMenuUI.OpenSummonerDieMenuUI(summonerDieItemStackList, 0);
     }
 
-    public void ReturnToMenuSelection(Battlefield battlefield, BattleFormat battleFormat, BattleActionManager battleActionManager)
+    public void ReturnToMenuSelection(Battlefield battlefield, BattleActionManager battleActionManager)
     {
-        UpdateTerraStatusBars(battlefield, battleFormat);
+        UpdateTerraStatusBars(battlefield);
         OpenMenuSelectionUI(battleActionManager);
-    }
-
-    public void HideTerraStatusBars()
-    {
-        for(int i = 0; i < primarySideTerraStatusBarList.Count; i++)
-            primarySideTerraStatusBarList[i].gameObject.SetActive(false);
-        for(int i = 0; i < secondarySideTerraStatusBarList.Count; i++)
-            secondarySideTerraStatusBarList[i].gameObject.SetActive(false);
     }
 
     public void CloseAllSelectionUI()

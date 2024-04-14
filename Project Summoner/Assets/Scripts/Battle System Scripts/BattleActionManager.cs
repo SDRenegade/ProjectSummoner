@@ -112,7 +112,7 @@ public class BattleActionManager
         pendingCaptureAttempt = null;
     }
 
-    //Processes any necessary battle action stacks
+    // Processes any necessary battle action stacks
     public void ProcessActionStacks(BattleSystem battleSystem)
     {
         for(int i = 0; i < terraAttackList.Count; i++)

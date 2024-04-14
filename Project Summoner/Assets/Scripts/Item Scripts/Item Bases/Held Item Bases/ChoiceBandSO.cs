@@ -64,12 +64,15 @@ public class ChoiceBand : ItemBase
             return;
         if (chosenMoveIndex == null || defenderList == null)
             return;
-        if (terraBattlePosition.GetTerra().GetMoves()[(int)chosenMoveIndex].GetCurrentPP() <= 0)
-            return;
 
-        Debug.Log(BattleDialog.ItemProkedMsg(this));
-        eventArgs.GetBattleSystem().MoveSelectionAction(terraBattlePosition, defenderList, (int)chosenMoveIndex);
-        eventArgs.SetMoveSelectionCancled(true);
+        if(eventArgs.GetBattleSystem().ForceTerraAttackSelection(terraBattlePosition, defenderList, (int)chosenMoveIndex)) {
+            Debug.Log(BattleDialog.ItemProkedMsg(this));
+            eventArgs.SetMoveSelectionCancled(true);
+        }
+        else {
+            chosenMoveIndex = null;
+            defenderList = null;
+        }
     }
 
     public void ApplyDamageModifier(object sender, DirectAttackEventArgs eventArgs)
