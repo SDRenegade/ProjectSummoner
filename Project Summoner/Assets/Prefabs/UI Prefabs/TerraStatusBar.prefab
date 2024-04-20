@@ -279,7 +279,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3979187138031589634}
-  - component: {fileID: 3979187138031589635}
+  - component: {fileID: 7004224896547478928}
   m_Layer: 5
   m_Name: TerraStatusBar
   m_TagString: Untagged
@@ -308,7 +308,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 400, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &3979187138031589635
+--- !u!114 &7004224896547478928
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -317,7 +317,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3979187138031589633}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d20b5e53f5b726489e2d8708e8cd293, type: 3}
+  m_Script: {fileID: 11500000, guid: 66a895e495162dc478e69f0b2af8c385, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   healthBar: {fileID: 3979187138267695800}

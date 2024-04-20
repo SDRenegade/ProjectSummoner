@@ -31,17 +31,8 @@ public class PlayerInteract : MonoBehaviour
         if (terraEncounter == null)
             return;
 
-        StringBuilder sb = new StringBuilder();
-        sb.Append("Encountered " + terraEncounter.GetTerra().GetTerraBase().GetSpeciesName() + " at level: " + terraEncounter.GetTerra().GetLevel() + " / Move set: ");
-        for (int i = 0; i < terraEncounter.GetTerra().GetMoves().Count; i++) {
-            if (terraEncounter.GetTerra().GetMoves()[i] != null) {
-                if (i != 0)
-                    sb.Append(", ");
-                sb.Append(terraEncounter.GetTerra().GetMoves()[i].GetMoveSO().GetMoveName());
-            }
-        }
-        Debug.Log(sb);
+        Debug.Log("You have encountered a(n)" + terraEncounter.GetTerraList()[0].GetTerraBase().GetSpeciesName());
 
-        BattleLoader.GetInstance().LoadWildBattle(gameObject.transform.root.GetComponent<PlayerTerraParty>().GetTerraList(), terraEncounter.GetTerra());
+        BattleLoader.GetInstance().LoadWildBattle(gameObject.transform.root.GetComponent<PlayerTerraParty>().GetTerraList(), terraEncounter.GetTerraList());
     }
 }

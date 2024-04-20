@@ -7,10 +7,10 @@ using UnityEngine.SceneManagement;
 public class BattleLoader : MonoBehaviour
 {
     private static BattleLoader instance;
-    private List<Terra> primaryTerraList;
-    private List<Terra> secondaryTerraList;
     private BattleType battleType;
     private BattleFormat battleFormat;
+    private List<Terra> primaryTerraList;
+    private List<Terra> secondaryTerraList;
 
     private void Awake()
     {
@@ -23,12 +23,16 @@ public class BattleLoader : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public void LoadWildBattle(List<Terra> playerTerraList, Terra wildTerra)
+    public void LoadWildBattle(List<Terra> playerTerraList, List<Terra> wildTerraList)
     {
-        primaryTerraList = playerTerraList;
-        secondaryTerraList = new List<Terra> { wildTerra };
         battleType = BattleType.WILD;
         battleFormat = BattleFormat.DOUBLE;
+        primaryTerraList = playerTerraList;
+        if(wildTerraList.Count >= battleFormat.NumberOfLeadingPositions()) {
+            for(int i = wildTerraList.Count - 1; i >= battleFormat.NumberOfLeadingPositions(); i--)
+                wildTerraList.RemoveAt(i);
+        }
+        secondaryTerraList = wildTerraList;
 
         //Save the player/scene data before loading into the battle scene
         SaveSystem.GetInstance().SaveGame();

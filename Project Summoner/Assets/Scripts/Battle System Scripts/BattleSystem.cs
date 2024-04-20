@@ -90,7 +90,7 @@ public class BattleSystem : MonoBehaviour
         battleType = BattleLoader.GetInstance().GetBattleType();
         battleFormat = BattleLoader.GetInstance().GetBattleFormat();
         primarySideAI = null;
-        secondarySideAI = new WildTerraAI(secondaryTerraList);
+        secondarySideAI = new WildTerraAI();
         battlefield = new Battlefield(battleFormat, primaryTerraList, secondaryTerraList);
 
         battleActionManager = new BattleActionManager(this);
@@ -556,7 +556,12 @@ public class BattleSystem : MonoBehaviour
                         SwitchFaintedTerra();
                     });
             else {
-                battleAI.SwitchFaintedTerra(faintedTerra);
+                int? switchIndex = battleAI.SwitchFaintedTerra(faintedTerra, this);
+                if (switchIndex != null)
+                    SwitchTerra(new TerraSwitch(
+                        faintedTerra.GetFaintedTerraPartyIndex(),
+                        (int)switchIndex,
+                        faintedTerra.IsPrimarySide()));
                 SwitchFaintedTerra();
             }
         }

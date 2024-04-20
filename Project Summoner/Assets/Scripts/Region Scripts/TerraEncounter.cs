@@ -4,17 +4,16 @@ using UnityEngine;
 
 public class TerraEncounter : MonoBehaviour
 {
-    [SerializeField] private Terra terra;
+    [SerializeField] private List<Terra> terraList;
 
     public void Start()
     {
-        terra.SetCurrentHP(terra.GetMaxHP());
+        for(int i = 0; i < terraList.Count; i++)
+            terraList[i].SetCurrentHP(terraList[i].GetMaxHP());
+
     }
 
-    //TODO Add encounter cry and visual effect
-    //public void InvokeEncounter() {}
+    public List<Terra> GetTerraList() { return terraList; }
 
-    public Terra GetTerra() { return terra; }
-
-    public void SetTerra(Terra terra) { this.terra = terra; }
+    public void SetTerraList(List<Terra> terraList) { this.terraList = terraList; }
 }

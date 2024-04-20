@@ -21,6 +21,7 @@ public class PartyBanner : MonoBehaviour
     [SerializeField] private TextMeshProUGUI terraLevel;
     [SerializeField] private TextMeshProUGUI terraCurrentHealth;
     [SerializeField] private TextMeshProUGUI terraMaxHealth;
+    [SerializeField] private Sprite emptyBannerSprite;
 
     public void UpdatePartyBanner(TerraBattlePosition activeTerraPosition, int? terraPartyIndex, PartyOptionSelectionUI optionSelectionUI, Action<TerraBattlePosition, TerraSwitch> switchAction, BattleSystem battleSystem)
     {
@@ -63,7 +64,7 @@ public class PartyBanner : MonoBehaviour
 
     private void SetEmptyBanner()
     {
-        image.sprite = null;
+        image.sprite = emptyBannerSprite;
         image.color = EMPTY_BANNER_IMAGE_COLOR;
 
         detailPanelLayer.gameObject.SetActive(false);

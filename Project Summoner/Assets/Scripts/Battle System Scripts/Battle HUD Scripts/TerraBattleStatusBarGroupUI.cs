@@ -10,23 +10,17 @@ public class TerraBattleStatusBarGroupUI : MonoBehaviour
     private List<TerraBattleStatusBar> primaryStatusBarList;
     private List<TerraBattleStatusBar> secondaryStatusBarList;
 
-    public void Start()
-    {
-        for (int i = 0; i < primaryStatusBarList.Count; i++)
-            primaryStatusBarList[i].gameObject.SetActive(false);
-        for (int i = 0; i < secondaryStatusBarList.Count; i++)
-            secondaryStatusBarList[i].gameObject.SetActive(false);
-    }
-
     public void InitStatusBars(BattleFormat battleFormat)
     {
         primaryStatusBarList = new List<TerraBattleStatusBar>();
         secondaryStatusBarList = new List<TerraBattleStatusBar>();
         for(int i = 0; i < battleFormat.NumberOfLeadingPositions(); i++) {
-            TerraBattleStatusBar primaryTerraStatusBar = Instantiate(terraStatusBarPrefab).GetComponent<TerraBattleStatusBar>();
-            TerraBattleStatusBar secondaryTerraStatusBar = Instantiate(terraStatusBarPrefab).GetComponent<TerraBattleStatusBar>();
-            primaryStatusBarList.Add(primaryTerraStatusBar);
-            secondaryStatusBarList.Add(secondaryTerraStatusBar);
+            GameObject primaryTerraStatusBar = Instantiate(terraStatusBarPrefab);
+            primaryTerraStatusBar.transform.SetParent(primaryStatusBarPanel.transform);
+            primaryStatusBarList.Add(primaryTerraStatusBar.GetComponent<TerraBattleStatusBar>());
+            GameObject secondaryTerraStatusBar = Instantiate(terraStatusBarPrefab);
+            secondaryTerraStatusBar.transform.SetParent(secondaryStatusBarPanel.transform);
+            secondaryStatusBarList.Add(secondaryTerraStatusBar.GetComponent<TerraBattleStatusBar>());
         }
     }
 

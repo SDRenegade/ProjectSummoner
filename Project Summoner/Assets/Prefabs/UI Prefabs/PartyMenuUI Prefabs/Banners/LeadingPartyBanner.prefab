@@ -1350,6 +1350,7 @@ MonoBehaviour:
   terraLevel: {fileID: 4447663108994427028}
   terraCurrentHealth: {fileID: 4447663107767725297}
   terraMaxHealth: {fileID: 4447663107559071636}
+  emptyBannerSprite: {fileID: 21300000, guid: b0971e410c4354d4aafc81a860c8f39b, type: 3}
 --- !u!1 &4447663108994427034
 GameObject:
   m_ObjectHideFlags: 0

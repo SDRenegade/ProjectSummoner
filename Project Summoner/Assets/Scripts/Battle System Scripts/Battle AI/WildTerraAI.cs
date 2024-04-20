@@ -4,12 +4,8 @@ using UnityEngine;
 
 public class WildTerraAI : BattleAI
 {
-    private List<Terra> terraList;
 
-    public WildTerraAI(List<Terra> terraList)
-    {
-        this.terraList = terraList;
-    }
+    public WildTerraAI() {}
 
     public void PerformAction(TerraBattlePosition terraBattlePosition, List<int> disabledMoveIndicies, BattleSystem battleSystem)
     {
@@ -22,8 +18,10 @@ public class WildTerraAI : BattleAI
                 availableMoveIndicies.RemoveAt(i);
         }
 
-        int targetPositionIndex = Random.Range(0, battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr().Length);
-        TerraBattlePosition targetPosition = battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr()[targetPositionIndex];
+        bool isPrimarySide = terraBattlePosition.GetBattleSide().IsPrimarySide();
+        TerraBattlePosition[] opponentTerraBattlePositionArr = isPrimarySide ? battleSystem.GetBattlefield().GetSecondaryBattleSide().GetTerraBattlePositionArr() : battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
+        int targetPositionIndex = Random.Range(0, opponentTerraBattlePositionArr.Length);
+        TerraBattlePosition targetPosition = opponentTerraBattlePositionArr[targetPositionIndex];
         
         //Choose a valid move index at random. If there are no valid move indicies, use struggle.
         if(availableMoveIndicies.Count == 0) {
@@ -39,8 +37,16 @@ public class WildTerraAI : BattleAI
         }
     }
 
-    public int? SwitchFaintedTerra(FaintedTerra faintedTerra)
+    public int? SwitchFaintedTerra(FaintedTerra faintedTerra, BattleSystem battleSystem)
     {
+        // Temp Since wild terra encounters should never have bench terra in the terra list.
+        bool isPirmarySide = faintedTerra.IsPrimarySide();
+        List<Terra> terraList = isPirmarySide ? battleSystem.GetPrimaryTerraList() : battleSystem.GetSecondaryTerraList();
+        for(int i = battleSystem.GetBattleFormat().NumberOfLeadingPositions(); i < terraList.Count; i++) {
+            if (terraList[i].GetCurrentHP() > 0)
+                return i;
+        }
+
         return null;
     }
 }

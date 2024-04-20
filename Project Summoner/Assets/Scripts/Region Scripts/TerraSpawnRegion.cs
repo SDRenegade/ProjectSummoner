@@ -39,7 +39,10 @@ public class TerraSpawnRegion : MonoBehaviour
                     Vector3 spawnPosition = new Vector3(rayOrigin.x, hit.transform.position.y, rayOrigin.z);
                     GameObject spawnedTerraGameObject = Instantiate(terraSpawnList[i].GetTerraBase().GetTerraGameObject(), spawnPosition, Quaternion.identity);
                     spawnedTerraGameObject.transform.parent = wildTerraParentObject.transform;
-                    spawnedTerraGameObject.AddComponent<TerraEncounter>().SetTerra(new Terra(terraSpawnList[i].GetTerraBase(), Random.Range(terraSpawnList[i].GetMinLevel(), terraSpawnList[i].GetMaxLevel())));
+                    spawnedTerraGameObject.AddComponent<TerraEncounter>().SetTerraList(
+                        new List<Terra> {
+                            new Terra(terraSpawnList[i].GetTerraBase(), Random.Range(terraSpawnList[i].GetMinLevel(), terraSpawnList[i].GetMaxLevel()))
+                    });
                 }
                 else
                     Debug.Log("No spawnable area detected for layerMask " + layerMask.value);

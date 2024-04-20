@@ -553,18 +553,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58d5a1da3e872a64889991d157a6dd6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  terra:
-    terraBase: {fileID: 11400000, guid: 4423df2580197fe468e0df8e1d363e6d, type: 2}
+  terraList:
+  - terraBase: {fileID: 11400000, guid: 4423df2580197fe468e0df8e1d363e6d, type: 2}
     terraNickname: 
-    level: 25
+    level: 12
     moves:
     - moveSO: {fileID: 11400000, guid: bd1aecb2193b359438b9e423cfd674c1, type: 2}
-      maxPP: 20
-      currentPP: 20
+      maxPP: 12
+      currentPP: 12
     - moveSO: {fileID: 11400000, guid: bbab58efed0be3d4493ef2893699d3fd, type: 2}
-      maxPP: 20
-      currentPP: 20
-    currentHP: 20
+      maxPP: 12
+      currentPP: 12
+    currentHP: 0
+  - terraBase: {fileID: 11400000, guid: 4be40f0e713c22742b9dbccd4d87c6be, type: 2}
+    terraNickname: 
+    level: 15
+    moves:
+    - moveSO: {fileID: 11400000, guid: 0a6c1492c35a3b84e913e4a8a54d9397, type: 2}
+      maxPP: 10
+      currentPP: 10
+    - moveSO: {fileID: 11400000, guid: a8608705956752c4b850835747302741, type: 2}
+      maxPP: 10
+      currentPP: 10
+    currentHP: 0
+  - terraBase: {fileID: 11400000, guid: 2f168a1530418724e8e4fd080557a192, type: 2}
+    terraNickname: 
+    level: 11
+    moves:
+    - moveSO: {fileID: 11400000, guid: 7ed8d7368d09e0d468b3265e11f7fb48, type: 2}
+      maxPP: 10
+      currentPP: 10
+    - moveSO: {fileID: 11400000, guid: 78c0a383ee589d3428dad714f38560bb, type: 2}
+      maxPP: 10
+      currentPP: 10
+    currentHP: 0
 --- !u!4 &245214802 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
@@ -2842,7 +2864,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.94
+      value: 3.66
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.y
