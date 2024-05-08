@@ -1,22 +1,22 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using static PathHandle;
 
 [CustomEditor(typeof(Spline))]
 public class SplineEditor : Editor
 {
     private readonly float BEZIER_LINE_WIDTH = 3f;
     private readonly Color BEZIER_LINE_COLOR = Color.green;
-    private readonly float ANCHOR_SIZE = 0.75f;
-    private readonly float HANDLE_SIZE = 0.4f;
-    // TODO Add anchor colors for normal, highlighted, and selected
+    private readonly float ANCHOR_SIZE = 0.70f;
+    private readonly float CONTROL_SIZE = 0.45f;
     private readonly int WORLD_RAY_DISTANCE = 18;
 
     private Spline spline;
-    private Tool LastTool = Tool.None;
-    private int mouseOverHandleIndex;
-    private bool wasShiftingLastFrame;
+    private Tool LastTool;
+    private Tuple<int, SplineHandleType> mouseOverHandle;
+    private Tuple<int, SplineHandleType> transformDisplayHandle;
 
     private void OnEnable()
     {
@@ -104,48 +104,12 @@ public class SplineEditor : Editor
         Vector3 transformPosition = spline.transform.position;
         List<SplineAnchor> anchorList = spline.GetAnchorList();
         if (anchorList != null) {
-            foreach (SplineAnchor anchor in spline.GetAnchorList()) {
-                Handles.color = Color.red;
-                Handles.SphereHandleCap(0, spline.transform.position + anchor.position, Quaternion.identity, ANCHOR_SIZE, EventType.Repaint);
+            for (int i = 0; i < spline.GetAnchorList().Count; i++) {
+                SplineAnchor anchor = spline.GetAnchorList()[i];
 
-                EditorGUI.BeginChangeCheck();
-                Vector3 newAnchorPos = Handles.PositionHandle(spline.transform.position + anchor.position, Quaternion.identity);
-                if (EditorGUI.EndChangeCheck()) {
-                    Undo.RecordObject(spline, "Change Anchor Position");
-                    anchor.controlAPosition = (anchor.controlAPosition - anchor.position) + newAnchorPos - transformPosition;
-                    anchor.controlBPosition = (anchor.controlBPosition - anchor.position) + newAnchorPos - transformPosition;
-                    anchor.position = newAnchorPos - transformPosition;
-                    spline.SetDirty();
-                    serializedObject.Update();
-                }
-
-                Handles.color = Color.blue;
-                Handles.SphereHandleCap(0, transformPosition + anchor.controlAPosition, Quaternion.identity, HANDLE_SIZE, EventType.Repaint);
-
-                EditorGUI.BeginChangeCheck();
-                Vector3 newHandleAPos = Handles.PositionHandle(transformPosition + anchor.controlAPosition, Quaternion.identity);
-                if (EditorGUI.EndChangeCheck()) {
-                    Undo.RecordObject(spline, "Change Anchor Control A Position");
-                    anchor.controlAPosition = newHandleAPos - transformPosition;
-                    if (Event.current.shift)
-                        anchor.controlBPosition = anchor.position - (anchor.controlAPosition - anchor.position);
-                    spline.SetDirty();
-                    serializedObject.Update();
-                }
-
-                Handles.color = Color.blue;
-                Handles.SphereHandleCap(0, transformPosition + anchor.controlBPosition, Quaternion.identity, HANDLE_SIZE, EventType.Repaint);
-
-                EditorGUI.BeginChangeCheck();
-                Vector3 newHandleBPos = Handles.PositionHandle(transformPosition + anchor.controlBPosition, Quaternion.identity);
-                if (EditorGUI.EndChangeCheck()) {
-                    Undo.RecordObject(spline, "Change Anchor Control B Position");
-                    anchor.controlBPosition = newHandleBPos - transformPosition;
-                    if (Event.current.shift)
-                        anchor.controlAPosition = anchor.position - (anchor.controlBPosition - anchor.position);
-                    spline.SetDirty();
-                    serializedObject.Update();
-                }
+                DrawHandle(new Tuple<int, SplineHandleType>(i, SplineHandleType.Anchor));
+                DrawHandle(new Tuple<int, SplineHandleType>(i, SplineHandleType.ControlA));
+                DrawHandle(new Tuple<int, SplineHandleType>(i, SplineHandleType.ControlB));
 
                 Handles.color = Color.black;
                 Handles.DrawLine(transformPosition + anchor.position, transformPosition + anchor.controlAPosition);
@@ -170,21 +134,33 @@ public class SplineEditor : Editor
 
     private void ProcessBezierCurveInput(Event e)
     {
-        int previousMouseOverHandleIndex = (mouseOverHandleIndex == -1) ? 0 : mouseOverHandleIndex;
-        mouseOverHandleIndex = -1;
+        int previousMouseOverHandleIndex = (mouseOverHandle == null) ? 0 : mouseOverHandle.Item1;
+        mouseOverHandle = null;
         for(int i = 0; i < spline.GetAnchorList().Count; i++) {
             int handleIndex = (previousMouseOverHandleIndex + i) % spline.GetAnchorList().Count;
-            float handleRadius = HANDLE_SIZE;
-            Vector3 pos = spline.transform.position + spline.GetAnchorList()[handleIndex].position;
-            float distance = HandleUtility.DistanceToCircle(pos, handleRadius);
-            if (distance == 0) {
-                mouseOverHandleIndex = handleIndex;
+            Vector3 anchorPos = spline.transform.position + spline.GetAnchorList()[handleIndex].position;
+            Vector3 controlAPos = spline.transform.position + spline.GetAnchorList()[handleIndex].controlAPosition;
+            Vector3 controlBPos = spline.transform.position + spline.GetAnchorList()[handleIndex].controlBPosition;
+
+            float distanceToAnchor = HandleUtility.DistanceToCircle(anchorPos, ANCHOR_SIZE);
+            if (distanceToAnchor == 0) {
+                mouseOverHandle = new Tuple<int, SplineHandleType>(handleIndex, SplineHandleType.Anchor);
+                break;
+            }
+            float distanceControlA = HandleUtility.DistanceToCircle(controlAPos, CONTROL_SIZE);
+            if (distanceControlA == 0) {
+                mouseOverHandle = new Tuple<int, SplineHandleType>(handleIndex, SplineHandleType.ControlA);
+                break;
+            }
+            float distanceControlB = HandleUtility.DistanceToCircle(controlBPos, CONTROL_SIZE);
+            if (distanceControlB == 0) {
+                mouseOverHandle = new Tuple<int, SplineHandleType>(handleIndex, SplineHandleType.ControlB);
                 break;
             }
         }
 
-        // Shift-left click (when mouse not over a handle) to split or add segment
-        if (mouseOverHandleIndex == -1) {
+        if (mouseOverHandle == null) {
+            // Shift-left click (when mouse not over a handle) to add new segment
             if (e.type == EventType.MouseDown && e.button == 0 && e.shift) {
                 Vector2 mousePos = Event.current.mousePosition;
 
@@ -193,9 +169,98 @@ public class SplineEditor : Editor
 
                 Undo.RecordObject(spline, "Added Anchor");
                 spline.AddAnchor(newAnchorPos);
+            }
+        }
+        else {
+            // Control left click or press delete over an anchor to remove it from the spline
+            if (e.keyCode == KeyCode.Backspace || (e.control && e.type == EventType.MouseDown && e.button == 0)) {
+                if(mouseOverHandle.Item2 == SplineHandleType.Anchor) {
+                    Undo.RecordObject(spline, "Removed Anchor");
+                    spline.RemoveAnchorAt(mouseOverHandle.Item1);
+                }
+            }
+        }
+    }
+
+    // indexAndType holds the anchor index as item1 value and the point type (Anchor, ControlA, or ControlB) as item2
+    private void DrawHandle(Tuple<int, SplineHandleType> handleIndexAndType)
+    {
+        if (handleIndexAndType.Item1 >= spline.GetAnchorList().Count)
+            return;
+        if (handleIndexAndType.Item2 == SplineHandleType.None)
+            return;
+
+        Vector3 handlePosition = Vector3.zero;
+        switch(handleIndexAndType.Item2) {
+            case SplineHandleType.Anchor:
+                handlePosition = spline.transform.position + spline.GetAnchorList()[handleIndexAndType.Item1].position;
+                break;
+            case SplineHandleType.ControlA:
+                handlePosition = spline.transform.position + spline.GetAnchorList()[handleIndexAndType.Item1].controlAPosition;
+                break;
+            case SplineHandleType.ControlB:
+                handlePosition = spline.transform.position + spline.GetAnchorList()[handleIndexAndType.Item1].controlBPosition;
+                break;
+        }
+
+        float handleSize = (handleIndexAndType.Item2 == SplineHandleType.Anchor) ? ANCHOR_SIZE : CONTROL_SIZE;
+        HandleInputType handleInputType;
+        handlePosition = PathHandle.DrawHandle(handlePosition, handleSize, out handleInputType, handleIndexAndType);
+
+        bool isTransformHandleVisible = false;
+        if (transformDisplayHandle != null) {
+            isTransformHandleVisible = transformDisplayHandle.Item1 == handleIndexAndType.Item1 && transformDisplayHandle.Item2 == handleIndexAndType.Item2;
+        }
+        if(isTransformHandleVisible)
+            handlePosition = Handles.DoPositionHandle(handlePosition, Quaternion.identity);
+
+        switch (handleInputType) {
+            case HandleInputType.LMBDrag:
+                transformDisplayHandle = null;
+                Repaint();
+                break;
+            case HandleInputType.LMBRelease:
+                transformDisplayHandle = null;
+                Repaint();
+                break;
+            case HandleInputType.LMBClick:
+                if (Event.current.shift)
+                    transformDisplayHandle = null; // disable move tool if new point added
+                else {
+                    // disable move tool if clicking on point under move tool
+                    transformDisplayHandle = isTransformHandleVisible ? null : handleIndexAndType;
+                }
+                Repaint();
+                break;
+            case HandleInputType.LMBPress:
+                if (transformDisplayHandle != handleIndexAndType) {
+                    transformDisplayHandle = null;
+                    Repaint();
+                }
+                break;
+        }
 
 
-
+        Vector3 localPosition = handlePosition - spline.transform.position;
+        // Update spline anchor/control position. If an anchor position is updated, the corresponding control positions are updated as well.
+        // If shift is held and a control point is being updated, the control point positions are mirrored.
+        if (spline.GetAnchorList()[handleIndexAndType.Item1].GetSplineHandleTypePosition(handleIndexAndType.Item2) != localPosition) {
+            Undo.RecordObject(spline, "Move point");
+            SplineAnchor anchor = spline.GetAnchorList()[handleIndexAndType.Item1];
+            if (handleIndexAndType.Item2 == SplineHandleType.Anchor) {
+                anchor.controlAPosition += localPosition - anchor.position;
+                anchor.controlBPosition += localPosition - anchor.position;
+                anchor.position = localPosition;
+            }
+            else if(handleIndexAndType.Item2 == SplineHandleType.ControlA) {
+                anchor.controlAPosition = localPosition;
+                if (Event.current.shift)
+                    anchor.controlBPosition = anchor.position - (anchor.controlAPosition - anchor.position);
+            }
+            else {
+                anchor.controlBPosition = localPosition;
+                if (Event.current.shift)
+                    anchor.controlAPosition = anchor.position - (anchor.controlBPosition - anchor.position);
             }
         }
     }

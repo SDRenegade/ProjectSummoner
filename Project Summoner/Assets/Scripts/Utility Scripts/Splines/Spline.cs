@@ -293,7 +293,6 @@ public class Spline : MonoBehaviour
         if(anchorList != null) {
             Gizmos.color = Color.green;
             for(int i = 0; i < anchorList.Count; i++) {
-                Debug.Log("In point loop");
                 int nextPoint = i + 1;
                 if(nextPoint >= anchorList.Count) {
                     if (isClosedLoop)
@@ -307,12 +306,43 @@ public class Spline : MonoBehaviour
     }
 }
 
+public enum SplineHandleType
+{
+    None,
+    Anchor,
+    ControlA,
+    ControlB
+}
+
 [Serializable]
 public class SplineAnchor
 {
     public Vector3 position;
     public Vector3 controlAPosition;
     public Vector3 controlBPosition;
+
+    public Vector3 GetSplineHandleTypePosition(SplineHandleType splineHandleType)
+    {
+        Vector3 handlePosition = Vector3.zero;
+        if (splineHandleType == SplineHandleType.Anchor)
+            handlePosition = position;
+        else if(splineHandleType == SplineHandleType.ControlA)
+            handlePosition = controlAPosition;
+        else if (splineHandleType == SplineHandleType.ControlB)
+            handlePosition = controlBPosition;
+
+        return handlePosition;
+    }
+
+    public void SetSplineHandleTypePosition(Vector3 newPosition, SplineHandleType splineHandleType)
+    {
+        if (splineHandleType == SplineHandleType.Anchor)
+            position = newPosition;
+        else if (splineHandleType == SplineHandleType.ControlA)
+            controlAPosition = newPosition;
+        else if (splineHandleType == SplineHandleType.ControlB)
+            controlBPosition = newPosition;
+    }
 }
 
 [Serializable]

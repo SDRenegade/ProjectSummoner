@@ -1046,6 +1046,91 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 461324220}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &485168791
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 485168792}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &485168792
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 485168791}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.69, y: 4.8, z: 2.15}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 11
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &502078428
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 502078430}
+  - component: {fileID: 502078429}
+  m_Layer: 0
+  m_Name: New Spline
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &502078429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 502078428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09614bde15b9b804da460bceb0664818, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  normal: {x: 0, y: 0, z: -1}
+  isClosedLoop: 0
+  anchorList:
+  - position: {x: 1.0321321, y: 0.10205984, z: 0.45540285}
+    controlAPosition: {x: 6.6378326, y: 0.3528614, z: -0.03350067}
+    controlBPosition: {x: -5.362564, y: -0.32049942, z: 2.026081}
+  - position: {x: 1.0661154, y: -6.0779867, z: -0.39093208}
+    controlAPosition: {x: 6.38832, y: -4.474532, z: -2.467309}
+    controlBPosition: {x: -5.04795, y: -7.892806, z: 1.6126928}
+  isVisableWhenNotSelected: 0
+--- !u!4 &502078430
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 502078428}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.38, y: 5.45, z: 1.4193573}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &564172028
 GameObject:
   m_ObjectHideFlags: 0
@@ -3510,23 +3595,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   normal: {x: 0, y: 0, z: -1}
-  isClosedLoop: 1
+  isClosedLoop: 0
   anchorList:
-  - position: {x: 13.80476, y: 0, z: -15.503852}
-    controlAPosition: {x: 14.234718, y: 0.3847102, z: -21.238972}
-    controlBPosition: {x: 11.859505, y: -0.014613867, z: -10.298264}
-  - position: {x: 11.368065, y: 0, z: -3.9561613}
-    controlAPosition: {x: -1.7543259, y: -0.4037193, z: 0.93194795}
-    controlBPosition: {x: 24.490456, y: 0.4037193, z: -8.844271}
-  - position: {x: 2.7947292, y: -0.5095912, z: 19.52539}
-    controlAPosition: {x: 21.543259, y: -0.5095912, z: 21.62489}
-    controlBPosition: {x: -7.244049, y: -0.5095912, z: 18.156937}
-  - position: {x: -18.828957, y: 5.528172, z: 13.528953}
-    controlAPosition: {x: -9.521812, y: 5.158774, z: 18.55901}
-    controlBPosition: {x: -28.1361, y: 5.89757, z: 8.498896}
-  - position: {x: -17.617447, y: -0.78892004, z: -12.021838}
-    controlAPosition: {x: -21.390902, y: 0.18019378, z: -8.693411}
-    controlBPosition: {x: -13.843992, y: -1.7580339, z: -15.3502655}
+  - position: {x: 4.1723366, y: 0, z: 18.705076}
+    controlAPosition: {x: -7.2003098, y: 0.27860653, z: 17.413923}
+    controlBPosition: {x: 15.544983, y: -0.27860653, z: 19.99623}
+  - position: {x: 16.656384, y: -2.9079485, z: -5.3309364}
+    controlAPosition: {x: 22.257244, y: -2.8263378, z: 4.4841814}
+    controlBPosition: {x: 11.055523, y: -2.9895592, z: -15.146054}
+  - position: {x: -3.5786304, y: 4.1455603, z: -12.591129}
+    controlAPosition: {x: 1.7533607, y: -0.038778424, z: -18.83562}
+    controlBPosition: {x: -8.910622, y: 8.329899, z: -6.3466377}
+  - position: {x: -20.688753, y: 0.047672153, z: -8.148301}
+    controlAPosition: {x: -15.811924, y: 1.3031814, z: -1.6696157}
+    controlBPosition: {x: -25.565582, y: -1.2078371, z: -14.6269865}
   isVisableWhenNotSelected: 1
 --- !u!4 &1931318026
 Transform:
