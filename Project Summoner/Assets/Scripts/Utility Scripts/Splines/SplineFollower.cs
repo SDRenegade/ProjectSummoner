@@ -9,6 +9,8 @@ public class SplineFollower : MonoBehaviour
 
     [SerializeField] private Spline spline;
     [SerializeField] private float speed;
+    [SerializeField] private bool isFollowForward;
+    [SerializeField] private bool isFollowNormal;
 
     private float moveAmount;
 
@@ -16,7 +18,8 @@ public class SplineFollower : MonoBehaviour
     {
         moveAmount = (moveAmount + (Time.deltaTime * speed)) % MAX_MOVEMENT;
 
-        transform.position = spline.GetPositionAt(moveAmount);
-        transform.forward = spline.GetForwardAt(moveAmount);
+        // TODO Update with vector path GetPositionAt and GetForward
+        //transform.position = spline.GetPositionAt(moveAmount);
+        //transform.forward = spline.GetForwardAt(moveAmount);
     }
 }

@@ -5,186 +5,84 @@ using UnityEngine;
 
 public class Spline : MonoBehaviour
 {
+    private const float MAX_ANGLE_ERROR = 0.3f;
+    private const float MIN_VERTEX_DST = 0.01f;
+    private const float ACCURACY = 10f;
+
     public event EventHandler OnDirty;
 
     [SerializeField] private Vector3 normal = new Vector3(0, 0, -1);
     [SerializeField] private bool isClosedLoop;
-    [SerializeField] private List<SplineAnchor> anchorList;
-
     [SerializeField] private bool isVisableWhenNotSelected;
+    [SerializeField] private List<SplineAnchor> anchorList;
+    private VertexPath vertexPath;
 
-    private List<SplinePoint> pointList;
-    private float pointAmtInCurve;
-    private float pointAmountPerUnitInCurve = 2f;
-
-    private void Awake()
-    {
-        SetupPointList();
-    }
-
-    public Vector3 QuadraticLerp(Vector3 a, Vector3 b, Vector3 c, float t)
-    {
-        Vector3 ab = Vector3.Lerp(a, b, t);
-        Vector3 bc = Vector3.Lerp(b, c, t);
-
-        return Vector3.Lerp(ab, bc, t);
-    }
-
-    public Vector3 CubicLerp(Vector3 a, Vector3 b, Vector3 c, Vector3 d, float t)
-    {
-        Vector3 abc = QuadraticLerp(a, b, c, t);
-        Vector3 bcd = QuadraticLerp(b, c, d, t);
-
-        return Vector3.Lerp(abc, bcd, t);
-    }
-
-    public Vector3 GetPositionAt(float t)
+    public void InitializeAnchorList()
     {
         if (anchorList == null)
-            return Vector3.zero;
-        if (anchorList.Count < 2)
-            return anchorList[0].position;
+            anchorList = new List<SplineAnchor>();
+        else
+            anchorList.Clear();
 
-        SplineAnchor anchorA, anchorB;
-        if (t == 1) {
-            // Full position, special case
-            if (isClosedLoop) {
-                anchorA = anchorList[anchorList.Count - 1];
-                anchorB = anchorList[0];
-            }
-            else {
-                anchorA = anchorList[anchorList.Count - 2];
-                anchorB = anchorList[anchorList.Count - 1];
-            }
-            return transform.position + CubicLerp(anchorA.position, anchorA.controlBPosition, anchorB.controlAPosition, anchorB.position, t);
-        }
-        else {
-            int addClosedLoop = isClosedLoop ? 1 : 0;
-            float tFull = t * (anchorList.Count - 1 + addClosedLoop);
-            int anchorIndex = Mathf.FloorToInt(tFull);
-            float tAnchor = tFull - anchorIndex;
+        anchorList.Add(new SplineAnchor());
+        anchorList.Add(new SplineAnchor());
+        anchorList[0].anchorPos = new Vector3(-5, 0, 0);
+        anchorList[0].controlAPos = new Vector3(-8, -3, 0);
+        anchorList[0].controlBPos = new Vector3(-2, 3, 0);
+        anchorList[1].anchorPos = new Vector3(5, 0, 0);
+        anchorList[1].controlAPos = new Vector3(2, -3, 0);
+        anchorList[1].controlBPos = new Vector3(8, 3, 0);
 
-            if (anchorIndex < anchorList.Count - 1) {
-                anchorA = anchorList[anchorIndex];
-                anchorB = anchorList[anchorIndex + 1]; // Doesn't ever result in an out of bounds error since we know t != 1
-            }
-            else {
-                // anchorIndex is final one, either don't link to "next" one or loop back
-                if (isClosedLoop) {
-                    anchorA = anchorList[anchorList.Count - 1];
-                    anchorB = anchorList[0];
+        UpdateVertexPath();
+    }
+
+    public VertexPath UpdateVertexPath()
+    {
+        if (vertexPath == null)
+            vertexPath = new VertexPath();
+        else
+            vertexPath.Clear();
+
+        vertexPath.vertices.Add(anchorList[0].anchorPos);
+        vertexPath.tangents.Add(EvaluateCurveDerivative(anchorList[0], anchorList[1], 0));
+
+        Vector3 prevPointOnPath = anchorList[0].anchorPos;
+        Vector3 lastAddedPoint = anchorList[0].anchorPos;
+        float dstSinceLastVertex = 0;
+
+        // Iterate through all spline segments and split them into verticies
+        for(int segmentIndex = 0; segmentIndex < GetNumSegments(); segmentIndex++) {
+            float estimatedSegmentLength = EstimateBezierCurveLength(anchorList[segmentIndex], anchorList[(segmentIndex + 1) % anchorList.Count]);
+            int numDivisions = Mathf.CeilToInt(estimatedSegmentLength * ACCURACY);
+            float increment = 1f / numDivisions;
+
+            for (float t = increment; t <= 1; t += increment) {
+                bool isLastPointOnPath = (t + increment > 1 && segmentIndex == GetNumSegments() - 1);
+                if (isLastPointOnPath)
+                    t = 1;
+                Vector3 pointOnPath = CubicLerp(anchorList[segmentIndex], anchorList[(segmentIndex + 1) % anchorList.Count], t);
+                Vector3 nextPointOnPath = CubicLerp(anchorList[segmentIndex], anchorList[(segmentIndex + 1) % anchorList.Count], t + increment);
+
+                // angle at current point on path
+                float localAngle = 180 - Vector3.Angle((prevPointOnPath - pointOnPath), (nextPointOnPath - pointOnPath));
+                // angle between the last added vertex, the current point on the path, and the next point on the path
+                float angleFromPrevVertex = 180 - Vector3.Angle((lastAddedPoint - pointOnPath), (nextPointOnPath - pointOnPath));
+                float angleError = Mathf.Max(localAngle, angleFromPrevVertex);
+
+                if ((angleError > MAX_ANGLE_ERROR && dstSinceLastVertex >= MIN_VERTEX_DST) || isLastPointOnPath) {
+                    vertexPath.vertices.Add(pointOnPath);
+                    vertexPath.tangents.Add(EvaluateCurveDerivative(anchorList[segmentIndex], anchorList[(segmentIndex + 1) % anchorList.Count], t).normalized);
+                    dstSinceLastVertex = 0;
+                    lastAddedPoint = pointOnPath;
                 }
-                else {
-                    // *** Remove if not being hit ***
-                    Debug.Log("Odd case being hit");
-                    anchorA = anchorList[anchorIndex - 1];
-                    anchorB = anchorList[anchorIndex];
-                    tAnchor = 1f;
-                }
-            }
+                else
+                    dstSinceLastVertex += (pointOnPath - prevPointOnPath).magnitude;
 
-            return transform.position + CubicLerp(anchorA.position, anchorA.controlBPosition, anchorB.controlAPosition, anchorB.position, tAnchor);
-        }
-    }
-
-    public Vector3 GetForwardAt(float t)
-    {
-        SplinePoint pointA = GetPreviousPoint(t);
-        int pointBIndex;
-
-        pointBIndex = (pointList.IndexOf(pointA) + 1) % pointList.Count;
-        SplinePoint pointB = pointList[pointBIndex];
-
-        return Vector3.Lerp(pointA.forward, pointB.forward, (t - pointA.t) / Mathf.Abs(pointA.t - pointB.t));
-    }
-
-    public SplinePoint GetPreviousPoint(float t)
-    {
-        int previousIndex = 0;
-        for (int i = 1; i < pointList.Count; i++) {
-            SplinePoint point = pointList[i];
-            if (t < point.t) {
-                return pointList[previousIndex];
-            }
-            else {
-                previousIndex = i;
+                prevPointOnPath = pointOnPath;
             }
         }
-        return pointList[previousIndex];
-    }
 
-    public SplinePoint GetClosestPoint(float t)
-    {
-        SplinePoint closestPoint = pointList[0];
-        foreach (SplinePoint point in pointList) {
-            if (Mathf.Abs(t - point.t) < Mathf.Abs(t - closestPoint.t)) {
-                closestPoint = point;
-            }
-        }
-        return closestPoint;
-    }
-
-    private void SetupPointList()
-    {
-        pointList = new List<SplinePoint>();
-        pointAmtInCurve = pointAmountPerUnitInCurve * GetSplineLength();
-        for (float t = 0; t < 1f; t += 1f / pointAmtInCurve) {
-            pointList.Add(new SplinePoint {
-                t = t,
-                position = GetPositionAt(t),
-                normal = normal,
-            });
-        }
-
-        pointList.Add(new SplinePoint {
-            t = 1f,
-            position = GetPositionAt(1f),
-        });
-
-        UpdateForwardVectors();
-    }
-
-    private void UpdatePointList()
-    {
-        if (pointList == null)
-            return;
-
-        foreach (SplinePoint point in pointList)
-            point.position = GetPositionAt(point.t);
-
-        UpdateForwardVectors();
-    }
-
-    private void UpdateForwardVectors()
-    {
-        if (pointList == null || pointList.Count == 0)
-            return;
-
-        // Set forward vectors
-        for (int i = 0; i < pointList.Count - 1; i++) {
-            // Set final forward vector
-            if (i == pointList.Count - 1 && isClosedLoop)
-                pointList[i].forward = (pointList[i + 1].position - pointList[i].position).normalized;
-            else
-                pointList[i].forward = (pointList[i + 1].position - pointList[i].position).normalized;
-        }
-    }
-
-    public float GetSplineLength(float stepSize = .01f)
-    {
-        float splineLength = 0f;
-
-        Vector3 lastPosition = GetPositionAt(0f);
-
-        for (float t = 0; t < 1f; t += stepSize) {
-            splineLength += Vector3.Distance(lastPosition, GetPositionAt(t));
-
-            lastPosition = GetPositionAt(t);
-        }
-
-        splineLength += Vector3.Distance(lastPosition, GetPositionAt(1f));
-
-        return splineLength;
+        return vertexPath;
     }
 
     public void AddAnchor()
@@ -194,19 +92,21 @@ public class Spline : MonoBehaviour
 
         if (anchorList.Count == 0) {
             anchorList.Add(new SplineAnchor {
-                position = new Vector3(0, 0, 0),
-                controlAPosition = new Vector3(3f, 0, 0),
-                controlBPosition = new Vector3(-3f, 0, 0),
+                anchorPos = new Vector3(0, 0, 0),
+                controlAPos = new Vector3(3f, 0, 0),
+                controlBPos = new Vector3(-3f, 0, 0),
             });
         }
         else {
             SplineAnchor lastAnchor = anchorList[anchorList.Count - 1];
             anchorList.Add(new SplineAnchor {
-                position = lastAnchor.position + new Vector3(3f, 0, 0),
-                controlAPosition = lastAnchor.controlAPosition + new Vector3(3f, 0, 0),
-                controlBPosition = lastAnchor.controlBPosition + new Vector3(3f, 0, 0),
+                anchorPos = lastAnchor.anchorPos + new Vector3(3f, 0, 0),
+                controlAPos = lastAnchor.controlAPos + new Vector3(3f, 0, 0),
+                controlBPos = lastAnchor.controlBPos + new Vector3(3f, 0, 0),
             });
         }
+
+        UpdateVertexPath();
     }
 
     public void AddAnchor(Vector3 worldPosition)
@@ -217,19 +117,21 @@ public class Spline : MonoBehaviour
         Vector3 localPosition = worldPosition - transform.position;
         if (anchorList.Count == 0) {
             anchorList.Add(new SplineAnchor {
-                position = localPosition,
-                controlAPosition = localPosition + new Vector3(3f, 0, 0),
-                controlBPosition = localPosition + new Vector3(-3f, 0, 0)
+                anchorPos = localPosition,
+                controlAPos = localPosition + new Vector3(3f, 0, 0),
+                controlBPos = localPosition + new Vector3(-3f, 0, 0)
             });
         }
         else {
             SplineAnchor lastAnchor = anchorList[anchorList.Count - 1];
             anchorList.Add(new SplineAnchor {
-                position = localPosition,
-                controlAPosition = (lastAnchor.controlAPosition - lastAnchor.position) + localPosition,
-                controlBPosition = (lastAnchor.controlBPosition - lastAnchor.position) + localPosition
+                anchorPos = localPosition,
+                controlAPos = (lastAnchor.controlAPos - lastAnchor.anchorPos) + localPosition,
+                controlBPos = (lastAnchor.controlBPos - lastAnchor.anchorPos) + localPosition
             });
         }
+
+        UpdateVertexPath();
     }
 
     public void RemoveAnchorAt(int index)
@@ -238,7 +140,8 @@ public class Spline : MonoBehaviour
             return;
 
         anchorList.RemoveAt(index);
-        Debug.Log("Anchor has been removed");
+
+        UpdateVertexPath();
     }
 
     public void RemoveLastAnchor()
@@ -249,40 +152,94 @@ public class Spline : MonoBehaviour
         }
 
         anchorList.RemoveAt(anchorList.Count - 1);
-        Debug.Log("Anchor has been removed");
+
+        UpdateVertexPath();
     }
-
-    public List<SplineAnchor> GetAnchorList() { return anchorList; }
-
-
-    public List<SplinePoint> GetPointList() { return pointList; }
-
-    public bool IsClosedLoop() { return isClosedLoop; }
 
     public void SetAllZZero()
     {
         foreach (SplineAnchor anchor in anchorList) {
-            anchor.position = new Vector3(anchor.position.x, anchor.position.y, 0f);
-            anchor.controlAPosition = new Vector3(anchor.controlAPosition.x, anchor.controlAPosition.y, 0f);
-            anchor.controlBPosition = new Vector3(anchor.controlBPosition.x, anchor.controlBPosition.y, 0f);
+            anchor.anchorPos = new Vector3(anchor.anchorPos.x, anchor.anchorPos.y, 0f);
+            anchor.controlAPos = new Vector3(anchor.controlAPos.x, anchor.controlAPos.y, 0f);
+            anchor.controlBPos = new Vector3(anchor.controlBPos.x, anchor.controlBPos.y, 0f);
         }
     }
 
     public void SetAllYZero()
     {
         foreach (SplineAnchor anchor in anchorList) {
-            anchor.position = new Vector3(anchor.position.x, 0f, anchor.position.z);
-            anchor.controlAPosition = new Vector3(anchor.controlAPosition.x, 0f, anchor.controlAPosition.z);
-            anchor.controlBPosition = new Vector3(anchor.controlBPosition.x, 0f, anchor.controlBPosition.z);
+            anchor.anchorPos = new Vector3(anchor.anchorPos.x, 0f, anchor.anchorPos.z);
+            anchor.controlAPos = new Vector3(anchor.controlAPos.x, 0f, anchor.controlAPos.z);
+            anchor.controlBPos = new Vector3(anchor.controlBPos.x, 0f, anchor.controlBPos.z);
         }
     }
 
     public void SetDirty()
     {
-        UpdatePointList();
+        UpdateVertexPath();
 
         OnDirty?.Invoke(this, EventArgs.Empty);
     }
+
+    // TODO Move these two methods to a utilities class
+    /// Returns point at time 't' (between 0 and 1) along quadratic path defined by three points (anchor_1, control, anchor_2)
+    public static Vector3 QuadraticLerp(Vector3 a, Vector3 b, Vector3 c, float t)
+    {
+        t = Mathf.Clamp01(t);
+
+        Vector3 ab = Vector3.Lerp(a, b, t);
+        Vector3 bc = Vector3.Lerp(b, c, t);
+
+        return Vector3.Lerp(ab, bc, t);
+    }
+
+    /// Returns point at time 't' (between 0 and 1)  along bezier curve defined by 4 points (anchor_1, control_1, control_2, anchor_2)
+    public static Vector3 CubicLerp(SplineAnchor a1, SplineAnchor a2, float t)
+    {
+        return CubicLerp(a1.anchorPos, a1.controlBPos, a2.controlAPos, a2.anchorPos, t);
+    }
+
+    /// Returns point at time 't' (between 0 and 1)  along bezier curve defined by 4 points (anchor_1, control_1, control_2, anchor_2)
+    public static Vector3 CubicLerp(Vector3 a, Vector3 b, Vector3 c, Vector3 d, float t)
+    {
+        t = Mathf.Clamp01(t);
+
+        Vector3 abc = QuadraticLerp(a, b, c, t);
+        Vector3 bcd = QuadraticLerp(b, c, d, t);
+
+        return Vector3.Lerp(abc, bcd, t);
+    }
+
+    /// Returns a vector tangent to the point at time 't'
+    /// This is the vector tangent to the curve at that point
+    public static Vector3 EvaluateCurveDerivative(SplineAnchor a1, SplineAnchor a2, float t)
+    {
+        return EvaluateCurveDerivative(a1.anchorPos, a1.controlBPos, a2.controlAPos, a2.anchorPos, t);
+    }
+
+    /// Calculates the derivative of the curve at time 't'
+    /// This is the vector tangent to the curve at that point
+    public static Vector3 EvaluateCurveDerivative(Vector3 a1, Vector3 c1, Vector3 c2, Vector3 a2, float t)
+    {
+        t = Mathf.Clamp01(t);
+        return 3 * (1 - t) * (1 - t) * (c1 - a1) + 6 * (1 - t) * t * (c2 - c1) + 3 * t * t * (a2 - c2);
+    }
+
+    // Crude, but fast estimation of bezier curve length.
+    public static float EstimateBezierCurveLength(SplineAnchor anchor1, SplineAnchor anchor2)
+    {
+        float controlNetLength = (anchor1.anchorPos - anchor1.controlBPos).magnitude + (anchor1.controlBPos - anchor2.controlAPos).magnitude + (anchor2.controlAPos - anchor2.anchorPos).magnitude;
+        float estimatedCurveLength = (anchor1.anchorPos - anchor2.anchorPos).magnitude + controlNetLength / 2f;
+        return estimatedCurveLength;
+    }
+
+    public List<SplineAnchor> GetAnchorList() { return anchorList; }
+
+    public VertexPath GetVertexPath() { return vertexPath; }
+
+    public bool IsClosedLoop() { return isClosedLoop; }
+
+    public int GetNumSegments() { return isClosedLoop ? anchorList.Count : anchorList.Count - 1; }
 
     private void OnDrawGizmos()
     {
@@ -290,17 +247,17 @@ public class Spline : MonoBehaviour
         if (!isVisableWhenNotSelected || selectedObj == gameObject)
             return;
 
-        if(anchorList != null) {
+        if(vertexPath != null) {
             Gizmos.color = Color.green;
-            for(int i = 0; i < anchorList.Count; i++) {
+            for(int i = 0; i < vertexPath.vertices.Count; i++) {
                 int nextPoint = i + 1;
-                if(nextPoint >= anchorList.Count) {
+                if (nextPoint >= vertexPath.vertices.Count) {
                     if (isClosedLoop)
-                        nextPoint %= anchorList.Count;
+                        nextPoint %= vertexPath.vertices.Count;
                     else
                         break;
                 }
-                Gizmos.DrawLine(transform.position + anchorList[i].position, transform.position + anchorList[nextPoint].position);
+                Gizmos.DrawLine(transform.position + vertexPath.vertices[i], transform.position + vertexPath.vertices[nextPoint]);
             }
         }
     }
@@ -317,39 +274,45 @@ public enum SplineHandleType
 [Serializable]
 public class SplineAnchor
 {
-    public Vector3 position;
-    public Vector3 controlAPosition;
-    public Vector3 controlBPosition;
+    public Vector3 anchorPos;
+    public Vector3 controlAPos;
+    public Vector3 controlBPos;
 
-    public Vector3 GetSplineHandleTypePosition(SplineHandleType splineHandleType)
+    public Vector3 GetSplineHandlePosition(SplineHandleType splineHandleType)
     {
         Vector3 handlePosition = Vector3.zero;
         if (splineHandleType == SplineHandleType.Anchor)
-            handlePosition = position;
+            handlePosition = anchorPos;
         else if(splineHandleType == SplineHandleType.ControlA)
-            handlePosition = controlAPosition;
+            handlePosition = controlAPos;
         else if (splineHandleType == SplineHandleType.ControlB)
-            handlePosition = controlBPosition;
+            handlePosition = controlBPos;
 
         return handlePosition;
     }
 
-    public void SetSplineHandleTypePosition(Vector3 newPosition, SplineHandleType splineHandleType)
+    public void SetSplineHandlePosition(Vector3 newPosition, SplineHandleType splineHandleType)
     {
         if (splineHandleType == SplineHandleType.Anchor)
-            position = newPosition;
+            anchorPos = newPosition;
         else if (splineHandleType == SplineHandleType.ControlA)
-            controlAPosition = newPosition;
+            controlAPos = newPosition;
         else if (splineHandleType == SplineHandleType.ControlB)
-            controlBPosition = newPosition;
+            controlBPos = newPosition;
     }
 }
 
 [Serializable]
-public class SplinePoint
+public class VertexPath
 {
-    public float t;
-    public Vector3 position;
-    public Vector3 forward;
-    public Vector3 normal;
+    public List<Vector3> vertices = new List<Vector3>();
+    public List<Vector3> tangents = new List<Vector3>();
+    public List<float> cumulativeLength = new List<float>();
+
+    public void Clear()
+    {
+        vertices.Clear();
+        tangents.Clear();
+        cumulativeLength.Clear();
+    }
 }
