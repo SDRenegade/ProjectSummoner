@@ -55,15 +55,15 @@ public class SplineEditor : Editor
 
             serializedObject.ApplyModifiedProperties();
 
-            if (GUILayout.Button("Set All Z = 0")) {
-                Undo.RecordObject(spline, "Set All Z = 0");
-                spline.SetAllZZero();
+            if (GUILayout.Button("Flatten on Z axis")) {
+                Undo.RecordObject(spline, "Flatten on Z axis");
+                spline.FlattenOnZ();
                 spline.SetDirty();
                 serializedObject.Update();
             }
-            if (GUILayout.Button("Set All Y = 0")) {
-                Undo.RecordObject(spline, "Set All Y = 0");
-                spline.SetAllYZero();
+            if (GUILayout.Button("Flatten on Y axis")) {
+                Undo.RecordObject(spline, "Flatten on Y axis");
+                spline.FlattenOnY();
                 spline.SetDirty();
                 serializedObject.Update();
             }
@@ -215,9 +215,8 @@ public class SplineEditor : Editor
         handlePosition = PathHandle.DrawHandle(handlePosition, handleSize, out handleInputType, handleIndexAndType);
 
         bool isTransformHandleVisible = false;
-        if (transformDisplayHandle != null) {
+        if (transformDisplayHandle != null)
             isTransformHandleVisible = transformDisplayHandle.Item1 == handleIndexAndType.Item1 && transformDisplayHandle.Item2 == handleIndexAndType.Item2;
-        }
         if(isTransformHandleVisible)
             handlePosition = Handles.DoPositionHandle(handlePosition, Quaternion.identity);
 
@@ -231,18 +230,24 @@ public class SplineEditor : Editor
                 Repaint();
                 break;
             case HandleInputType.LMBClick:
+                // Disable move tool if a new point is added with shift click
                 if (Event.current.shift)
-                    transformDisplayHandle = null; // disable move tool if new point added
+                    transformDisplayHandle = null;
                 else {
-                    // disable move tool if clicking on point under move tool
+                    // disable move tool if clicking on a point that currently has the move tool displayed
                     transformDisplayHandle = isTransformHandleVisible ? null : handleIndexAndType;
                 }
                 Repaint();
                 break;
             case HandleInputType.LMBPress:
-                if (transformDisplayHandle != handleIndexAndType) {
-                    transformDisplayHandle = null;
-                    Repaint();
+                // If the handle pressed down on is not the one that has the trasform tool displayed for,
+                // disable the transform tool
+                if(transformDisplayHandle != null) {
+                    if (transformDisplayHandle.Item1 != handleIndexAndType.Item1 ||
+                        transformDisplayHandle.Item2 != handleIndexAndType.Item2) {
+                        transformDisplayHandle = null;
+                        Repaint();
+                    }
                 }
                 break;
         }

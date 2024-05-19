@@ -17,6 +17,11 @@ public class Spline : MonoBehaviour
     [SerializeField] private List<SplineAnchor> anchorList;
     private VertexPath vertexPath;
 
+    public void Awake()
+    {
+        UpdateVertexPath();
+    }
+
     public void InitializeAnchorList()
     {
         if (anchorList == null)
@@ -45,9 +50,11 @@ public class Spline : MonoBehaviour
 
         vertexPath.vertices.Add(anchorList[0].anchorPos);
         vertexPath.tangents.Add(EvaluateCurveDerivative(anchorList[0], anchorList[1], 0));
+        vertexPath.cumulativeLength.Add(0);
 
         Vector3 prevPointOnPath = anchorList[0].anchorPos;
         Vector3 lastAddedPoint = anchorList[0].anchorPos;
+        float cumulativeLength = 0;
         float dstSinceLastVertex = 0;
 
         // Iterate through all spline segments and split them into verticies
@@ -63,6 +70,7 @@ public class Spline : MonoBehaviour
                 Vector3 pointOnPath = CubicLerp(anchorList[segmentIndex], anchorList[(segmentIndex + 1) % anchorList.Count], t);
                 Vector3 nextPointOnPath = CubicLerp(anchorList[segmentIndex], anchorList[(segmentIndex + 1) % anchorList.Count], t + increment);
 
+                dstSinceLastVertex += (pointOnPath - prevPointOnPath).magnitude;
                 // angle at current point on path
                 float localAngle = 180 - Vector3.Angle((prevPointOnPath - pointOnPath), (nextPointOnPath - pointOnPath));
                 // angle between the last added vertex, the current point on the path, and the next point on the path
@@ -70,19 +78,55 @@ public class Spline : MonoBehaviour
                 float angleError = Mathf.Max(localAngle, angleFromPrevVertex);
 
                 if ((angleError > MAX_ANGLE_ERROR && dstSinceLastVertex >= MIN_VERTEX_DST) || isLastPointOnPath) {
+                    cumulativeLength += dstSinceLastVertex;
                     vertexPath.vertices.Add(pointOnPath);
                     vertexPath.tangents.Add(EvaluateCurveDerivative(anchorList[segmentIndex], anchorList[(segmentIndex + 1) % anchorList.Count], t).normalized);
+                    vertexPath.cumulativeLength.Add(cumulativeLength);
                     dstSinceLastVertex = 0;
                     lastAddedPoint = pointOnPath;
                 }
-                else
-                    dstSinceLastVertex += (pointOnPath - prevPointOnPath).magnitude;
 
                 prevPointOnPath = pointOnPath;
             }
         }
 
         return vertexPath;
+    }
+
+    // Get the position at a certain distance on the vertex path
+    public Vector3 GetPositionAt(float dst)
+    {
+        dst = dst % vertexPath.cumulativeLength[vertexPath.cumulativeLength.Count - 1];
+
+        int vertexSegemntIndex = 0;
+        for(int i = 0; i < vertexPath.vertices.Count; i++) {
+            if(dst <= vertexPath.cumulativeLength[i]) {
+                vertexSegemntIndex = i - 1 >= 0 ? i - 1 : vertexPath.cumulativeLength.Count - 1;
+                break;
+            }
+        }
+
+        float segmentLength = vertexSegemntIndex == 0 ? vertexPath.cumulativeLength[0] :
+            vertexPath.cumulativeLength[vertexSegemntIndex + 1] - vertexPath.cumulativeLength[vertexSegemntIndex];
+        float dstOnSegment = dst - vertexPath.cumulativeLength[vertexSegemntIndex];
+        float t = dstOnSegment / segmentLength;
+
+        return transform.position + Vector3.Lerp(vertexPath.vertices[vertexSegemntIndex], vertexPath.vertices[vertexSegemntIndex + 1], t);
+    }
+
+    public Vector3 GetForwardAt(float dst)
+    {
+        dst = dst % vertexPath.cumulativeLength[vertexPath.cumulativeLength.Count - 1];
+
+        int vertexSegemntIndex = 0;
+        for (int i = 0; i < vertexPath.vertices.Count; i++) {
+            if (dst <= vertexPath.cumulativeLength[i]) {
+                vertexSegemntIndex = i - 1 >= 0 ? i - 1 : vertexPath.cumulativeLength.Count - 1;
+                break;
+            }
+        }
+
+        return vertexPath.tangents[vertexSegemntIndex];
     }
 
     public void AddAnchor()
@@ -136,9 +180,14 @@ public class Spline : MonoBehaviour
 
     public void RemoveAnchorAt(int index)
     {
-        if(index >=  anchorList.Count)
+        if(anchorList == null)
             return;
+        if (anchorList.Count <= 2) {
+            Debug.LogWarning("You cannot remove an achor point from a bezier curve when there are 2 or less anchor points left");
+            return;
+        }
 
+        index = Mathf.Clamp(index, 0, anchorList.Count - 1);
         anchorList.RemoveAt(index);
 
         UpdateVertexPath();
@@ -146,8 +195,10 @@ public class Spline : MonoBehaviour
 
     public void RemoveLastAnchor()
     {
-        if (anchorList == null) {
-            anchorList = new List<SplineAnchor>();
+        if (anchorList == null)
+            return;
+        if (anchorList.Count <= 2) {
+            Debug.LogWarning("You cannot remove an achor point from a bezier curve when there are 2 or less anchor points left");
             return;
         }
 
@@ -156,7 +207,7 @@ public class Spline : MonoBehaviour
         UpdateVertexPath();
     }
 
-    public void SetAllZZero()
+    public void FlattenOnZ()
     {
         foreach (SplineAnchor anchor in anchorList) {
             anchor.anchorPos = new Vector3(anchor.anchorPos.x, anchor.anchorPos.y, 0f);
@@ -165,7 +216,7 @@ public class Spline : MonoBehaviour
         }
     }
 
-    public void SetAllYZero()
+    public void FlattenOnY()
     {
         foreach (SplineAnchor anchor in anchorList) {
             anchor.anchorPos = new Vector3(anchor.anchorPos.x, 0f, anchor.anchorPos.z);
@@ -247,7 +298,12 @@ public class Spline : MonoBehaviour
         if (!isVisableWhenNotSelected || selectedObj == gameObject)
             return;
 
-        if(vertexPath != null) {
+        // This should be moved into a hook method for when the scene view is opened, however,
+        // I couldn't find any such method.
+        if (vertexPath == null && anchorList != null)
+            UpdateVertexPath();
+
+        if (vertexPath != null) {
             Gizmos.color = Color.green;
             for(int i = 0; i < vertexPath.vertices.Count; i++) {
                 int nextPoint = i + 1;
