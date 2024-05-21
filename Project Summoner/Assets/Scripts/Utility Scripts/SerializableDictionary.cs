@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Toolbars;
 using UnityEngine;
 
 [System.Serializable]
@@ -16,8 +17,11 @@ public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IS
     {
         Clear();
 
-        foreach(var element in elements)
+        foreach(var element in elements) {
+            if(element.GetKey() == null || element.GetValue() == null)
+                continue;
             this.Add(element.GetKey(), element.GetValue());
+        }
     }
 
     public void OnBeforeSerialize()

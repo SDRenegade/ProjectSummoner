@@ -98,14 +98,16 @@ public class Spline : MonoBehaviour
     {
         dst = dst % vertexPath.cumulativeLength[vertexPath.cumulativeLength.Count - 1];
 
+        Debug.Log("dst: " + dst);
         int vertexSegemntIndex = 0;
         for(int i = 0; i < vertexPath.vertices.Count; i++) {
-            if(dst <= vertexPath.cumulativeLength[i]) {
+            if(dst < vertexPath.cumulativeLength[i]) {
                 vertexSegemntIndex = i - 1 >= 0 ? i - 1 : vertexPath.cumulativeLength.Count - 1;
                 break;
             }
         }
 
+        Debug.Log("vertexSegmentIndex: " + vertexSegemntIndex + " cumlativeLength Count: " + vertexPath.cumulativeLength.Count);
         float segmentLength = vertexSegemntIndex == 0 ? vertexPath.cumulativeLength[0] :
             vertexPath.cumulativeLength[vertexSegemntIndex + 1] - vertexPath.cumulativeLength[vertexSegemntIndex];
         float dstOnSegment = dst - vertexPath.cumulativeLength[vertexSegemntIndex];
@@ -128,6 +130,8 @@ public class Spline : MonoBehaviour
 
         return vertexPath.tangents[vertexSegemntIndex];
     }
+
+    public float GetVertexPathLength() { return vertexPath.cumulativeLength[vertexPath.cumulativeLength.Count - 1]; }
 
     public void AddAnchor()
     {

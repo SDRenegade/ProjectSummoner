@@ -7,7 +7,7 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private Spline spline;
     [SerializeField] private float speed;
     [SerializeField] private bool isFollowForward;
-    [SerializeField] private bool isFollowNormal;
+    //[SerializeField] private bool isFollowNormal;
 
     private float moveAmount;
 
@@ -16,6 +16,7 @@ public class PathFollower : MonoBehaviour
         moveAmount += speed * Time.deltaTime;
 
         transform.position = spline.GetPositionAt(moveAmount);
-        transform.forward = spline.GetForwardAt(moveAmount);
+        if(isFollowForward)
+            transform.forward = spline.GetForwardAt(moveAmount);
     }
 }
