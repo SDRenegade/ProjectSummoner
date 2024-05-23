@@ -25,7 +25,7 @@ public class BattleLoader : MonoBehaviour
 
     public void LoadWildBattle(List<Terra> playerTerraList, List<Terra> wildTerraList)
     {
-        battleType = BattleType.WILD;
+        battleType = BattleType.Summoner;
         battleFormat = BattleFormat.DOUBLE;
         primaryTerraList = playerTerraList;
         if(wildTerraList.Count >= battleFormat.NumberOfLeadingPositions()) {

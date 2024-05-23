@@ -47,7 +47,7 @@ public class BattleStage : MonoBehaviour
             primarySummonerGO.transform.position = primarySummonerPos;
             primarySummonerGO.transform.eulerAngles = new Vector3(0f, battlefieldOrigin.eulerAngles.y, 0f);
         }
-        if (BattleLoader.GetInstance().GetBattleType() != BattleType.WILD && secondarySummonerPrefab != null) {
+        if (BattleLoader.GetInstance().GetBattleType() != BattleType.Wild && secondarySummonerPrefab != null) {
             secondarySummonerGO = Instantiate(secondarySummonerPrefab);
             secondarySummonerGO.transform.position = secondarySummonerPos;
             secondarySummonerGO.transform.eulerAngles = new Vector3(0f, battlefieldOrigin.eulerAngles.y - 180f, 0f);

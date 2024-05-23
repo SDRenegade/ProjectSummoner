@@ -98,7 +98,6 @@ public class Spline : MonoBehaviour
     {
         dst = dst % vertexPath.cumulativeLength[vertexPath.cumulativeLength.Count - 1];
 
-        Debug.Log("dst: " + dst);
         int vertexSegemntIndex = 0;
         for(int i = 0; i < vertexPath.vertices.Count; i++) {
             if(dst < vertexPath.cumulativeLength[i]) {
@@ -107,7 +106,6 @@ public class Spline : MonoBehaviour
             }
         }
 
-        Debug.Log("vertexSegmentIndex: " + vertexSegemntIndex + " cumlativeLength Count: " + vertexPath.cumulativeLength.Count);
         float segmentLength = vertexSegemntIndex == 0 ? vertexPath.cumulativeLength[0] :
             vertexPath.cumulativeLength[vertexSegemntIndex + 1] - vertexPath.cumulativeLength[vertexSegemntIndex];
         float dstOnSegment = dst - vertexPath.cumulativeLength[vertexSegemntIndex];
@@ -236,7 +234,7 @@ public class Spline : MonoBehaviour
         OnDirty?.Invoke(this, EventArgs.Empty);
     }
 
-    // TODO Move these two methods to a utilities class
+    // TODO Move these methods to a utilities class
     /// Returns point at time 't' (between 0 and 1) along quadratic path defined by three points (anchor_1, control, anchor_2)
     public static Vector3 QuadraticLerp(Vector3 a, Vector3 b, Vector3 c, float t)
     {

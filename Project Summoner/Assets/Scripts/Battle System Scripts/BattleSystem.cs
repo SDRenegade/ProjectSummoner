@@ -6,8 +6,8 @@ using UnityEngine;
 
 public enum BattleType
 {
-    WILD,
-    SUMMONER
+    Wild,
+    Summoner
 }
 
 public class BattleSystem : MonoBehaviour
@@ -164,7 +164,7 @@ public class BattleSystem : MonoBehaviour
 
     public void EscapeSelection()
     {
-        if (battleType != BattleType.WILD) {
+        if (battleType != BattleType.Wild) {
             Debug.Log(BattleDialog.CANNOT_ESCAPE_SUMMONER_BATTLE);
             return;
         }
