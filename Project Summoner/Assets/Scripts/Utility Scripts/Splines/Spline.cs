@@ -100,8 +100,8 @@ public class Spline : MonoBehaviour
 
         int vertexSegemntIndex = 0;
         for(int i = 0; i < vertexPath.vertices.Count; i++) {
-            if(dst < vertexPath.cumulativeLength[i]) {
-                vertexSegemntIndex = i - 1 >= 0 ? i - 1 : vertexPath.cumulativeLength.Count - 1;
+            if(dst <= vertexPath.cumulativeLength[i]) {
+                vertexSegemntIndex = i - 1 >= 0 ? i - 1 : vertexPath.cumulativeLength.Count - 2;
                 break;
             }
         }

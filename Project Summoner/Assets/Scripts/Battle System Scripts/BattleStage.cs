@@ -6,9 +6,11 @@ using UnityEngine;
 public class BattleStage : MonoBehaviour
 {
     [SerializeField] private Transform battlefieldOrigin;
-    [SerializeField] private float opposingTerraSpacing;
-    [SerializeField] private float allyTerraSpacing;
-    [SerializeField] private float summonerTerraSpacing;
+    [Header("Spacing")]
+    [SerializeField] private Vector3 opposingTerraSpacing;
+    [SerializeField] private Vector3 allyTerraSpacing;
+    [SerializeField] private Vector3 summonerTerraSpacing;
+    [Header("Prefabs")]
     [SerializeField] private GameObject primarySummonerPrefab;
     [SerializeField] private GameObject secondarySummonerPrefab;
 
@@ -21,26 +23,14 @@ public class BattleStage : MonoBehaviour
     private GameObject[] primaryTerraGOArr;
     private GameObject[] secondaryTerraGOArr;
 
-    private float sinOfBattleOriginY;
-    private float cosOfBattleOriginY;
-
     public void Start()
     {
-        sinOfBattleOriginY = Mathf.Sin((battlefieldOrigin.eulerAngles.y * Mathf.PI) / 180f);
-        cosOfBattleOriginY = Mathf.Cos((battlefieldOrigin.eulerAngles.y * Mathf.PI) / 180f);
+        Quaternion battlefieldRotation = Quaternion.Euler(0, battlefieldOrigin.eulerAngles.y, 0).normalized;
 
-        primaryTerraFieldCenterPos = battlefieldOrigin.position;
-        primaryTerraFieldCenterPos.x -= opposingTerraSpacing * sinOfBattleOriginY;
-        primaryTerraFieldCenterPos.z -= opposingTerraSpacing * cosOfBattleOriginY;
-        secondaryTerraFieldCenterPos = battlefieldOrigin.position;
-        secondaryTerraFieldCenterPos.x += opposingTerraSpacing * sinOfBattleOriginY;
-        secondaryTerraFieldCenterPos.z += opposingTerraSpacing * cosOfBattleOriginY;
-        primarySummonerPos = primaryTerraFieldCenterPos;
-        primarySummonerPos.x -= summonerTerraSpacing * sinOfBattleOriginY;
-        primarySummonerPos.z -= summonerTerraSpacing * cosOfBattleOriginY;
-        secondarySummonerPos = secondaryTerraFieldCenterPos;
-        secondarySummonerPos.x += summonerTerraSpacing * sinOfBattleOriginY;
-        secondarySummonerPos.z += summonerTerraSpacing * cosOfBattleOriginY;
+        primaryTerraFieldCenterPos = battlefieldOrigin.position - (battlefieldRotation * opposingTerraSpacing);
+        secondaryTerraFieldCenterPos = battlefieldOrigin.position + (battlefieldRotation * opposingTerraSpacing);
+        primarySummonerPos = primaryTerraFieldCenterPos - (battlefieldRotation * summonerTerraSpacing);
+        secondarySummonerPos = secondaryTerraFieldCenterPos + (battlefieldRotation * summonerTerraSpacing);
 
         if (primarySummonerPrefab != null) {
             primarySummonerGO = Instantiate(primarySummonerPrefab);
@@ -88,7 +78,7 @@ public class BattleStage : MonoBehaviour
             if (positionIndex < 0 || positionIndex >= primaryTerraGOArr.Length)
                 positionIndex = 0;
 
-            float centerSpacing = allyTerraSpacing / 2;
+            float centerSpacing = allyTerraSpacing.magnitude / 2;
             if (positionIndex == 0)
                 centerSpacing = -centerSpacing;
 

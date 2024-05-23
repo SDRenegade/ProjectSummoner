@@ -5677,9 +5677,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   battlefieldOrigin: {fileID: 270892284}
-  opposingTerraSpacing: 15
-  allyTerraSpacing: 12
-  summonerTerraSpacing: 8
+  opposingTerraSpacing: {x: 0, y: 0, z: 15}
+  allyTerraSpacing: {x: 12, y: 0, z: 0}
+  summonerTerraSpacing: {x: 0, y: 0, z: 8}
   primarySummonerPrefab: {fileID: 5581033331738924364, guid: 6fea8a63968ae2149b66b69a8d58bcce, type: 3}
   secondarySummonerPrefab: {fileID: 5581033331738924364, guid: 6fea8a63968ae2149b66b69a8d58bcce, type: 3}
 --- !u!4 &1195796265

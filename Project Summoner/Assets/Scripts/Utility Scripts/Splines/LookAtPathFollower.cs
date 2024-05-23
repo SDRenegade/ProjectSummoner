@@ -13,23 +13,23 @@ public class LookAtPathFollower : MonoBehaviour
     [SerializeField] private bool isActive;
 
     private float moveAmount;
-    private int currentLookAtByPathIndex;
+    private int currentPathIndex;
 
     private void Update()
     {
         if(!isActive)
             return;
 
-        moveAmount = moveAmount + (speed * Time.deltaTime) < lookAtPathList[currentLookAtByPathIndex].GetPath().GetVertexPathLength() ?
-            moveAmount + (speed * Time.deltaTime) : lookAtPathList[currentLookAtByPathIndex].GetPath().GetVertexPathLength();
+        moveAmount = moveAmount + (speed * Time.deltaTime) < lookAtPathList[currentPathIndex].GetPath().GetVertexPathLength() ?
+            moveAmount + (speed * Time.deltaTime) : lookAtPathList[currentPathIndex].GetPath().GetVertexPathLength();
 
-        transform.position = lookAtPathList[currentLookAtByPathIndex].GetPath().GetPositionAt(moveAmount);
-        transform.LookAt(lookAtPathList[currentLookAtByPathIndex].GetLookAtPosition());
+        transform.position = lookAtPathList[currentPathIndex].GetPath().GetPositionAt(moveAmount);
+        transform.LookAt(lookAtPathList[currentPathIndex].GetLookAtPosition());
 
-        if(moveAmount >= lookAtPathList[currentLookAtByPathIndex].GetPath().GetVertexPathLength()) {
+        if(moveAmount >= lookAtPathList[currentPathIndex].GetPath().GetVertexPathLength()) {
             moveAmount = 0;
-            currentLookAtByPathIndex = (currentLookAtByPathIndex + 1) % lookAtPathList.Count;
-            if (currentLookAtByPathIndex == 0) {
+            currentPathIndex = (currentPathIndex + 1) % lookAtPathList.Count;
+            if (currentPathIndex == 0) {
                 OnEndOfPath?.Invoke(this, EventArgs.Empty);
                 if(!isLoop)
                     isActive = false;
@@ -47,7 +47,7 @@ public class LookAtPathFollower : MonoBehaviour
     {
         if(!isActive) {
             moveAmount = 0;
-            currentLookAtByPathIndex = 0;
+            currentPathIndex = 0;
         }
 
         this.isActive = isActive;
