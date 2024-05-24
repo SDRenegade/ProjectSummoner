@@ -10,13 +10,13 @@ public static class PathHandle
     private static readonly HandleColors ANCHOR_COLORS = new HandleColors(Color.red, new Color32(255, 100, 100, 255), Color.white);
     private static readonly HandleColors CONTROL_COLORS = new HandleColors(Color.blue, new Color32(115, 120, 255, 255), Color.white);
 
-    private static Tuple<int, SplineHandleType> selectedHandle;
+    private static Tuple<int, BezierHandleType> selectedHandle;
     private static bool isMouseOverAHandle;
     private static Vector2 handleDragMouseStart;
     private static Vector2 handleDragMouseEnd;
     private static Vector3 handleDragWorldStart;
 
-    public static Vector3 DrawHandle(Vector3 position, float handleDiameter, out HandleInputType inputType, Tuple<int, SplineHandleType> handleIndexAndType)
+    public static Vector3 DrawHandle(Vector3 position, float handleDiameter, out HandleInputType inputType, Tuple<int, BezierHandleType> handleIndexAndType)
     {
         float handleRadius = handleDiameter / 2f;
         float dstToHandle = HandleUtility.DistanceToCircle(position, handleRadius + extraInputRadius);
@@ -73,7 +73,7 @@ public static class PathHandle
 
         if(Event.current.type == EventType.Repaint) {
             Color originalColour = Handles.color;
-            HandleColors handleColors = handleIndexAndType.Item2 == SplineHandleType.Anchor ? ANCHOR_COLORS : CONTROL_COLORS;
+            HandleColors handleColors = handleIndexAndType.Item2 == BezierHandleType.Anchor ? ANCHOR_COLORS : CONTROL_COLORS;
             Handles.color = handleColors.defaultColor;
 
             if (dstToHandle == 0)
@@ -86,7 +86,7 @@ public static class PathHandle
         return position;
     }
 
-    private static int GetHandleID(Tuple<int, SplineHandleType> handleIndexAndType)
+    private static int GetHandleID(Tuple<int, BezierHandleType> handleIndexAndType)
     {
         return handleIndexAndType.Item1 * 10 + (int)handleIndexAndType.Item2;
     }

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Spline : MonoBehaviour
+public class PathCreator : MonoBehaviour
 {
     private const float MAX_ANGLE_ERROR = 0.3f;
     private const float MIN_VERTEX_DST = 0.01f;
@@ -14,7 +14,7 @@ public class Spline : MonoBehaviour
     [SerializeField] private Vector3 normal = new Vector3(0, 0, -1);
     [SerializeField] private bool isClosedLoop;
     [SerializeField] private bool isVisableWhenNotSelected;
-    [SerializeField] private List<SplineAnchor> anchorList;
+    [SerializeField] private List<BezierSegment> bezierSegmentList;
     private VertexPath vertexPath;
 
     public void Awake()
@@ -24,19 +24,19 @@ public class Spline : MonoBehaviour
 
     public void InitializeAnchorList()
     {
-        if (anchorList == null)
-            anchorList = new List<SplineAnchor>();
+        if (bezierSegmentList == null)
+            bezierSegmentList = new List<BezierSegment>();
         else
-            anchorList.Clear();
+            bezierSegmentList.Clear();
 
-        anchorList.Add(new SplineAnchor());
-        anchorList.Add(new SplineAnchor());
-        anchorList[0].anchorPos = new Vector3(-5, 0, 0);
-        anchorList[0].controlAPos = new Vector3(-8, -3, 0);
-        anchorList[0].controlBPos = new Vector3(-2, 3, 0);
-        anchorList[1].anchorPos = new Vector3(5, 0, 0);
-        anchorList[1].controlAPos = new Vector3(2, -3, 0);
-        anchorList[1].controlBPos = new Vector3(8, 3, 0);
+        bezierSegmentList.Add(new BezierSegment());
+        bezierSegmentList.Add(new BezierSegment());
+        bezierSegmentList[0].anchorPos = new Vector3(-5, 0, 0);
+        bezierSegmentList[0].controlAPos = new Vector3(-8, -3, 0);
+        bezierSegmentList[0].controlBPos = new Vector3(-2, 3, 0);
+        bezierSegmentList[1].anchorPos = new Vector3(5, 0, 0);
+        bezierSegmentList[1].controlAPos = new Vector3(2, -3, 0);
+        bezierSegmentList[1].controlBPos = new Vector3(8, 3, 0);
 
         UpdateVertexPath();
     }
@@ -48,18 +48,18 @@ public class Spline : MonoBehaviour
         else
             vertexPath.Clear();
 
-        vertexPath.vertices.Add(anchorList[0].anchorPos);
-        vertexPath.tangents.Add(EvaluateCurveDerivative(anchorList[0], anchorList[1], 0));
+        vertexPath.vertices.Add(bezierSegmentList[0].anchorPos);
+        vertexPath.tangents.Add(EvaluateCurveDerivative(bezierSegmentList[0], bezierSegmentList[1], 0));
         vertexPath.cumulativeLength.Add(0);
 
-        Vector3 prevPointOnPath = anchorList[0].anchorPos;
-        Vector3 lastAddedPoint = anchorList[0].anchorPos;
+        Vector3 prevPointOnPath = bezierSegmentList[0].anchorPos;
+        Vector3 lastAddedPoint = bezierSegmentList[0].anchorPos;
         float cumulativeLength = 0;
         float dstSinceLastVertex = 0;
 
-        // Iterate through all spline segments and split them into verticies
+        // Iterate through all bezier segments and split them into verticies
         for(int segmentIndex = 0; segmentIndex < GetNumSegments(); segmentIndex++) {
-            float estimatedSegmentLength = EstimateBezierCurveLength(anchorList[segmentIndex], anchorList[(segmentIndex + 1) % anchorList.Count]);
+            float estimatedSegmentLength = EstimateBezierCurveLength(bezierSegmentList[segmentIndex], bezierSegmentList[(segmentIndex + 1) % bezierSegmentList.Count]);
             int numDivisions = Mathf.CeilToInt(estimatedSegmentLength * ACCURACY);
             float increment = 1f / numDivisions;
 
@@ -67,8 +67,8 @@ public class Spline : MonoBehaviour
                 bool isLastPointOnPath = (t + increment > 1 && segmentIndex == GetNumSegments() - 1);
                 if (isLastPointOnPath)
                     t = 1;
-                Vector3 pointOnPath = CubicLerp(anchorList[segmentIndex], anchorList[(segmentIndex + 1) % anchorList.Count], t);
-                Vector3 nextPointOnPath = CubicLerp(anchorList[segmentIndex], anchorList[(segmentIndex + 1) % anchorList.Count], t + increment);
+                Vector3 pointOnPath = CubicLerp(bezierSegmentList[segmentIndex], bezierSegmentList[(segmentIndex + 1) % bezierSegmentList.Count], t);
+                Vector3 nextPointOnPath = CubicLerp(bezierSegmentList[segmentIndex], bezierSegmentList[(segmentIndex + 1) % bezierSegmentList.Count], t + increment);
 
                 dstSinceLastVertex += (pointOnPath - prevPointOnPath).magnitude;
                 // angle at current point on path
@@ -80,7 +80,7 @@ public class Spline : MonoBehaviour
                 if ((angleError > MAX_ANGLE_ERROR && dstSinceLastVertex >= MIN_VERTEX_DST) || isLastPointOnPath) {
                     cumulativeLength += dstSinceLastVertex;
                     vertexPath.vertices.Add(pointOnPath);
-                    vertexPath.tangents.Add(EvaluateCurveDerivative(anchorList[segmentIndex], anchorList[(segmentIndex + 1) % anchorList.Count], t).normalized);
+                    vertexPath.tangents.Add(EvaluateCurveDerivative(bezierSegmentList[segmentIndex], bezierSegmentList[(segmentIndex + 1) % bezierSegmentList.Count], t).normalized);
                     vertexPath.cumulativeLength.Add(cumulativeLength);
                     dstSinceLastVertex = 0;
                     lastAddedPoint = pointOnPath;
@@ -133,19 +133,19 @@ public class Spline : MonoBehaviour
 
     public void AddAnchor()
     {
-        if (anchorList == null)
-            anchorList = new List<SplineAnchor>();
+        if (bezierSegmentList == null)
+            bezierSegmentList = new List<BezierSegment>();
 
-        if (anchorList.Count == 0) {
-            anchorList.Add(new SplineAnchor {
+        if (bezierSegmentList.Count == 0) {
+            bezierSegmentList.Add(new BezierSegment {
                 anchorPos = new Vector3(0, 0, 0),
                 controlAPos = new Vector3(3f, 0, 0),
                 controlBPos = new Vector3(-3f, 0, 0),
             });
         }
         else {
-            SplineAnchor lastAnchor = anchorList[anchorList.Count - 1];
-            anchorList.Add(new SplineAnchor {
+            BezierSegment lastAnchor = bezierSegmentList[bezierSegmentList.Count - 1];
+            bezierSegmentList.Add(new BezierSegment {
                 anchorPos = lastAnchor.anchorPos + new Vector3(3f, 0, 0),
                 controlAPos = lastAnchor.controlAPos + new Vector3(3f, 0, 0),
                 controlBPos = lastAnchor.controlBPos + new Vector3(3f, 0, 0),
@@ -157,20 +157,20 @@ public class Spline : MonoBehaviour
 
     public void AddAnchor(Vector3 worldPosition)
     {
-        if (anchorList == null)
-            anchorList = new List<SplineAnchor>();
+        if (bezierSegmentList == null)
+            bezierSegmentList = new List<BezierSegment>();
 
         Vector3 localPosition = worldPosition - transform.position;
-        if (anchorList.Count == 0) {
-            anchorList.Add(new SplineAnchor {
+        if (bezierSegmentList.Count == 0) {
+            bezierSegmentList.Add(new BezierSegment {
                 anchorPos = localPosition,
                 controlAPos = localPosition + new Vector3(3f, 0, 0),
                 controlBPos = localPosition + new Vector3(-3f, 0, 0)
             });
         }
         else {
-            SplineAnchor lastAnchor = anchorList[anchorList.Count - 1];
-            anchorList.Add(new SplineAnchor {
+            BezierSegment lastAnchor = bezierSegmentList[bezierSegmentList.Count - 1];
+            bezierSegmentList.Add(new BezierSegment {
                 anchorPos = localPosition,
                 controlAPos = (lastAnchor.controlAPos - lastAnchor.anchorPos) + localPosition,
                 controlBPos = (lastAnchor.controlBPos - lastAnchor.anchorPos) + localPosition
@@ -182,36 +182,36 @@ public class Spline : MonoBehaviour
 
     public void RemoveAnchorAt(int index)
     {
-        if(anchorList == null)
+        if(bezierSegmentList == null)
             return;
-        if (anchorList.Count <= 2) {
+        if (bezierSegmentList.Count <= 2) {
             Debug.LogWarning("You cannot remove an achor point from a bezier curve when there are 2 or less anchor points left");
             return;
         }
 
-        index = Mathf.Clamp(index, 0, anchorList.Count - 1);
-        anchorList.RemoveAt(index);
+        index = Mathf.Clamp(index, 0, bezierSegmentList.Count - 1);
+        bezierSegmentList.RemoveAt(index);
 
         UpdateVertexPath();
     }
 
     public void RemoveLastAnchor()
     {
-        if (anchorList == null)
+        if (bezierSegmentList == null)
             return;
-        if (anchorList.Count <= 2) {
+        if (bezierSegmentList.Count <= 2) {
             Debug.LogWarning("You cannot remove an achor point from a bezier curve when there are 2 or less anchor points left");
             return;
         }
 
-        anchorList.RemoveAt(anchorList.Count - 1);
+        bezierSegmentList.RemoveAt(bezierSegmentList.Count - 1);
 
         UpdateVertexPath();
     }
 
     public void FlattenOnZ()
     {
-        foreach (SplineAnchor anchor in anchorList) {
+        foreach (BezierSegment anchor in bezierSegmentList) {
             anchor.anchorPos = new Vector3(anchor.anchorPos.x, anchor.anchorPos.y, 0f);
             anchor.controlAPos = new Vector3(anchor.controlAPos.x, anchor.controlAPos.y, 0f);
             anchor.controlBPos = new Vector3(anchor.controlBPos.x, anchor.controlBPos.y, 0f);
@@ -220,7 +220,7 @@ public class Spline : MonoBehaviour
 
     public void FlattenOnY()
     {
-        foreach (SplineAnchor anchor in anchorList) {
+        foreach (BezierSegment anchor in bezierSegmentList) {
             anchor.anchorPos = new Vector3(anchor.anchorPos.x, 0f, anchor.anchorPos.z);
             anchor.controlAPos = new Vector3(anchor.controlAPos.x, 0f, anchor.controlAPos.z);
             anchor.controlBPos = new Vector3(anchor.controlBPos.x, 0f, anchor.controlBPos.z);
@@ -247,7 +247,7 @@ public class Spline : MonoBehaviour
     }
 
     /// Returns point at time 't' (between 0 and 1)  along bezier curve defined by 4 points (anchor_1, control_1, control_2, anchor_2)
-    public static Vector3 CubicLerp(SplineAnchor a1, SplineAnchor a2, float t)
+    public static Vector3 CubicLerp(BezierSegment a1, BezierSegment a2, float t)
     {
         return CubicLerp(a1.anchorPos, a1.controlBPos, a2.controlAPos, a2.anchorPos, t);
     }
@@ -265,7 +265,7 @@ public class Spline : MonoBehaviour
 
     /// Returns a vector tangent to the point at time 't'
     /// This is the vector tangent to the curve at that point
-    public static Vector3 EvaluateCurveDerivative(SplineAnchor a1, SplineAnchor a2, float t)
+    public static Vector3 EvaluateCurveDerivative(BezierSegment a1, BezierSegment a2, float t)
     {
         return EvaluateCurveDerivative(a1.anchorPos, a1.controlBPos, a2.controlAPos, a2.anchorPos, t);
     }
@@ -279,20 +279,20 @@ public class Spline : MonoBehaviour
     }
 
     // Crude, but fast estimation of bezier curve length.
-    public static float EstimateBezierCurveLength(SplineAnchor anchor1, SplineAnchor anchor2)
+    public static float EstimateBezierCurveLength(BezierSegment anchor1, BezierSegment anchor2)
     {
         float controlNetLength = (anchor1.anchorPos - anchor1.controlBPos).magnitude + (anchor1.controlBPos - anchor2.controlAPos).magnitude + (anchor2.controlAPos - anchor2.anchorPos).magnitude;
         float estimatedCurveLength = (anchor1.anchorPos - anchor2.anchorPos).magnitude + controlNetLength / 2f;
         return estimatedCurveLength;
     }
 
-    public List<SplineAnchor> GetAnchorList() { return anchorList; }
+    public List<BezierSegment> GetBezierSegmentList() { return bezierSegmentList; }
 
     public VertexPath GetVertexPath() { return vertexPath; }
 
     public bool IsClosedLoop() { return isClosedLoop; }
 
-    public int GetNumSegments() { return isClosedLoop ? anchorList.Count : anchorList.Count - 1; }
+    public int GetNumSegments() { return isClosedLoop ? bezierSegmentList.Count : bezierSegmentList.Count - 1; }
 
     private void OnDrawGizmos()
     {
@@ -302,7 +302,7 @@ public class Spline : MonoBehaviour
 
         // This should be moved into a hook method for when the scene view is opened, however,
         // I couldn't find any such method.
-        if (vertexPath == null && anchorList != null)
+        if (vertexPath == null && bezierSegmentList != null)
             UpdateVertexPath();
 
         if (vertexPath != null) {
@@ -321,7 +321,7 @@ public class Spline : MonoBehaviour
     }
 }
 
-public enum SplineHandleType
+public enum BezierHandleType
 {
     None,
     Anchor,
@@ -330,32 +330,32 @@ public enum SplineHandleType
 }
 
 [Serializable]
-public class SplineAnchor
+public class BezierSegment
 {
     public Vector3 anchorPos;
     public Vector3 controlAPos;
     public Vector3 controlBPos;
 
-    public Vector3 GetSplineHandlePosition(SplineHandleType splineHandleType)
+    public Vector3 GetBezierHandlePosition(BezierHandleType bezierHandleType)
     {
         Vector3 handlePosition = Vector3.zero;
-        if (splineHandleType == SplineHandleType.Anchor)
+        if (bezierHandleType == BezierHandleType.Anchor)
             handlePosition = anchorPos;
-        else if(splineHandleType == SplineHandleType.ControlA)
+        else if(bezierHandleType == BezierHandleType.ControlA)
             handlePosition = controlAPos;
-        else if (splineHandleType == SplineHandleType.ControlB)
+        else if (bezierHandleType == BezierHandleType.ControlB)
             handlePosition = controlBPos;
 
         return handlePosition;
     }
 
-    public void SetSplineHandlePosition(Vector3 newPosition, SplineHandleType splineHandleType)
+    public void SetBezierHandlePosition(Vector3 newPosition, BezierHandleType bezierHandleType)
     {
-        if (splineHandleType == SplineHandleType.Anchor)
+        if (bezierHandleType == BezierHandleType.Anchor)
             anchorPos = newPosition;
-        else if (splineHandleType == SplineHandleType.ControlA)
+        else if (bezierHandleType == BezierHandleType.ControlA)
             controlAPos = newPosition;
-        else if (splineHandleType == SplineHandleType.ControlB)
+        else if (bezierHandleType == BezierHandleType.ControlB)
             controlBPos = newPosition;
     }
 }

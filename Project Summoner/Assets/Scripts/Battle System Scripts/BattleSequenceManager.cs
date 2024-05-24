@@ -8,15 +8,16 @@ public class BattleSequenceManager : MonoBehaviour
     private static BattleSequenceManager instance;
 
     [SerializeField] private BattleStage battleStage;
+    [SerializeField] private LookAtPathFollower pathFollower;
     [Header("Sequences")]
     [SerializeField] private ActionSequence introSequence;
     [SerializeField] private ActionSequence idleBattlefieldSequence;
     [SerializeField] private ActionSequence battleActionSequence;
-    [Header("Intro References")]
+    [Header("Intro Path")]
     [SerializeField] private BattleCamera battleCam;
-    [SerializeField] private LookAtPathFollower introPath;
-    [Header("Idle Battlefield References")]
-    [SerializeField] private LookAtPathFollower idleBattlefieldPath; // TODO Make a randomized path follower class
+    [SerializeField] private List<LookAtPath> introPathList;
+    [Header("Idle Battlefield Path")]
+    [SerializeField] private List<LookAtPath> idleBattlefieldPathList; // TODO Make a randomized path follower class
 
     private void Awake()
     {
@@ -35,8 +36,12 @@ public class BattleSequenceManager : MonoBehaviour
     {
         float introDuration = 0f;
 
-        introSequence.AddTaskByTime(() => introPath.SetIsActive(true), 0f);
-        introDuration = 6f;
+        introSequence.AddTaskByTime(() => {
+            pathFollower.SetLookAtPath(introPathList);
+            pathFollower.SetSpeed(32f);
+            pathFollower.SetIsActive(true);
+        }, 0f);
+        introDuration = 6.5f;
         // Opponent intro
         if (battleStage.GetSecondarySummonerGO() != null)
             introSequence.AddTaskByTime(() => {
@@ -63,7 +68,7 @@ public class BattleSequenceManager : MonoBehaviour
 
                 battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, true);
             }, introDuration);
-            introDuration += 1.25f;
+            introDuration += 1.5f;
         }
         // Opponent casting die animation
         introSequence.AddTaskByTime(() => {
@@ -83,16 +88,26 @@ public class BattleSequenceManager : MonoBehaviour
 
                 battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, false);
             }, introDuration);
-            introDuration += 1.25f;
+            introDuration += 1.5f;
         }
+        introSequence.AddTaskByTime(() => StartIdleBattlefieldSequence(), introDuration);
 
         introSequence.SetDuration(introDuration);
-        introSequence.StartSequence();
+        introSequence.StartSequence(); // Temp remove once StartIntroScenece is being called form this class
     }
 
     private void InitializeIdleBattlefieldSequence()
     {
+        float idleBattlefieldDuration = 60f;
 
+        idleBattlefieldSequence.AddTaskByTime(() => {
+            pathFollower.SetLookAtPath(idleBattlefieldPathList);
+            pathFollower.SetSpeed(3.5f);
+            pathFollower.SetIsLoop(true);
+            pathFollower.SetIsActive(true);
+        }, 0f);
+
+        idleBattlefieldSequence.SetDuration(idleBattlefieldDuration);
     }
 
     public void StartIntroSequence()

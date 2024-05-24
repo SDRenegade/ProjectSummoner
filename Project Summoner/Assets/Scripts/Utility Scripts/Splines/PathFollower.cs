@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PathFollower : MonoBehaviour
 {
-    [SerializeField] private Spline spline;
+    [SerializeField] private PathCreator spline;
     [SerializeField] private float speed;
     [SerializeField] private bool isFollowForward;
     //[SerializeField] private bool isFollowNormal;

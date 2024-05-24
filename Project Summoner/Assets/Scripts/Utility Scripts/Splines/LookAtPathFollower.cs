@@ -17,7 +17,7 @@ public class LookAtPathFollower : MonoBehaviour
 
     private void Update()
     {
-        if(!isActive)
+        if (!isActive)
             return;
 
         moveAmount = moveAmount + (speed * Time.deltaTime) < lookAtPathList[currentPathIndex].GetPath().GetVertexPathLength() ?
@@ -26,26 +26,41 @@ public class LookAtPathFollower : MonoBehaviour
         transform.position = lookAtPathList[currentPathIndex].GetPath().GetPositionAt(moveAmount);
         transform.LookAt(lookAtPathList[currentPathIndex].GetLookAtPosition());
 
-        if(moveAmount >= lookAtPathList[currentPathIndex].GetPath().GetVertexPathLength()) {
+        if (moveAmount >= lookAtPathList[currentPathIndex].GetPath().GetVertexPathLength()) {
             moveAmount = 0;
             currentPathIndex = (currentPathIndex + 1) % lookAtPathList.Count;
             if (currentPathIndex == 0) {
                 OnEndOfPath?.Invoke(this, EventArgs.Empty);
-                if(!isLoop)
+                if (!isLoop)
                     isActive = false;
             }
         }
     }
 
+    public List<LookAtPath> GetLookAtPathList() { return lookAtPathList; }
+
+    public void SetLookAtPath(List<LookAtPath> lookAtPathList)
+    {
+        isActive = false;
+        moveAmount = 0;
+        currentPathIndex = 0;
+
+        this.lookAtPathList = lookAtPathList;
+    }
+
+    public float GetSpeed() { return speed; }
+
+    public void SetSpeed(float speed) { this.speed = speed; }
+
     public bool IsLoop() { return isLoop; }
 
-    public void SetIsLoop(bool isLoop) {  this.isLoop = isLoop; }
+    public void SetIsLoop(bool isLoop) { this.isLoop = isLoop; }
 
     public bool IsActive() { return isActive; }
 
     public void SetIsActive(bool isActive)
     {
-        if(!isActive) {
+        if (!isActive) {
             moveAmount = 0;
             currentPathIndex = 0;
         }

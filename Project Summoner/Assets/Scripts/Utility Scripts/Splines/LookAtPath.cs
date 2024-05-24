@@ -6,10 +6,10 @@ using UnityEngine;
 [Serializable]
 public class LookAtPath
 {
-    [SerializeField] private Spline path;
+    [SerializeField] private PathCreator path;
     [SerializeField] private Transform lookAtPos;
 
-    public Spline GetPath() { return path; }
+    public PathCreator GetPath() { return path; }
 
     public Transform GetLookAtPosition() {  return lookAtPos; }
 }

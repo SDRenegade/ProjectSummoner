@@ -1108,21 +1108,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   normal: {x: 0, y: 0, z: -1}
-  isClosedLoop: 1
+  isClosedLoop: 0
   isVisableWhenNotSelected: 1
-  anchorList:
-  - anchorPos: {x: -17.850094, y: 2.443203, z: 0.1967287}
-    controlAPos: {x: -21.121143, y: 12.05863, z: 0.66593647}
-    controlBPos: {x: -14.579044, y: -7.172224, z: -0.27247906}
-  - anchorPos: {x: -5.998272, y: -16.854239, z: 0.38857365}
-    controlAPos: {x: 7.8507843, y: -11.213742, z: -0.00053691864}
-    controlBPos: {x: 11.729248, y: -23.849655, z: 0.30028725}
-  - anchorPos: {x: 10.240429, y: -0.94369125, z: -0.35859966}
-    controlAPos: {x: 19.82222, y: -8.146194, z: -0.35859966}
-    controlBPos: {x: 31.410305, y: 6.556532, z: -0.72596264}
-  - anchorPos: {x: 0.31228638, y: 21.141233, z: -0.84239864}
-    controlAPos: {x: 12.421001, y: 19.405897, z: -1.1683226}
-    controlBPos: {x: -11.796429, y: 22.87657, z: -0.5164747}
+  bezierSegmentList:
+  - anchorPos: {x: -5.9389343, y: -0.16894531, z: 0.016578674}
+    controlAPos: {x: -8.938934, y: -3.1689453, z: 0.016578674}
+    controlBPos: {x: -2.2051544, y: 5.280901, z: -0.010924339}
+  - anchorPos: {x: 6.4624786, y: -0.015825272, z: 0.0109062195}
+    controlAPos: {x: 3.5890656, y: -3.5242825, z: 0.019242287}
+    controlBPos: {x: 9.335892, y: 3.492632, z: 0.0025701523}
+  - anchorPos: {x: 6.8038483, y: 8.979185, z: -0.7227659}
+    controlAPos: {x: 1.6125336, y: 3.9940472, z: -0.6952734}
+    controlBPos: {x: 9.803848, y: 11.979185, z: -0.7227659}
 --- !u!4 &438825679
 Transform:
   m_ObjectHideFlags: 0
@@ -3177,7 +3174,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -10.19
+      value: 6.31
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3642,7 +3639,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1649538752}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 329e8356eaa492b4dbb320f7a51ce938, type: 3}
+  m_Script: {fileID: 11500000, guid: afe41fa48d0e99a469bcc1691ce9ace2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   lookAtPathList:
@@ -3650,8 +3647,8 @@ MonoBehaviour:
     lookAtPos: {fileID: 1639294622}
   - path: {fileID: 1801238546}
     lookAtPos: {fileID: 206456112}
-  speed: 8
-  isLoop: 0
+  speed: 10
+  isLoop: 1
   isActive: 1
 --- !u!1 &1668677193
 GameObject:
@@ -3932,25 +3929,13 @@ MonoBehaviour:
   normal: {x: 0, y: 0, z: -1}
   isClosedLoop: 1
   isVisableWhenNotSelected: 1
-  anchorList:
-  - anchorPos: {x: -5.444466, y: -0.06957626, z: 8.497245}
-    controlAPos: {x: -9.287136, y: 0.0007362366, z: 9.018057}
-    controlBPos: {x: -1.6017957, y: -0.13988876, z: 7.9764333}
-  - anchorPos: {x: -2.8082232, y: -0.10863876, z: -2.8350744}
-    controlAPos: {x: 2.093648, y: -0.10864067, z: 1.3806615}
-    controlBPos: {x: -7.7100945, y: -0.108636856, z: -7.0508103}
-  - anchorPos: {x: -12.997087, y: -0.030513763, z: -10.453948}
-    controlAPos: {x: -11.4793625, y: -0.037590027, z: -6.3762712}
-    controlBPos: {x: -14.532686, y: -0.037590027, z: -6.4156656}
-  - anchorPos: {x: -22.762959, y: -0.014888763, z: -2.7640352}
-    controlAPos: {x: -18.180042, y: -0.021965027, z: -7.029993}
-    controlBPos: {x: -27.345875, y: -0.0078125, z: 1.5019226}
-  - anchorPos: {x: -20.69778, y: -0.022701263, z: 8.29865}
-    controlAPos: {x: -24.445145, y: 0.008548737, z: 7.678647}
-    controlBPos: {x: -16.950417, y: -0.053951263, z: 8.918653}
-  - anchorPos: {x: -13.251927, y: -0.0070762634, z: 4.846577}
-    controlAPos: {x: -15.7025, y: -0.014888763, z: 7.572234}
-    controlBPos: {x: -10.121408, y: -0.014888763, z: 7.7174606}
+  bezierSegmentList:
+  - anchorPos: {x: -5, y: 0, z: 0}
+    controlAPos: {x: -15.47551, y: -5.027136, z: -0.1729269}
+    controlBPos: {x: -9.907593, y: 9.236147, z: 0.23467636}
+  - anchorPos: {x: 5, y: 0, z: 0}
+    controlAPos: {x: 7.801483, y: 8.635853, z: 0.7052374}
+    controlBPos: {x: 5.8751373, y: -7.7364035, z: -0.6162443}
 --- !u!4 &1801238547
 Transform:
   m_ObjectHideFlags: 0
