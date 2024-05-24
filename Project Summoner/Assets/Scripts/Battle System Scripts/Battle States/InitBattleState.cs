@@ -12,15 +12,13 @@ public class InitBattleState : BattleState
         battleSystem.InvokeOnStartOfTurn();
 
         battleSystem.GetBattleHUD().InitBattleHUD(battleSystem);
-        battleSystem.GetBattleStage().InitBattleStage(
-            battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr(),
-            battleSystem.GetBattlefield().GetSecondaryBattleSide().GetTerraBattlePositionArr());
+        battleSystem.GetBattleStage().InitBattleStage(battleSystem.GetBattlefield().GetTerraBattlePositionList());
         InitBattleActions(battleSystem);
 
         battleSystem.UpdateTerraStatusBars();
 
         Debug.Log("============== Entered Init Battle State ==============");
-        //TODO Set main camera to start moving along track
+        BattleSequenceManager.GetInstance().StartIntroSequence(battleSystem.GetBattlefield());
         battleManager.SwitchState(battleManager.GetStartTurnState());
     }
 

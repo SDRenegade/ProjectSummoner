@@ -33,4 +33,15 @@ public class Battlefield
     public BattleSide GetPrimaryBattleSide() { return primaryBattleSide; }
 
     public BattleSide GetSecondaryBattleSide() { return secondaryBattleSide; }
+
+    public List<TerraBattlePosition> GetTerraBattlePositionList()
+    {
+        List<TerraBattlePosition> battlePositionList = new List<TerraBattlePosition>();
+        for(int i = 0; i < primaryBattleSide.GetTerraBattlePositionArr().Length; i++)
+            battlePositionList.Add(primaryBattleSide.GetTerraBattlePositionArr()[i]);
+        for (int i = 0; i < secondaryBattleSide.GetTerraBattlePositionArr().Length; i++)
+            battlePositionList.Add(secondaryBattleSide.GetTerraBattlePositionArr()[i]);
+
+        return battlePositionList;
+    }
 }

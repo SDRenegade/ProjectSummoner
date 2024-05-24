@@ -119,7 +119,7 @@ public class BattleSystem : MonoBehaviour
 
     public void OpenPartyMenuUI()
     {
-        List<Terra> terraList = battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide() ? primaryTerraList : secondaryTerraList;
+        List<Terra> terraList = battleActionManager.GetCurrentTerraActionSelection().IsPrimarySide() ? primaryTerraList : secondaryTerraList;
 
         battleHUD.OpenPartyMenuUI(
             battleActionManager.GetCurrentTerraActionSelection(),
@@ -139,20 +139,20 @@ public class BattleSystem : MonoBehaviour
 
     public void OpenSummonerDieMenuUI()
     {
-        List<SummonerDieItemStack> summonerDieList = battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide() ? primarySummonerDieItemStackList : secondarySummonerDieItemStackList;
+        List<SummonerDieItemStack> summonerDieList = battleActionManager.GetCurrentTerraActionSelection().IsPrimarySide() ? primarySummonerDieItemStackList : secondarySummonerDieItemStackList;
         battleHUD.OpenSummonerDieMenuUI(summonerDieList);
     }
 
     public void IterateSummonerDieSlider(int offset)
     {
-        bool isPrimarySide = battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide();
+        bool isPrimarySide = battleActionManager.GetCurrentTerraActionSelection().IsPrimarySide();
         List<SummonerDieItemStack> summonerDieList = isPrimarySide ? primarySummonerDieItemStackList : secondarySummonerDieItemStackList;
         battleHUD.GetSummonerDieMenuUI().OpenSummonerDieMenuUI(summonerDieList, offset);
     }
 
     public void SummonerDieSelection(int summonerDieIndex)
     {
-        bool isPrimarySide = battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide();
+        bool isPrimarySide = battleActionManager.GetCurrentTerraActionSelection().IsPrimarySide();
         List<SummonerDieItemStack> summonerDieList = isPrimarySide ? primarySummonerDieItemStackList : secondarySummonerDieItemStackList;
         if (summonerDieIndex >= summonerDieList.Count)
             return;
@@ -173,7 +173,7 @@ public class BattleSystem : MonoBehaviour
             return;
         }
 
-        EscapeAttempt escapeAttempt = new EscapeAttempt(battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide());
+        EscapeAttempt escapeAttempt = new EscapeAttempt(battleActionManager.GetCurrentTerraActionSelection().IsPrimarySide());
         ReadyBattleAction(new EscapeAttemptBattleAction(battleActionManager.GetCurrentTerraActionSelection(), escapeAttempt));
     }
 
@@ -302,8 +302,8 @@ public class BattleSystem : MonoBehaviour
         TerraBattlePosition[] targetableOpponentTerraPositions = new TerraBattlePosition[battleFormat.NumberOfLeadingPositions()];
         if (battleActionManager.GetPendingTerraAttack() != null) {
             TerraBattlePosition attackerPosition = battleActionManager.GetPendingTerraAttack().GetAttackerPosition();
-            TerraBattlePosition[] allyTerraPositions = attackerPosition.GetBattleSide().IsPrimarySide() ? battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr() : battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
-            TerraBattlePosition[] opponentTerraPositions = attackerPosition.GetBattleSide().IsPrimarySide() ? battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr() : battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
+            TerraBattlePosition[] allyTerraPositions = attackerPosition.IsPrimarySide() ? battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr() : battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
+            TerraBattlePosition[] opponentTerraPositions = attackerPosition.IsPrimarySide() ? battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr() : battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
             for (int i = 0; i < battleFormat.NumberOfLeadingPositions(); i++) {
                 if (allyTerraPositions[i] != attackerPosition)
                     targetableAllyTerraPositions[i] = allyTerraPositions[i];
@@ -324,8 +324,8 @@ public class BattleSystem : MonoBehaviour
     public void TargetSelection(int positionIndex)
     {
         TerraBattlePosition targetTerraPosition = null;
-        TerraBattlePosition[] opponentTerraPositions = battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide() ? battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr() : battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
-        TerraBattlePosition[] allyTerraPositions = battleActionManager.GetCurrentTerraActionSelection().GetBattleSide().IsPrimarySide() ? battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr() : battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
+        TerraBattlePosition[] opponentTerraPositions = battleActionManager.GetCurrentTerraActionSelection().IsPrimarySide() ? battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr() : battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
+        TerraBattlePosition[] allyTerraPositions = battleActionManager.GetCurrentTerraActionSelection().IsPrimarySide() ? battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr() : battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
         if (positionIndex == 0)
             targetTerraPosition = opponentTerraPositions[0];
         else if(positionIndex == 1)
@@ -465,16 +465,16 @@ public class BattleSystem : MonoBehaviour
         if (eventArgs.IsCanceled())
             return;
 
-        List<Terra> terraList = terraSwitch.IsPrimarySide() ? primaryTerraList : secondaryTerraList;
+        List<Terra> terraList = terraSwitch.GetTerraBattlePosition().IsPrimarySide() ? primaryTerraList : secondaryTerraList;
         Debug.Log(BattleDialog.SwitchTerraMsg(terraSwitch, terraList));
-        Terra tmp = primaryTerraList[terraSwitch.GetLeadingPositionIndex()];
-        terraList[terraSwitch.GetLeadingPositionIndex()] = terraList[terraSwitch.GetBenchPositionIndex()];
+        Terra tmp = terraSwitch.GetTerraBattlePosition().GetTerra();
+        terraSwitch.GetTerraBattlePosition().SetTerra(terraList[terraSwitch.GetBenchPositionIndex()]);
         terraList[terraSwitch.GetBenchPositionIndex()] = tmp;
         if(terraSwitch.IsPrimarySide())
             battlefield.GetPrimaryBattleSide().UpdateLeadingTerra(terraList);
         else
             battlefield.GetSecondaryBattleSide().UpdateLeadingTerra(terraList);
-        battleStage.SetTerraAtPosition(terraList[terraSwitch.GetLeadingPositionIndex()], terraSwitch.IsPrimarySide(), terraSwitch.GetLeadingPositionIndex());
+        battleStage.SetTerraAtPosition(terraSwitch.GetTerraBattlePosition());
         UpdateTerraStatusBars();
     }
 
@@ -514,7 +514,7 @@ public class BattleSystem : MonoBehaviour
         //*** Terra Faint Event ***
         InvokeOnTerraFainted(terraBattlePosition);
 
-        bool isPrimarySide = terraBattlePosition.GetBattleSide().IsPrimarySide();
+        bool isPrimarySide = terraBattlePosition.IsPrimarySide();
         List<Terra> terraList = isPrimarySide ? primaryTerraList : secondaryTerraList;
         int faintedTerraIndex = 0;
         for (int i = 0; i < battleFormat.NumberOfLeadingPositions(); i++) {
@@ -559,7 +559,7 @@ public class BattleSystem : MonoBehaviour
                 int? switchIndex = battleAI.SwitchFaintedTerra(faintedTerra, this);
                 if (switchIndex != null)
                     SwitchTerra(new TerraSwitch(
-                        faintedTerra.GetFaintedTerraPartyIndex(),
+                        faintedTerra.GetTerraBattlePosition(),
                         (int)switchIndex,
                         faintedTerra.IsPrimarySide()));
                 SwitchFaintedTerra();
@@ -567,7 +567,7 @@ public class BattleSystem : MonoBehaviour
         }
         else {
             faintedTerra.GetTerraBattlePosition().SetTerra(null);
-            battleStage.SetTerraAtPosition(null, faintedTerra.IsPrimarySide(), faintedTerra.GetFaintedTerraPartyIndex());
+            battleStage.SetTerraAtPosition(faintedTerra.GetTerraBattlePosition());
             SwitchFaintedTerra();
         }
     }

@@ -18,7 +18,7 @@ public class WildTerraAI : BattleAI
                 availableMoveIndicies.RemoveAt(i);
         }
 
-        bool isPrimarySide = terraBattlePosition.GetBattleSide().IsPrimarySide();
+        bool isPrimarySide = terraBattlePosition.IsPrimarySide();
         TerraBattlePosition[] opponentTerraBattlePositionArr = isPrimarySide ? battleSystem.GetBattlefield().GetSecondaryBattleSide().GetTerraBattlePositionArr() : battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
         int targetPositionIndex = Random.Range(0, opponentTerraBattlePositionArr.Length);
         TerraBattlePosition targetPosition = opponentTerraBattlePositionArr[targetPositionIndex];

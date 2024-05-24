@@ -27,12 +27,7 @@ public class BattleSequenceManager : MonoBehaviour
             Destroy(gameObject);
     }
 
-    private void Start()
-    {
-        InitializeIntroSequence();
-    }
-
-    private void InitializeIntroSequence()
+    private void InitIntroSequence(Battlefield battlefield)
     {
         float introDuration = 0f;
 
@@ -58,12 +53,12 @@ public class BattleSequenceManager : MonoBehaviour
         }, introDuration);
         introDuration += 1.5f;
         // Player terra summoning animation
-        for (int i = 0; i < battleStage.GetPrimaryTerraGOArr().Length; i++) {
+        for (int i = 0; i < battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr().Length; i++) {
             // Need a temp variable for i since the lambda expression will use the i value for
             // when the entire loop has finished since the action isn't being executed right away
             int iValue = i;
             introSequence.AddTaskByTime(() => {
-                Transform terraTransform = battleStage.GetPrimaryTerraGOArr()[iValue].transform;
+                Transform terraTransform = battleStage.GetTerraObject(battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[iValue]).transform;
                 Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
 
                 battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, true);
@@ -78,31 +73,31 @@ public class BattleSequenceManager : MonoBehaviour
         }, introDuration);
         introDuration += 1.5f;
         // Opponent terra summoning animation
-        for (int i = 0; i < battleStage.GetSecondaryTerraGOArr().Length; i++) {
+        for (int i = 0; i < battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr().Length; i++) {
             // Need a temp variable for i since the lambda expression will use the i value for
             // when the entire loop has finished since the action isn't being executed right away
             int iValue = i;
             introSequence.AddTaskByTime(() => {
-                Transform terraTransform = battleStage.GetSecondaryTerraGOArr()[iValue].transform;
+                Transform terraTransform = battleStage.GetTerraObject(battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[iValue]).transform;
                 Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
 
                 battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, false);
             }, introDuration);
             introDuration += 1.5f;
         }
-        introSequence.AddTaskByTime(() => StartIdleBattlefieldSequence(), introDuration);
+        introSequence.AddTaskByTime(() => StartIdleBattlefieldSequence(battlefield), introDuration);
 
         introSequence.SetDuration(introDuration);
         introSequence.StartSequence(); // Temp remove once StartIntroScenece is being called form this class
     }
 
-    private void InitializeIdleBattlefieldSequence()
+    private void InitIdleBattlefieldSequence(Battlefield battlefield)
     {
         float idleBattlefieldDuration = 60f;
 
         idleBattlefieldSequence.AddTaskByTime(() => {
             pathFollower.SetLookAtPath(idleBattlefieldPathList);
-            pathFollower.SetSpeed(3.5f);
+            pathFollower.SetSpeed(3.2f);
             pathFollower.SetIsLoop(true);
             pathFollower.SetIsActive(true);
         }, 0f);
@@ -110,20 +105,39 @@ public class BattleSequenceManager : MonoBehaviour
         idleBattlefieldSequence.SetDuration(idleBattlefieldDuration);
     }
 
-    public void StartIntroSequence()
+    private void InitBattleActionSequence(TerraAttack terraAttack)
     {
-        InitializeIntroSequence();
+        float sequenceDuration = 0f;
+
+        // Static shot of attacking terra
+        introSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(terraAttack.GetAttackerPosition()).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, terraAttack.GetAttackerPosition().IsPrimarySide());
+        }, sequenceDuration);
+        sequenceDuration += 1.5f;
+        // Attacking animation
+
+        // Target animation
+
+        // After effect animations
+    }
+
+    public void StartIntroSequence(Battlefield battlefield)
+    {
+        InitIntroSequence(battlefield);
         introSequence.StartSequence();
     }
 
-    public void StartIdleBattlefieldSequence()
+    public void StartIdleBattlefieldSequence(Battlefield battlefield)
     {
         if (introSequence.IsPlaying())
             introSequence.StopSequence();
         if(battleActionSequence.IsPlaying())
             battleActionSequence.StopSequence();
 
-        InitializeIdleBattlefieldSequence();
+        InitIdleBattlefieldSequence(battlefield);
         idleBattlefieldSequence.StartSequence();
     }
 

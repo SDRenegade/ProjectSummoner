@@ -20,18 +20,22 @@ public class BattleStage : MonoBehaviour
     private Vector3 secondarySummonerPos;
     private GameObject primarySummonerGO;
     private GameObject secondarySummonerGO;
-    private GameObject[] primaryTerraGOArr;
-    private GameObject[] secondaryTerraGOArr;
+    private Dictionary<TerraBattlePosition, GameObject> terraObjectByPosition;
 
     public void Start()
     {
+        terraObjectByPosition = new Dictionary<TerraBattlePosition, GameObject>();
+
         Quaternion battlefieldRotation = Quaternion.Euler(0, battlefieldOrigin.eulerAngles.y, 0).normalized;
 
         primaryTerraFieldCenterPos = battlefieldOrigin.position - (battlefieldRotation * opposingTerraSpacing);
         secondaryTerraFieldCenterPos = battlefieldOrigin.position + (battlefieldRotation * opposingTerraSpacing);
         primarySummonerPos = primaryTerraFieldCenterPos - (battlefieldRotation * summonerTerraSpacing);
         secondarySummonerPos = secondaryTerraFieldCenterPos + (battlefieldRotation * summonerTerraSpacing);
+    }
 
+    public void InitBattleStage(List<TerraBattlePosition> battlePositionList)
+    {
         if (primarySummonerPrefab != null) {
             primarySummonerGO = Instantiate(primarySummonerPrefab);
             primarySummonerGO.transform.position = primarySummonerPos;
@@ -43,21 +47,10 @@ public class BattleStage : MonoBehaviour
             secondarySummonerGO.transform.eulerAngles = new Vector3(0f, battlefieldOrigin.eulerAngles.y - 180f, 0f);
         }
 
-        int numTerraPositions = (BattleLoader.GetInstance().GetBattleFormat() == BattleFormat.SINGLE) ? 1 : 2;
-        primaryTerraGOArr = new GameObject[numTerraPositions];
-        secondaryTerraGOArr = new GameObject[numTerraPositions];
-    }
-
-    public void InitBattleStage(TerraBattlePosition[] primaryTerraPositionList, TerraBattlePosition[] secondaryTerraPositionList)
-    {
-        for (int i = 0; i < primaryTerraPositionList.Length; i++) {
-            if (primaryTerraPositionList[i].GetTerra() != null)
-                SetTerraAtPosition(primaryTerraPositionList[i].GetTerra(), true, i);
-        }
-
-        for (int i = 0; i < secondaryTerraPositionList.Length; i++) {
-            if (secondaryTerraPositionList[i].GetTerra() != null)
-                SetTerraAtPosition(secondaryTerraPositionList[i].GetTerra(), false, i);
+        for(int i = 0; i < battlePositionList.Count; i++) {
+            terraObjectByPosition.Add(battlePositionList[i], null);
+            if (battlePositionList[i].GetTerra() != null)
+                SetTerraAtPosition(battlePositionList[i]);
         }
     }
 
@@ -65,52 +58,50 @@ public class BattleStage : MonoBehaviour
 
     public GameObject GetSecondarySummonerGO() { return secondarySummonerGO; }
 
-    public GameObject[] GetPrimaryTerraGOArr() { return primaryTerraGOArr; }
-
-    public GameObject[] GetSecondaryTerraGOArr() { return secondaryTerraGOArr; }
-
-    public Vector3 GetTerraPosition(bool isPrimarySide, int positionIndex)
+    public GameObject GetTerraObject(TerraBattlePosition battlePosition)
     {
-        Vector3 terraPosition = isPrimarySide ? primaryTerraFieldCenterPos : secondaryTerraFieldCenterPos;
+        return terraObjectByPosition.ContainsKey(battlePosition) ? terraObjectByPosition[battlePosition] : null;
+    }
 
+    public Vector3? GetTerraPosition(TerraBattlePosition battlePosition)
+    {
+        if (!terraObjectByPosition.ContainsKey(battlePosition)) {
+            Debug.LogWarning("The provided terra battle position was not found in BattleStage");
+            return null;
+        }
+
+        Vector3 terraPosition = battlePosition.IsPrimarySide() ? primaryTerraFieldCenterPos : secondaryTerraFieldCenterPos;
         //This could be generalized to account for any number of terra positions
         if(BattleLoader.GetInstance().GetBattleFormat() == BattleFormat.DOUBLE) {
-            if (positionIndex < 0 || positionIndex >= primaryTerraGOArr.Length)
-                positionIndex = 0;
-
-            float centerSpacing = allyTerraSpacing.magnitude / 2;
-            if (positionIndex == 0)
+            Vector3 centerSpacing = allyTerraSpacing / 2;
+            if (battlePosition.GetBattlePositionIndex() == 0)
                 centerSpacing = -centerSpacing;
 
-            //Calculating the perpendicular sin and cos of the battle origin Y rotation
-            float perpendicularSinOfBattleOriginY = Mathf.Sin(((battlefieldOrigin.eulerAngles.y + 90) * Mathf.PI) / 180f);
-            float perpendicularCosOfBattleOriginY = Mathf.Cos(((battlefieldOrigin.eulerAngles.y + 90) * Mathf.PI) / 180f);
-            terraPosition.x += centerSpacing * perpendicularSinOfBattleOriginY;
-            terraPosition.z += centerSpacing * perpendicularCosOfBattleOriginY;
+            Quaternion battlefieldRotation = Quaternion.Euler(0, battlefieldOrigin.eulerAngles.y, 0).normalized;
+            terraPosition += battlefieldRotation * centerSpacing;
         }
 
         return terraPosition;
     }
 
-    public void SetTerraAtPosition(Terra terra, bool isPrimarySide, int positionIndex)
+    public void SetTerraAtPosition(TerraBattlePosition battlePosition)
     {
-        if (positionIndex >= primaryTerraGOArr.Length) {
-            Debug.Log("position index " + positionIndex + " is out of bounds for SetTerraAtPosition in BattleStage.");
+        if(!terraObjectByPosition.ContainsKey(battlePosition)) {
+            Debug.LogWarning("The provided terra battle position was not found in BattleStage");
             return;
         }
 
-        Vector3 terraPos = GetTerraPosition(isPrimarySide, positionIndex);
+        Vector3 terraPos = (Vector3)GetTerraPosition(battlePosition);
         Vector3 terraRot = Vector3.zero;
-        terraRot.y = isPrimarySide ? battlefieldOrigin.eulerAngles.y : battlefieldOrigin.eulerAngles.y - 180f;
-        GameObject[] terraGOList = isPrimarySide ? primaryTerraGOArr : secondaryTerraGOArr;
+        terraRot.y = battlePosition.IsPrimarySide() ? battlefieldOrigin.eulerAngles.y : battlefieldOrigin.eulerAngles.y - 180f;
 
-        if (terraGOList[positionIndex] != null)
-            Destroy(terraGOList[positionIndex]);
+        if (terraObjectByPosition[battlePosition] != null)
+            Destroy(terraObjectByPosition[battlePosition]);
 
-        if(terra != null) {
-            terraGOList[positionIndex] = Instantiate(terra.GetTerraBase().GetTerraGameObject());
-            terraGOList[positionIndex].transform.position = terraPos;
-            terraGOList[positionIndex].transform.eulerAngles = terraRot;
+        if(battlePosition.GetTerra() != null) {
+            terraObjectByPosition[battlePosition] = Instantiate(battlePosition.GetTerra().GetTerraBase().GetTerraGameObject());
+            terraObjectByPosition[battlePosition].transform.position = terraPos;
+            terraObjectByPosition[battlePosition].transform.eulerAngles = terraRot;
         }
     }
 }

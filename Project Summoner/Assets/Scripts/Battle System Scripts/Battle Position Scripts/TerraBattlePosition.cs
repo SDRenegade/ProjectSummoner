@@ -23,15 +23,15 @@ public enum BattlePositionState
 
 public class TerraBattlePosition
 {
-    private BattleSide battleSide;
     private Terra terra;
+    private bool isPrimarySide;
+    private int battlePositionIndex;
     private Dictionary<Stats, StatStages> statStagesMap;
     private BattlePositionState battlePositionState;
     private List<VolatileStatusEffectBase> vStatusEffectList;
 
-    public TerraBattlePosition(BattleSide battleSide)
+    public TerraBattlePosition(bool isPrimarySide, int battlePositionIndex)
     {
-        this.battleSide = battleSide;
         terra = null;
         statStagesMap = new Dictionary<Stats, StatStages> {
             { Stats.ATK, StatStages.NEUTRAL },
@@ -44,11 +44,12 @@ public class TerraBattlePosition
         };
         battlePositionState = BattlePositionState.NORMAL;
         vStatusEffectList = new List<VolatileStatusEffectBase>();
+        this.isPrimarySide = isPrimarySide;
+        this.battlePositionIndex = battlePositionIndex;
     }
 
-    public TerraBattlePosition(Terra terra, BattleSide battleSide)
+    public TerraBattlePosition(Terra terra, bool isPrimarySide, int battlePositionIndex)
     {
-        this.battleSide = battleSide;
         this.terra = terra;
         statStagesMap = new Dictionary<Stats, StatStages> {
             { Stats.ATK, StatStages.NEUTRAL },
@@ -61,6 +62,8 @@ public class TerraBattlePosition
         };
         battlePositionState = BattlePositionState.NORMAL;
         vStatusEffectList = new List<VolatileStatusEffectBase>();
+        this.isPrimarySide = isPrimarySide;
+        this.battlePositionIndex = battlePositionIndex;
     }
 
     public void ResetBattlePosition(BattleSystem battleSystem)
@@ -77,11 +80,13 @@ public class TerraBattlePosition
             statStagesMap[stat] = StatStages.NEUTRAL;
     }
 
-    public BattleSide GetBattleSide() { return battleSide; }
-
     public Terra GetTerra() { return terra; }
 
     public void SetTerra(Terra terra) {  this.terra = terra; }
+
+    public bool IsPrimarySide() { return isPrimarySide; }
+
+    public int GetBattlePositionIndex() { return battlePositionIndex; }
 
     public StatStages GetStatStage(Stats stat) { return statStagesMap[stat]; }
 

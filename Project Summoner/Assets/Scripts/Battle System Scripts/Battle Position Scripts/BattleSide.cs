@@ -14,7 +14,7 @@ public class BattleSide
         int numBattlePositions = battleFormat.NumberOfLeadingPositions();
         terraBattlePositionArr = new TerraBattlePosition[numBattlePositions];
         for (int i = 0; i < numBattlePositions; i++)
-            terraBattlePositionArr[i] = new TerraBattlePosition(this);
+            terraBattlePositionArr[i] = new TerraBattlePosition(isPrimarySide, i);
 
         int battlePositionIndex = 0;
         for(int i = 0; i < terraList.Count; i++) {
@@ -34,7 +34,7 @@ public class BattleSide
         int numBattlePositions = battleFormat.NumberOfLeadingPositions();
         terraBattlePositionArr = new TerraBattlePosition[numBattlePositions];
         for (int i = 0; i < numBattlePositions; i++)
-            terraBattlePositionArr[i] = new TerraBattlePosition(this);
+            terraBattlePositionArr[i] = new TerraBattlePosition(isPrimarySide, i);
 
         if (terra != null && terra.GetCurrentHP() > 0)
             terraBattlePositionArr[0].SetTerra(terra);

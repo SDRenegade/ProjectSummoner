@@ -30,7 +30,7 @@ public class PartyBanner : MonoBehaviour
             return;
         }
 
-        List<Terra> terraList = activeTerraPosition.GetBattleSide().IsPrimarySide() ? battleSystem.GetPrimaryTerraList() : battleSystem.GetSecondaryTerraList();
+        List<Terra> terraList = activeTerraPosition.IsPrimarySide() ? battleSystem.GetPrimaryTerraList() : battleSystem.GetSecondaryTerraList();
         Terra terra = terraList[(int)terraPartyIndex];
 
         //TODO Set Image to sprite of terra

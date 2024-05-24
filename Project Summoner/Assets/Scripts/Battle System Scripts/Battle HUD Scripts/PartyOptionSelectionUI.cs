@@ -38,13 +38,13 @@ public class PartyOptionSelectionUI : MonoBehaviour
             CloseOptionSelection();
         });
         
-        if(IsValidSwitchIndex(selectedTerraIndex, activeTerraPosition.GetBattleSide().IsPrimarySide(), battleSystem)) {
+        if(IsValidSwitchIndex(selectedTerraIndex, activeTerraPosition.IsPrimarySide(), battleSystem)) {
             switchBtn.gameObject.SetActive(true);
             switchBtn.onClick.AddListener(delegate {
                 CloseOptionSelection();
                 battleSystem.ReturnToMenuSelection();
                 TerraBattlePosition[] terraBattlePositionArr = battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
-                TerraSwitch terraSwitch = new TerraSwitch(Array.IndexOf(terraBattlePositionArr, activeTerraPosition), selectedTerraIndex, true);
+                TerraSwitch terraSwitch = new TerraSwitch(activeTerraPosition, selectedTerraIndex, true);
                 switchAction?.Invoke(activeTerraPosition, terraSwitch);
             });
         }
