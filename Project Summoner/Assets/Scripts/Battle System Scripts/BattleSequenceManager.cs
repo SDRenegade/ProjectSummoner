@@ -9,14 +9,14 @@ public class BattleSequenceManager : MonoBehaviour
 
     [SerializeField] private BattleStage battleStage;
     [SerializeField] private LookAtPathFollower pathFollower;
+    [SerializeField] private BattleCamera battleCam;
     [Header("Sequences")]
     [SerializeField] private ActionSequence introSequence;
     [SerializeField] private ActionSequence idleBattlefieldSequence;
     [SerializeField] private ActionSequence battleActionSequence;
-    [Header("Intro Path")]
-    [SerializeField] private BattleCamera battleCam;
+    [Space]
     [SerializeField] private List<LookAtPath> introPathList;
-    [Header("Idle Battlefield Path")]
+    [Space]
     [SerializeField] private List<LookAtPath> idleBattlefieldPathList; // TODO Make a randomized path follower class
 
     private void Awake()
@@ -37,6 +37,7 @@ public class BattleSequenceManager : MonoBehaviour
             pathFollower.SetIsActive(true);
         }, 0f);
         introDuration = 6.5f;
+
         // Opponent intro
         if (battleStage.GetSecondarySummonerGO() != null)
             introSequence.AddTaskByTime(() => {
@@ -45,6 +46,7 @@ public class BattleSequenceManager : MonoBehaviour
                 battleCam.SetStaticLookAt(summonerOffsetPos, summonerTransform.eulerAngles, false);
             }, introDuration);
         introDuration += 2f;
+
         // Player casting die animation
         introSequence.AddTaskByTime(() => {
             Transform summonerTransform = battleStage.GetPrimarySummonerGO().transform;
@@ -52,6 +54,7 @@ public class BattleSequenceManager : MonoBehaviour
             battleCam.SetStaticLookAt(summonerOffsetPos, summonerTransform.eulerAngles, true);
         }, introDuration);
         introDuration += 1.5f;
+
         // Player terra summoning animation
         for (int i = 0; i < battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr().Length; i++) {
             // Need a temp variable for i since the lambda expression will use the i value for
@@ -60,11 +63,11 @@ public class BattleSequenceManager : MonoBehaviour
             introSequence.AddTaskByTime(() => {
                 Transform terraTransform = battleStage.GetTerraObject(battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr()[iValue]).transform;
                 Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
-
                 battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, true);
             }, introDuration);
             introDuration += 1.5f;
         }
+
         // Opponent casting die animation
         introSequence.AddTaskByTime(() => {
             Transform summonerTransform = battleStage.GetSecondarySummonerGO().transform;
@@ -72,6 +75,7 @@ public class BattleSequenceManager : MonoBehaviour
             battleCam.SetStaticLookAt(summonerOffsetPos, summonerTransform.eulerAngles, false);
         }, introDuration);
         introDuration += 1.5f;
+
         // Opponent terra summoning animation
         for (int i = 0; i < battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr().Length; i++) {
             // Need a temp variable for i since the lambda expression will use the i value for
@@ -80,15 +84,14 @@ public class BattleSequenceManager : MonoBehaviour
             introSequence.AddTaskByTime(() => {
                 Transform terraTransform = battleStage.GetTerraObject(battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr()[iValue]).transform;
                 Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
-
                 battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, false);
             }, introDuration);
             introDuration += 1.5f;
         }
+
         introSequence.AddTaskByTime(() => StartIdleBattlefieldSequence(battlefield), introDuration);
 
         introSequence.SetDuration(introDuration);
-        introSequence.StartSequence(); // Temp remove once StartIntroScenece is being called form this class
     }
 
     private void InitIdleBattlefieldSequence(Battlefield battlefield)
@@ -105,23 +108,16 @@ public class BattleSequenceManager : MonoBehaviour
         idleBattlefieldSequence.SetDuration(idleBattlefieldDuration);
     }
 
-    private void InitBattleActionSequence(TerraAttack terraAttack)
+    public void AddBattleActionToSequence(IBattleSequence battleSequence)
+    {
+        AddBattleActionToSequence(battleSequence.GetBattleSequence(battleStage, battleCam));
+    }
+
+    public void AddBattleActionToSequence(Dictionary<Action, float> actionTasksByTime)
     {
         float sequenceDuration = 0f;
 
-        // Static shot of attacking terra
-        introSequence.AddTaskByTime(() => {
-            Transform terraTransform = battleStage.GetTerraObject(terraAttack.GetAttackerPosition()).transform;
-            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
 
-            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, terraAttack.GetAttackerPosition().IsPrimarySide());
-        }, sequenceDuration);
-        sequenceDuration += 1.5f;
-        // Attacking animation
-
-        // Target animation
-
-        // After effect animations
     }
 
     public void StartIntroSequence(Battlefield battlefield)
@@ -141,7 +137,7 @@ public class BattleSequenceManager : MonoBehaviour
         idleBattlefieldSequence.StartSequence();
     }
 
-    public void StartBattleActionSequence()
+    public void StartBattleActionSequence(IBattleSequence battleSequence)
     {
         if (introSequence.IsPlaying())
             introSequence.StopSequence();
@@ -150,6 +146,13 @@ public class BattleSequenceManager : MonoBehaviour
 
         battleActionSequence.StartSequence();
     }
+
+    public void AddTerraStatChangeBattleSequence()
+    {
+        // TODO 
+    }
+
+    // TODO Add methods for recoil, canceled attack, missed attack, attack charging
 
     public static BattleSequenceManager GetInstance() { return instance; }
 }

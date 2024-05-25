@@ -425,7 +425,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 206456108}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 190.94, y: 19.88, z: -10.33}
+  m_LocalPosition: {x: 167.07, y: 20, z: -11.05}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1108,18 +1108,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   normal: {x: 0, y: 0, z: -1}
-  isClosedLoop: 0
+  isClosedLoop: 1
   isVisableWhenNotSelected: 1
   bezierSegmentList:
-  - anchorPos: {x: -5.9389343, y: -0.16894531, z: 0.016578674}
-    controlAPos: {x: -8.938934, y: -3.1689453, z: 0.016578674}
-    controlBPos: {x: -2.2051544, y: 5.280901, z: -0.010924339}
-  - anchorPos: {x: 6.4624786, y: -0.015825272, z: 0.0109062195}
-    controlAPos: {x: 3.5890656, y: -3.5242825, z: 0.019242287}
-    controlBPos: {x: 9.335892, y: 3.492632, z: 0.0025701523}
-  - anchorPos: {x: 6.8038483, y: 8.979185, z: -0.7227659}
-    controlAPos: {x: 1.6125336, y: 3.9940472, z: -0.6952734}
-    controlBPos: {x: 9.803848, y: 11.979185, z: -0.7227659}
+  - anchorPos: {x: -3.281433, y: 2.8478985, z: -4.68124}
+    controlAPos: {x: -6.7004395, y: 2.9806213, z: -4.663558}
+    controlBPos: {x: 0.13757324, y: 2.7151756, z: -4.698922}
+  - anchorPos: {x: 6.362503, y: -2.971302, z: 3.9375048}
+    controlAPos: {x: 5.7539062, y: -2.9381628, z: -1.5697255}
+    controlBPos: {x: 6.9711, y: -3.0044413, z: 9.444735}
+  - anchorPos: {x: -1.8821259, y: 2.8954754, z: 13.913313}
+    controlAPos: {x: 1.3799438, y: 2.8101768, z: 13.476796}
+    controlBPos: {x: -5.1441956, y: 2.980774, z: 14.34983}
+  - anchorPos: {x: -10.928619, y: -2.8886194, z: 4.222991}
+    controlAPos: {x: -10.873627, y: -2.8868933, z: 9.227293}
+    controlBPos: {x: -10.983612, y: -2.8903456, z: -0.78131104}
 --- !u!4 &438825679
 Transform:
   m_ObjectHideFlags: 0
@@ -1128,7 +1131,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 438825677}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 137.9, y: 22.532335, z: -8.429799}
+  m_LocalPosition: {x: 141.1, y: 19.3, z: -13.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3174,7 +3177,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 17
+      value: 4.05
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3521,7 +3524,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1639294618}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 137.69002, y: 28.140892, z: -8.7}
+  m_LocalPosition: {x: 137.69002, y: 20, z: -8.51}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3930,12 +3933,18 @@ MonoBehaviour:
   isClosedLoop: 1
   isVisableWhenNotSelected: 1
   bezierSegmentList:
-  - anchorPos: {x: -5, y: 0, z: 0}
-    controlAPos: {x: -15.47551, y: -5.027136, z: -0.1729269}
-    controlBPos: {x: -9.907593, y: 9.236147, z: 0.23467636}
-  - anchorPos: {x: 5, y: 0, z: 0}
-    controlAPos: {x: 7.801483, y: 8.635853, z: 0.7052374}
-    controlBPos: {x: 5.8751373, y: -7.7364035, z: -0.6162443}
+  - anchorPos: {x: -9.6262665, y: 0, z: -2.2961073}
+    controlAPos: {x: -7.7534637, y: 0, z: -6.8182364}
+    controlBPos: {x: -11.499069, y: 0, z: 2.2260218}
+  - anchorPos: {x: -1.8614502, y: 0, z: 0.978776}
+    controlAPos: {x: -4.416855, y: 0, z: 5.610189}
+    controlBPos: {x: 0.65826416, y: 0, z: 5.5920215}
+  - anchorPos: {x: 6.212845, y: 0, z: -2.1075096}
+    controlAPos: {x: 7.382889, y: 0, z: 2.4538612}
+    controlBPos: {x: 5.042801, y: 0, z: -6.6688805}
+  - anchorPos: {x: -1.7929535, y: 0, z: -10.020638}
+    controlAPos: {x: -0.41007996, y: 0, z: -5.713993}
+    controlBPos: {x: -3.2631073, y: 0, z: -5.7106457}
 --- !u!4 &1801238547
 Transform:
   m_ObjectHideFlags: 0
@@ -3944,7 +3953,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1801238545}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 203.90479, y: 19.87817, z: -8.619798}
+  m_LocalPosition: {x: 168.71, y: 20.45, z: -8.619798}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

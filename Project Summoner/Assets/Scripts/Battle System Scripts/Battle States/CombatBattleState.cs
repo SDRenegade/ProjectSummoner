@@ -5,6 +5,14 @@ using UnityEngine;
 
 public class CombatBattleState : BattleState
 {
+    private BattleSystem battleSystem;
+    private List<TerraAttack> queuedTerraAttackList;
+
+    public CombatBattleState(BattleSystem battleSystem)
+    {
+        this.battleSystem = battleSystem;
+    }
+
     public void EnterState(BattleStateManager battleManager)
     {
         BattleSystem battleSystem = battleManager.GetBattleSystem();
@@ -24,9 +32,10 @@ public class CombatBattleState : BattleState
         }
         ProcessTerraSwitches(battleSystem);
 
-        List<TerraAttack> queuedTerraAttackList = battleSystem.GetBattleActionManager().GetTerraAttackList();
+        queuedTerraAttackList = battleSystem.GetBattleActionManager().GetTerraAttackList();
         SortTerraAttackList(queuedTerraAttackList);
         for (int i = 0; i < queuedTerraAttackList.Count; i++) {
+            BattleSequenceManager.GetInstance().StartBattleActionSequence(queuedTerraAttackList[i]);
             ProcessTerraAttack(queuedTerraAttackList[i], battleSystem);
             if (battleSystem.IsBattleFinished())
                 break;
@@ -88,7 +97,9 @@ public class CombatBattleState : BattleState
         }
     }
 
-    private void ProcessTerraAttack(TerraAttack terraAttack, BattleSystem battleSystem)
+    // TODO Add IBattleSequence to all actions that take place. Should mostly be on events.
+    // i.e Canceld attack, accuracy check, damage calculation, and post attack effects.
+    public void ProcessTerraAttack(TerraAttack terraAttack, BattleSystem battleSystem)
     {
         if (terraAttack.GetAttackerPosition().GetTerra() == null)
             return;

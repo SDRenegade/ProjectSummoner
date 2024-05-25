@@ -9,7 +9,7 @@ public class ActionSequence : MonoBehaviour
     public event EventHandler<EventArgs> OnSequenceStart;
     public event EventHandler<EventArgs> OnSequenceStop;
 
-    private Dictionary<float, Action> taskByTime;
+    private Dictionary<Action, float> taskByTime;
     private float duration;
     private bool isLoop;
     private bool isPlaying;
@@ -18,7 +18,7 @@ public class ActionSequence : MonoBehaviour
 
     private void Awake()
     {
-        taskByTime = new Dictionary<float, Action>();
+        taskByTime = new Dictionary<Action, float>();
     }
 
     private void Update()
@@ -33,9 +33,9 @@ public class ActionSequence : MonoBehaviour
         if (currentTime > duration)
             currentTime = duration;
 
-        foreach(KeyValuePair<float, Action> pair in taskByTime) {
-            if (pair.Key > previousTime && pair.Key <= currentTime)
-                pair.Value();
+        foreach(KeyValuePair<Action, float> pair in taskByTime) {
+            if (pair.Value > previousTime && pair.Value <= currentTime)
+                pair.Key();
         }
 
         if(!isLoop && currentTime >= duration) {
@@ -60,7 +60,7 @@ public class ActionSequence : MonoBehaviour
 
     public void AddTaskByTime(Action task, float time)
     {
-        taskByTime.Add(time, task);
+        taskByTime.Add(task, time);
     }
 
     public float GetDuration() { return duration; }

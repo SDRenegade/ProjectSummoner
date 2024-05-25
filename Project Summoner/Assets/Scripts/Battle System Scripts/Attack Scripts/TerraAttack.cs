@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,7 +10,7 @@ public enum SpeedPriority
     HIGH = 2
 }
 
-public class TerraAttack
+public class TerraAttack : IBattleSequence
 {
     private TerraBattlePosition attackerPosition;
     private List<TerraBattlePosition> defendersPositionList;
@@ -52,6 +53,43 @@ public class TerraAttack
         isRecharging = false;
         isPersistent = false;
         isCanceled = false;
+    }
+
+    public Dictionary<Action, float> GetBattleSequence(BattleStage battleStage, BattleCamera battleCam)
+    {
+        Dictionary<Action, float> tasksByTime = new Dictionary<Action, float>();
+        float sequenceDuration = 0f;
+
+        // Static shot at attacking terra
+        tasksByTime.Add(() => {
+            Transform terraTransform = battleStage.GetTerraObject(attackerPosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, true);
+        }, sequenceDuration);
+        sequenceDuration += 1.25f;
+
+        // Terra attack animation
+        tasksByTime.Add(() => {
+            Transform terraTransform = battleStage.GetTerraObject(attackerPosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+
+            battleCam.SetAttackLookAt(terraOffsetPos, terraTransform.eulerAngles, true);
+        }, sequenceDuration);
+        sequenceDuration += 2f;
+
+        // Target terra damage animation
+        for(int i = 0; i < defendersPositionList.Count; i++) {
+            tasksByTime.Add(() => {
+                Transform terraTransform = battleStage.GetTerraObject(defendersPositionList[i]).transform;
+                Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+
+                battleCam.SetAttackLookAt(terraOffsetPos, terraTransform.eulerAngles, true);
+            }, sequenceDuration);
+            sequenceDuration += 2f;
+        }
+
+        return tasksByTime;
     }
 
     public TerraBattlePosition GetAttackerPosition() { return attackerPosition; }

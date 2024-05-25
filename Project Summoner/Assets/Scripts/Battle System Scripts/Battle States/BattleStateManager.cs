@@ -22,7 +22,7 @@ public class BattleStateManager
         initBattleState = new InitBattleState();
         startTurnState = new StartOfTurnBattleState();
         actionSelectionState = new ActionSelectionBattleState();
-        damageCalculationState = new CombatBattleState();
+        damageCalculationState = new CombatBattleState(battleSystem);
         endTurnState = new EndOfTurnBattleState();
         finishedMatchState = new FinishedMatchBattleState();
 
