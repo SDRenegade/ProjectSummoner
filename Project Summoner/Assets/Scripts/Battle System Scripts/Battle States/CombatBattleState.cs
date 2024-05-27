@@ -38,8 +38,6 @@ public class CombatBattleState : BattleState
 
     public void NextCombatAction(BattleSystem battleSystem)
     {
-        Debug.Log("NextCombatAction entered");
-
         if (battleSystem.IsBattleFinished()) {
             battleManager.SwitchState(battleManager.GetFinishedMatchState());
             return;

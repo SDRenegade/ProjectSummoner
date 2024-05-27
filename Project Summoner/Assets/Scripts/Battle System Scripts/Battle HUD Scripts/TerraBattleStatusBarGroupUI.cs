@@ -47,7 +47,6 @@ public class TerraBattleStatusBarGroupUI : MonoBehaviour
             secondaryStatusBarList[i].gameObject.SetActive(true);
             secondaryStatusBarList[i].UpdateStatusBar(secondaryTerraBattlePositionArr[i].GetTerra());
         }
-
     }
 
     public void HideTerraStatusBars()

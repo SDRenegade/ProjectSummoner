@@ -29,8 +29,14 @@ public class BattleSequenceManager : MonoBehaviour
 
     private void Start()
     {
+        battleSystem.OnEndOfInitState += StartIntroSequence;
         battleSystem.OnEnteringActionSelectionState += StartIdleBattlefieldSequence;
         battleSystem.OnAttackDeclaration += AddActionToBattleSequence;
+
+        introSequence.OnSequenceComplete += ExitInitBattleState;
+
+        battleActionSequence.OnSequenceStart += HideActionSelectionHUD;
+        battleActionSequence.OnSequenceComplete += ClearBattleSequenceOnCompletion;
     }
 
     private void InitIntroSequence(Battlefield battlefield)
@@ -45,13 +51,14 @@ public class BattleSequenceManager : MonoBehaviour
         introDuration = 6.5f;
 
         // Opponent intro
-        if (battleStage.GetSecondarySummonerGO() != null)
+        if (battleStage.GetSecondarySummonerGO() != null) {
             introSequence.AddTaskByTime(() => {
                 Transform summonerTransform = battleStage.GetSecondarySummonerGO().transform;
                 Vector3 summonerOffsetPos = new Vector3(summonerTransform.position.x, summonerTransform.position.y + 1.75f, summonerTransform.position.z);
                 battleCam.SetStaticLookAt(summonerOffsetPos, summonerTransform.eulerAngles, false);
             }, introDuration);
-        introDuration += 2f;
+            introDuration += 2f;
+        }
 
         // Player casting die animation
         introSequence.AddTaskByTime(() => {
@@ -131,9 +138,9 @@ public class BattleSequenceManager : MonoBehaviour
         battleActionSequence.SetDuration(battleActionSequence.GetDuration() + sequenceDuration);
     }
 
-    public void StartIntroSequence(Battlefield battlefield)
+    public void StartIntroSequence(object sender, EventArgs eventArgs)
     {
-        InitIntroSequence(battlefield);
+        InitIntroSequence(battleSystem.GetBattlefield());
         introSequence.StartSequence();
     }
 
@@ -155,10 +162,17 @@ public class BattleSequenceManager : MonoBehaviour
         if (idleBattlefieldSequence.IsPlaying())
             idleBattlefieldSequence.StopSequence();
 
-        battleActionSequence.OnSequenceComplete -= ClearBattleSequenceOnCompletion;
-        battleActionSequence.OnSequenceComplete += ClearBattleSequenceOnCompletion;
-
         battleActionSequence.StartSequence();
+    }
+
+    private void ExitInitBattleState(object sender, EventArgs eventArgs)
+    {
+        battleSystem.ExitInitBattleState();
+    }
+
+    private void HideActionSelectionHUD(object sender, EventArgs eventArgs)
+    {
+        battleSystem.GetBattleHUD().CloseAllSelectionUI();
     }
 
     private void ClearBattleSequenceOnCompletion(object sender, EventArgs eventArgs)

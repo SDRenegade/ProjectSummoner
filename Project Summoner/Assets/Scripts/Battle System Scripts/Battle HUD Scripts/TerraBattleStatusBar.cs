@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class TerraBattleStatusBar : MonoBehaviour
 {
@@ -16,21 +13,46 @@ public class TerraBattleStatusBar : MonoBehaviour
     [SerializeField] private TextMeshProUGUI terraCurrentHealthTMP;
     [SerializeField] private TextMeshProUGUI terraMaxHealthTMP;
 
+    float increment = 0.4f;
+    float currentHealth;
+    float previousHealth;
+    float maxHealth;
+    float interpolationValue;
+
+    private void Update()
+    {
+        if (interpolationValue >= 1f)
+            return;
+
+        interpolationValue += increment * Time.deltaTime;
+        if(interpolationValue > currentHealth)
+            interpolationValue = currentHealth;
+
+        float interpolationHealth = Mathf.Lerp(previousHealth, currentHealth, interpolationValue);
+        healthBar.SetProgress(interpolationHealth / maxHealth);
+        if (healthBar.GetProgress() > 0.5f)
+            healthBar.GetImage().color = HIGH_HP_RANGE_COLOR;
+        else if (healthBar.GetProgress() > 0.25)
+            healthBar.GetImage().color = MEDIUM_HP_RANGE_COLOR;
+        else
+            healthBar.GetImage().color = LOW_HP_RANGE_COLOR;
+
+        terraCurrentHealthTMP.SetText(((int)interpolationHealth).ToString());
+    }
+
     public void UpdateStatusBar(Terra terra)
     {
         terraNameTMP.SetText(terra.GetTerraBase().GetSpeciesName());
         terraLevelTMP.SetText("Lvl " + terra.GetLevel().ToString());
 
-        float progressValue = (float)terra.GetCurrentHP() / terra.GetMaxHP();
-        healthBar.SetProgress(progressValue);
-        if (progressValue > 0.5f)
-            healthBar.GetImage().color = HIGH_HP_RANGE_COLOR;
-        else if (progressValue > 0.25)
-            healthBar.GetImage().color = MEDIUM_HP_RANGE_COLOR;
-        else
-            healthBar.GetImage().color = LOW_HP_RANGE_COLOR;
+        maxHealth = terra.GetMaxHP();
+        float newCurrentHealth = terra.GetCurrentHP();
+        if(currentHealth != newCurrentHealth) {
+            previousHealth = currentHealth;
+            currentHealth = newCurrentHealth;
+            interpolationValue = 0f;
+        }
 
-        terraCurrentHealthTMP.SetText(terra.GetCurrentHP().ToString());
         terraMaxHealthTMP.SetText(terra.GetMaxHP().ToString());
     }
 

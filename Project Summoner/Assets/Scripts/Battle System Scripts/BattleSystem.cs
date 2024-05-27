@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using UnityEngine;
 
 public enum BattleType
@@ -12,11 +11,11 @@ public enum BattleType
 
 public class BattleSystem : MonoBehaviour
 {
-    public event EventHandler<BattleEventArgs> OnEnteringInitState;
+    public event EventHandler<BattleEventArgs> OnEndOfInitState;
     public event EventHandler<BattleEventArgs> OnStartOfTurn;
+    public event EventHandler<BattleEventArgs> OnEnteringActionSelectionState;
     public event EventHandler<EnteringActionSelectionEventArgs> OnEnteringActionSelection;
     public event EventHandler<OpeningMoveSelectionUIEventArgs> OnOpeningMoveSelectionUI;
-    public event EventHandler<BattleEventArgs> OnEnteringActionSelectionState;
     public event EventHandler<BattleEventArgs> OnActionSelection;
     public event EventHandler<BattleEventArgs> OnEnteringCombatState;
     public event EventHandler<EscapeAttemptsEventArgs> OnEscapeAttempt;
@@ -654,6 +653,14 @@ public class BattleSystem : MonoBehaviour
         return true;
     }
 
+    public void ExitInitBattleState()
+    {
+        if (battleStateManager.GetCurrentState() != battleStateManager.GetInitState())
+            return;
+
+        battleStateManager.SwitchState(battleStateManager.GetStartTurnState());
+    }
+
     public void NextCombatAction()
     {
         if (battleStateManager.GetCurrentState() != battleStateManager.GetCombatState())
@@ -667,10 +674,10 @@ public class BattleSystem : MonoBehaviour
         isBattleFinished = true;
     }
 
-    public BattleEventArgs InvokeOnEnteringInitState()
+    public BattleEventArgs InvokeOnEndOfInitState()
     {
         BattleEventArgs eventArgs = new BattleEventArgs(this);
-        OnEnteringInitState?.Invoke(this, eventArgs);
+        OnEndOfInitState?.Invoke(this, eventArgs);
 
         return eventArgs;
     }

@@ -6,21 +6,17 @@ public class InitBattleState : BattleState
 {
     public void EnterState(BattleStateManager battleManager)
     {
+        Debug.Log("============== Entered Init Battle State ==============");
+
         BattleSystem battleSystem = battleManager.GetBattleSystem();
 
-        //*** Init Battle State Event ***
-        battleSystem.InvokeOnStartOfTurn();
-
         battleSystem.GetBattleHUD().InitBattleHUD(battleSystem);
+        battleSystem.GetBattleHUD().HideTerraStatusBars();
         battleSystem.GetBattleStage().InitBattleStage(battleSystem.GetBattlefield().GetTerraBattlePositionList());
         InitBattleActions(battleSystem);
 
-        battleSystem.UpdateTerraStatusBars();
-
-        Debug.Log("============== Entered Init Battle State ==============");
-        // Removed temporarily for testing
-        //BattleSequenceManager.GetInstance().StartIntroSequence(battleSystem.GetBattlefield());
-        battleManager.SwitchState(battleManager.GetStartTurnState());
+        //*** End of Init Battle State Event ***
+        battleSystem.InvokeOnEndOfInitState();
     }
 
     private void InitBattleActions(BattleSystem battleSystem)

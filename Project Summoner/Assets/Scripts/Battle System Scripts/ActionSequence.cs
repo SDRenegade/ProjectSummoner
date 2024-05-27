@@ -39,7 +39,6 @@ public class ActionSequence : MonoBehaviour
         }
 
         if(!isLoop && currentTime >= duration) {
-            Debug.Log("Sequence has completed");
             isPlaying = false;
             taskByTime.Clear();
             OnSequenceComplete?.Invoke(this, new EventArgs());
@@ -49,14 +48,12 @@ public class ActionSequence : MonoBehaviour
     public void StartSequence()
     {
         isPlaying = true;
-        Debug.Log("Sequence has been started");
         OnSequenceStart?.Invoke(this, new EventArgs());
     }
 
     public void StopSequence()
     {
         isPlaying = false;
-        Debug.Log("Sequence has been stopped");
         OnSequenceStop?.Invoke(this, new EventArgs());
     }
 
