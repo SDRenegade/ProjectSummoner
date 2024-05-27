@@ -7,6 +7,7 @@ public class BattleSequenceManager : MonoBehaviour
 {
     private static BattleSequenceManager instance;
 
+    [SerializeField] private BattleSystem battleSystem;
     [SerializeField] private BattleStage battleStage;
     [SerializeField] private LookAtPathFollower pathFollower;
     [SerializeField] private BattleCamera battleCam;
@@ -14,10 +15,9 @@ public class BattleSequenceManager : MonoBehaviour
     [SerializeField] private ActionSequence introSequence;
     [SerializeField] private ActionSequence idleBattlefieldSequence;
     [SerializeField] private ActionSequence battleActionSequence;
-    [Space]
+    [Header("Paths")]
     [SerializeField] private List<LookAtPath> introPathList;
-    [Space]
-    [SerializeField] private List<LookAtPath> idleBattlefieldPathList; // TODO Make a randomized path follower class
+    [SerializeField] private List<LookAtPath> idleBattlefieldPathList;
 
     private void Awake()
     {
@@ -25,6 +25,12 @@ public class BattleSequenceManager : MonoBehaviour
             instance = this;
         else
             Destroy(gameObject);
+    }
+
+    private void Start()
+    {
+        battleSystem.OnEnteringActionSelectionState += StartIdleBattlefieldSequence;
+        battleSystem.OnAttackDeclaration += AddActionToBattleSequence;
     }
 
     private void InitIntroSequence(Battlefield battlefield)
@@ -89,35 +95,40 @@ public class BattleSequenceManager : MonoBehaviour
             introDuration += 1.5f;
         }
 
-        introSequence.AddTaskByTime(() => StartIdleBattlefieldSequence(battlefield), introDuration);
-
         introSequence.SetDuration(introDuration);
     }
 
-    private void InitIdleBattlefieldSequence(Battlefield battlefield)
+    private void InitIdleBattlefieldSequence()
     {
-        float idleBattlefieldDuration = 60f;
+        idleBattlefieldSequence.SetIsLoop(true);
 
-        idleBattlefieldSequence.AddTaskByTime(() => {
-            pathFollower.SetLookAtPath(idleBattlefieldPathList);
-            pathFollower.SetSpeed(3.2f);
-            pathFollower.SetIsLoop(true);
-            pathFollower.SetIsActive(true);
-        }, 0f);
+        idleBattlefieldSequence.OnSequenceStart -= SetIdleBattlefieldSequenceStartParams;
+        idleBattlefieldSequence.OnSequenceStart += SetIdleBattlefieldSequenceStartParams;
 
-        idleBattlefieldSequence.SetDuration(idleBattlefieldDuration);
+        idleBattlefieldSequence.OnSequenceStop -= RemoveLookAtPathOnPathFollower;
+        idleBattlefieldSequence.OnSequenceStop += RemoveLookAtPathOnPathFollower;
     }
 
-    public void AddBattleActionToSequence(IBattleSequence battleSequence)
+    private void SetIdleBattlefieldSequenceStartParams(object sender, EventArgs eventArgs)
     {
-        AddBattleActionToSequence(battleSequence.GetBattleSequence(battleStage, battleCam));
+        pathFollower.SetLookAtPath(idleBattlefieldPathList);
+        pathFollower.SetSpeed(3.2f);
+        pathFollower.SetIsLoop(true);
+        pathFollower.SetIsActive(true);
     }
 
-    public void AddBattleActionToSequence(Dictionary<Action, float> actionTasksByTime)
+    private void RemoveLookAtPathOnPathFollower(object sender, EventArgs eventArgs)
     {
-        float sequenceDuration = 0f;
+        pathFollower.SetLookAtPath(null);
+    }
 
+    public void AddActionToBattleSequence(object sender, BattleSequenceEventArgs eventArgs)
+    {
+        float sequenceDuration;
+        foreach (KeyValuePair<Action, float> kvp in eventArgs.GetBattleSequence().GetTasksByTime(battleStage, battleCam, out sequenceDuration))
+            battleActionSequence.AddTaskByTime(kvp.Key, kvp.Value + battleActionSequence.GetDuration());
 
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + sequenceDuration);
     }
 
     public void StartIntroSequence(Battlefield battlefield)
@@ -126,33 +137,35 @@ public class BattleSequenceManager : MonoBehaviour
         introSequence.StartSequence();
     }
 
-    public void StartIdleBattlefieldSequence(Battlefield battlefield)
+    public void StartIdleBattlefieldSequence(object sender, EventArgs eventArgs)
     {
         if (introSequence.IsPlaying())
             introSequence.StopSequence();
         if(battleActionSequence.IsPlaying())
             battleActionSequence.StopSequence();
 
-        InitIdleBattlefieldSequence(battlefield);
+        InitIdleBattlefieldSequence();
         idleBattlefieldSequence.StartSequence();
     }
 
-    public void StartBattleActionSequence(IBattleSequence battleSequence)
+    public void StartBattleActionSequence()
     {
         if (introSequence.IsPlaying())
             introSequence.StopSequence();
         if (idleBattlefieldSequence.IsPlaying())
             idleBattlefieldSequence.StopSequence();
 
+        battleActionSequence.OnSequenceComplete -= ClearBattleSequenceOnCompletion;
+        battleActionSequence.OnSequenceComplete += ClearBattleSequenceOnCompletion;
+
         battleActionSequence.StartSequence();
     }
 
-    public void AddTerraStatChangeBattleSequence()
+    private void ClearBattleSequenceOnCompletion(object sender, EventArgs eventArgs)
     {
-        // TODO 
+        battleActionSequence.ClearSequence();
+        battleSystem.NextCombatAction();
     }
-
-    // TODO Add methods for recoil, canceled attack, missed attack, attack charging
 
     public static BattleSequenceManager GetInstance() { return instance; }
 }

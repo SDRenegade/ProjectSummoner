@@ -55,17 +55,16 @@ public class TerraAttack : IBattleSequence
         isCanceled = false;
     }
 
-    public Dictionary<Action, float> GetBattleSequence(BattleStage battleStage, BattleCamera battleCam)
+    public Dictionary<Action, float> GetTasksByTime(BattleStage battleStage, BattleCamera battleCam, out float sequenceDuration)
     {
         Dictionary<Action, float> tasksByTime = new Dictionary<Action, float>();
-        float sequenceDuration = 0f;
+        sequenceDuration = 0f;
 
         // Static shot at attacking terra
         tasksByTime.Add(() => {
             Transform terraTransform = battleStage.GetTerraObject(attackerPosition).transform;
             Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
-
-            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, true);
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, attackerPosition.IsPrimarySide());
         }, sequenceDuration);
         sequenceDuration += 1.25f;
 
@@ -74,17 +73,17 @@ public class TerraAttack : IBattleSequence
             Transform terraTransform = battleStage.GetTerraObject(attackerPosition).transform;
             Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
 
-            battleCam.SetAttackLookAt(terraOffsetPos, terraTransform.eulerAngles, true);
+            battleCam.SetAttackLookAt(terraOffsetPos, terraTransform.eulerAngles, attackerPosition.IsPrimarySide());
         }, sequenceDuration);
         sequenceDuration += 2f;
 
         // Target terra damage animation
         for(int i = 0; i < defendersPositionList.Count; i++) {
+            int iValue = i;
             tasksByTime.Add(() => {
-                Transform terraTransform = battleStage.GetTerraObject(defendersPositionList[i]).transform;
+                Transform terraTransform = battleStage.GetTerraObject(defendersPositionList[iValue]).transform;
                 Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
-
-                battleCam.SetAttackLookAt(terraOffsetPos, terraTransform.eulerAngles, true);
+                battleCam.SetAttackLookAt(terraOffsetPos, terraTransform.eulerAngles, defendersPositionList[iValue].IsPrimarySide());
             }, sequenceDuration);
             sequenceDuration += 2f;
         }

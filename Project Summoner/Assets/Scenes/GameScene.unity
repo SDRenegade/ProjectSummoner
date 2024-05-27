@@ -1111,15 +1111,15 @@ MonoBehaviour:
   isClosedLoop: 1
   isVisableWhenNotSelected: 1
   bezierSegmentList:
-  - anchorPos: {x: -3.281433, y: 2.8478985, z: -4.68124}
-    controlAPos: {x: -6.7004395, y: 2.9806213, z: -4.663558}
-    controlBPos: {x: 0.13757324, y: 2.7151756, z: -4.698922}
+  - anchorPos: {x: -3.281433, y: 3.208067, z: -4.681241}
+    controlAPos: {x: -6.595108, y: 3.2092724, z: -4.6670227}
+    controlBPos: {x: 0.03224182, y: 3.2068615, z: -4.6954594}
   - anchorPos: {x: 6.362503, y: -2.971302, z: 3.9375048}
     controlAPos: {x: 5.7539062, y: -2.9381628, z: -1.5697255}
     controlBPos: {x: 6.9711, y: -3.0044413, z: 9.444735}
   - anchorPos: {x: -1.8821259, y: 2.8954754, z: 13.913313}
-    controlAPos: {x: 1.3799438, y: 2.8101768, z: 13.476796}
-    controlBPos: {x: -5.1441956, y: 2.980774, z: 14.34983}
+    controlAPos: {x: 2.1560822, y: 2.968773, z: 13.503704}
+    controlBPos: {x: -5.920334, y: 2.822178, z: 14.322922}
   - anchorPos: {x: -10.928619, y: -2.8886194, z: 4.222991}
     controlAPos: {x: -10.873627, y: -2.8868933, z: 9.227293}
     controlBPos: {x: -10.983612, y: -2.8903456, z: -0.78131104}
@@ -3177,7 +3177,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4.05
+      value: -10.18
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.y

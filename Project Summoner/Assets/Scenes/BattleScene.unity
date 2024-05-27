@@ -217,7 +217,7 @@ MonoBehaviour:
     controlAPos: {x: 5.282196, y: 3.2081203, z: -32.81643}
     controlBPos: {x: 3.3985367, y: -4.885351, z: 29.010742}
   - anchorPos: {x: -28.675825, y: -12.797415, z: 23.608438}
-    controlAPos: {x: -18.086895, y: -9.192869, z: 36.283867}
+    controlAPos: {x: -18.086895, y: -9.192869, z: 31.569613}
     controlBPos: {x: -27.946325, y: -18.064125, z: 50.501984}
 --- !u!4 &31076575
 Transform:
@@ -4322,6 +4322,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a9c57a5a6628e84aa321af002605c5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  duration: 0
+  isLoop: 1
+  isPlaying: 0
 --- !u!4 &691469747
 Transform:
   m_ObjectHideFlags: 0
@@ -5305,6 +5308,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1035532770}
   m_CullTransparentMesh: 1
+--- !u!1 &1038439766
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1038439768}
+  - component: {fileID: 1038439767}
+  m_Layer: 0
+  m_Name: battleActionSequence
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1038439767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038439766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a9c57a5a6628e84aa321af002605c5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  duration: 0
+  isLoop: 0
+  isPlaying: 0
+--- !u!4 &1038439768
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038439766}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1042743545
 GameObject:
   m_ObjectHideFlags: 0
@@ -7469,6 +7519,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a9c57a5a6628e84aa321af002605c5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  duration: 0
+  isLoop: 0
+  isPlaying: 0
 --- !u!4 &1595103006
 Transform:
   m_ObjectHideFlags: 0
@@ -8950,12 +9003,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 732562826b0e2f64c8a5c77f2373e0c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  battleSystem: {fileID: 2145235993}
   battleStage: {fileID: 1195796264}
   pathFollower: {fileID: 552977779}
+  battleCam: {fileID: 552977778}
   introSequence: {fileID: 1595103005}
   idleBattlefieldSequence: {fileID: 691469746}
-  battleActionSequence: {fileID: 691469746}
-  battleCam: {fileID: 552977778}
+  battleActionSequence: {fileID: 1038439767}
   introPathList:
   - path: {fileID: 31076574}
     lookAtPos: {fileID: 270892284}

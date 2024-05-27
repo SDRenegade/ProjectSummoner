@@ -9,12 +9,12 @@ public class ActionSequence : MonoBehaviour
     public event EventHandler<EventArgs> OnSequenceStart;
     public event EventHandler<EventArgs> OnSequenceStop;
 
-    private Dictionary<Action, float> taskByTime;
-    private float duration;
-    private bool isLoop;
-    private bool isPlaying;
+    [SerializeField] private float duration;
+    [SerializeField] private bool isLoop;
+    [SerializeField] private bool isPlaying;
     private float currentTime;
     private float previousTime;
+    private Dictionary<Action, float> taskByTime;
 
     private void Awake()
     {
@@ -26,12 +26,12 @@ public class ActionSequence : MonoBehaviour
         if (!isPlaying)
             return;
 
-        // Previous time needs to be set to below 0 one the first call otherwise any actions
+        // Previous time needs to be set to below 0 on the first call otherwise any actions
         // scheduled for time 0 will not be ran
         previousTime = currentTime == 0 ? -1 : currentTime;
         currentTime += Time.deltaTime;
         if (currentTime > duration)
-            currentTime = duration;
+            currentTime = isLoop ? currentTime % duration : duration;
 
         foreach(KeyValuePair<Action, float> pair in taskByTime) {
             if (pair.Value > previousTime && pair.Value <= currentTime)
@@ -39,23 +39,34 @@ public class ActionSequence : MonoBehaviour
         }
 
         if(!isLoop && currentTime >= duration) {
-            OnSequenceComplete?.Invoke(this, new EventArgs());
+            Debug.Log("Sequence has completed");
             isPlaying = false;
             taskByTime.Clear();
-            Debug.Log("AnimationSequence has completed");
+            OnSequenceComplete?.Invoke(this, new EventArgs());
         }
     }
 
     public void StartSequence()
     {
         isPlaying = true;
-        Debug.Log("AnimationSequence has been started");
+        Debug.Log("Sequence has been started");
+        OnSequenceStart?.Invoke(this, new EventArgs());
     }
 
     public void StopSequence()
     {
         isPlaying = false;
-        Debug.Log("AnimationSequence has been stopped");
+        Debug.Log("Sequence has been stopped");
+        OnSequenceStop?.Invoke(this, new EventArgs());
+    }
+
+    public void ClearSequence()
+    {
+        isPlaying = false;
+        duration = 0f;
+        currentTime = 0f;
+        previousTime = 0f;
+        taskByTime.Clear();
     }
 
     public void AddTaskByTime(Action task, float time)
@@ -66,6 +77,10 @@ public class ActionSequence : MonoBehaviour
     public float GetDuration() { return duration; }
 
     public void SetDuration(float duration) { this.duration = duration; }
+
+    public bool IsLoop() { return isLoop; }
+
+    public void SetIsLoop(bool isLoop) {  this.isLoop = isLoop; }
 
     public bool IsPlaying() { return isPlaying; }
 

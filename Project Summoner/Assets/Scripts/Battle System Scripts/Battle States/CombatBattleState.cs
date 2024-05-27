@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class CombatBattleState : BattleState
 {
-    private BattleSystem battleSystem;
-    private List<TerraAttack> queuedTerraAttackList;
+    private BattleStateManager battleManager;
+    private Queue<TerraAttack> terraAttackQueue;
 
-    public CombatBattleState(BattleSystem battleSystem)
+    public CombatBattleState(BattleStateManager battleManager)
     {
-        this.battleSystem = battleSystem;
+        this.battleManager = battleManager;
     }
 
     public void EnterState(BattleStateManager battleManager)
@@ -32,17 +32,23 @@ public class CombatBattleState : BattleState
         }
         ProcessTerraSwitches(battleSystem);
 
-        queuedTerraAttackList = battleSystem.GetBattleActionManager().GetTerraAttackList();
-        SortTerraAttackList(queuedTerraAttackList);
-        for (int i = 0; i < queuedTerraAttackList.Count; i++) {
-            BattleSequenceManager.GetInstance().StartBattleActionSequence(queuedTerraAttackList[i]);
-            ProcessTerraAttack(queuedTerraAttackList[i], battleSystem);
-            if (battleSystem.IsBattleFinished())
-                break;
+        terraAttackQueue = SortTerraAttackList(battleSystem.GetBattleActionManager().GetTerraAttackList());
+        NextCombatAction(battleSystem);
+    }
+
+    public void NextCombatAction(BattleSystem battleSystem)
+    {
+        Debug.Log("NextCombatAction entered");
+
+        if (battleSystem.IsBattleFinished()) {
+            battleManager.SwitchState(battleManager.GetFinishedMatchState());
+            return;
         }
 
-        if(battleSystem.IsBattleFinished())
-            battleManager.SwitchState(battleManager.GetFinishedMatchState());
+        if (terraAttackQueue.Count > 0) {
+            ProcessTerraAttack(terraAttackQueue.Dequeue(), battleSystem);
+            BattleSequenceManager.GetInstance().StartBattleActionSequence();
+        }
         else
             battleManager.SwitchState(battleManager.GetEndTurnState());
     }
@@ -70,19 +76,21 @@ public class CombatBattleState : BattleState
         }
     }
 
-    private void SortTerraAttackList(List<TerraAttack> queuedTerraAttackList)
+    private Queue<TerraAttack> SortTerraAttackList(List<TerraAttack> terraAttackList)
     {
+        Queue<TerraAttack> terraAttackQueue = new Queue<TerraAttack>();
+
         //Sorts the TerraAttacks in the queued list by move priority and then by Terra speed
-        for (int i = 0; i < queuedTerraAttackList.Count - 1; i++) {
+        for (int i = 0; i < terraAttackList.Count - 1; i++) {
             int highestPriorityAttackIndex = i;
-            for (int j = i + 1; j < queuedTerraAttackList.Count; j++) {
-                if (queuedTerraAttackList[highestPriorityAttackIndex].GetMovePriority() > queuedTerraAttackList[j].GetMovePriority())
+            for (int j = i + 1; j < terraAttackList.Count; j++) {
+                if (terraAttackList[highestPriorityAttackIndex].GetMovePriority() > terraAttackList[j].GetMovePriority())
                     continue;
-                else if(queuedTerraAttackList[highestPriorityAttackIndex].GetMovePriority() == queuedTerraAttackList[j].GetMovePriority()) {
-                    if (queuedTerraAttackList[highestPriorityAttackIndex].GetSpeedPiority() > queuedTerraAttackList[j].GetSpeedPiority())
+                else if(terraAttackList[highestPriorityAttackIndex].GetMovePriority() == terraAttackList[j].GetMovePriority()) {
+                    if (terraAttackList[highestPriorityAttackIndex].GetSpeedPiority() > terraAttackList[j].GetSpeedPiority())
                         continue;
-                    else if(queuedTerraAttackList[highestPriorityAttackIndex].GetSpeedPiority() == queuedTerraAttackList[j].GetSpeedPiority()
-                        && queuedTerraAttackList[highestPriorityAttackIndex].GetAttackerPosition().GetTerra().GetSpeed() >= queuedTerraAttackList[j].GetAttackerPosition().GetTerra().GetSpeed())
+                    else if(terraAttackList[highestPriorityAttackIndex].GetSpeedPiority() == terraAttackList[j].GetSpeedPiority()
+                        && terraAttackList[highestPriorityAttackIndex].GetAttackerPosition().GetTerra().GetSpeed() >= terraAttackList[j].GetAttackerPosition().GetTerra().GetSpeed())
                         continue;
                 }
 
@@ -90,15 +98,18 @@ public class CombatBattleState : BattleState
             }
 
             if (highestPriorityAttackIndex != i) {
-                TerraAttack tempTerraAttack = queuedTerraAttackList[i];
-                queuedTerraAttackList[i] = queuedTerraAttackList[highestPriorityAttackIndex];
-                queuedTerraAttackList[highestPriorityAttackIndex] = tempTerraAttack;
+                TerraAttack tempTerraAttack = terraAttackList[i];
+                terraAttackList[i] = terraAttackList[highestPriorityAttackIndex];
+                terraAttackList[highestPriorityAttackIndex] = tempTerraAttack;
             }
         }
+
+        for(int i = 0; i < terraAttackList.Count; i++)
+            terraAttackQueue.Enqueue(terraAttackList[i]);
+
+        return terraAttackQueue;
     }
 
-    // TODO Add IBattleSequence to all actions that take place. Should mostly be on events.
-    // i.e Canceld attack, accuracy check, damage calculation, and post attack effects.
     public void ProcessTerraAttack(TerraAttack terraAttack, BattleSystem battleSystem)
     {
         if (terraAttack.GetAttackerPosition().GetTerra() == null)

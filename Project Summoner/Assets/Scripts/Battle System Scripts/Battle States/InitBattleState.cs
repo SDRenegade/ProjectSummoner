@@ -18,7 +18,8 @@ public class InitBattleState : BattleState
         battleSystem.UpdateTerraStatusBars();
 
         Debug.Log("============== Entered Init Battle State ==============");
-        BattleSequenceManager.GetInstance().StartIntroSequence(battleSystem.GetBattlefield());
+        // Removed temporarily for testing
+        //BattleSequenceManager.GetInstance().StartIntroSequence(battleSystem.GetBattlefield());
         battleManager.SwitchState(battleManager.GetStartTurnState());
     }
 

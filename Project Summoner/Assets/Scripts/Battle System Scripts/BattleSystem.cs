@@ -16,6 +16,7 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<BattleEventArgs> OnStartOfTurn;
     public event EventHandler<EnteringActionSelectionEventArgs> OnEnteringActionSelection;
     public event EventHandler<OpeningMoveSelectionUIEventArgs> OnOpeningMoveSelectionUI;
+    public event EventHandler<BattleEventArgs> OnEnteringActionSelectionState;
     public event EventHandler<BattleEventArgs> OnActionSelection;
     public event EventHandler<BattleEventArgs> OnEnteringCombatState;
     public event EventHandler<EscapeAttemptsEventArgs> OnEscapeAttempt;
@@ -467,9 +468,10 @@ public class BattleSystem : MonoBehaviour
 
         List<Terra> terraList = terraSwitch.GetTerraBattlePosition().IsPrimarySide() ? primaryTerraList : secondaryTerraList;
         Debug.Log(BattleDialog.SwitchTerraMsg(terraSwitch, terraList));
-        Terra tmp = terraSwitch.GetTerraBattlePosition().GetTerra();
-        terraSwitch.GetTerraBattlePosition().SetTerra(terraList[terraSwitch.GetBenchPositionIndex()]);
+        Terra tmp = terraList[terraSwitch.GetTerraBattlePosition().GetBattlePositionIndex()];
+        terraList[terraSwitch.GetTerraBattlePosition().GetBattlePositionIndex()] = terraList[terraSwitch.GetBenchPositionIndex()];
         terraList[terraSwitch.GetBenchPositionIndex()] = tmp;
+        terraSwitch.GetTerraBattlePosition().SetTerra(terraList[terraSwitch.GetTerraBattlePosition().GetBattlePositionIndex()]);
         if(terraSwitch.IsPrimarySide())
             battlefield.GetPrimaryBattleSide().UpdateLeadingTerra(terraList);
         else
@@ -652,6 +654,14 @@ public class BattleSystem : MonoBehaviour
         return true;
     }
 
+    public void NextCombatAction()
+    {
+        if (battleStateManager.GetCurrentState() != battleStateManager.GetCombatState())
+            return;
+
+        battleStateManager.GetCombatState().NextCombatAction(this);
+    }
+
     public void EndBattle()
     {
         isBattleFinished = true;
@@ -685,6 +695,14 @@ public class BattleSystem : MonoBehaviour
     {
         OpeningMoveSelectionUIEventArgs eventArgs = new OpeningMoveSelectionUIEventArgs(terraBattlePosition, this);
         OnOpeningMoveSelectionUI?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public BattleEventArgs InvokeEnteringActionSelectionState()
+    {
+        BattleEventArgs eventArgs = new BattleEventArgs(this);
+        OnEnteringActionSelectionState?.Invoke(this, eventArgs);
 
         return eventArgs;
     }

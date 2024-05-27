@@ -8,6 +8,9 @@ public class ActionSelectionBattleState : BattleState
     {
         BattleSystem battleSystem = battleManager.GetBattleSystem();
 
+        //*** Entering Action Selection Event ***
+        battleSystem.InvokeEnteringActionSelectionState();
+
         TerraBattlePosition[] primarySidePositions = battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
         for (int i = 0; i < primarySidePositions.Length; i++) {
             if (primarySidePositions[i].GetTerra() != null)
@@ -34,7 +37,7 @@ public class ActionSelectionBattleState : BattleState
 
     private void ProcessActionSelection(BattleAI battleAI, TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
-        //*** Entering Action Selection Event ***
+        //*** Action Selection Event ***
         EnteringActionSelectionEventArgs enteringActionSelectionEventArgs = battleSystem.InvokeOnEnteringActionSelection(terraBattlePosition);
 
         if (enteringActionSelectionEventArgs.IsSkipActionSelection()) {

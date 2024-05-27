@@ -5,5 +5,5 @@ using UnityEngine;
 
 public interface IBattleSequence
 {
-    Dictionary<Action, float> GetBattleSequence(BattleStage battleStage, BattleCamera battleCam);
+    Dictionary<Action, float> GetTasksByTime(BattleStage battleStage, BattleCamera battleCam, out float sequenceDuration);
 }
