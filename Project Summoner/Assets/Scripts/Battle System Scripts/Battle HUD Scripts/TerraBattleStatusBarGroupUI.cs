@@ -10,21 +10,52 @@ public class TerraBattleStatusBarGroupUI : MonoBehaviour
     private List<TerraBattleStatusBar> primaryStatusBarList;
     private List<TerraBattleStatusBar> secondaryStatusBarList;
 
-    public void InitStatusBars(BattleFormat battleFormat)
+    public void InitStatusBarGroup(BattleFormat battleFormat, Battlefield battlefield)
     {
         primaryStatusBarList = new List<TerraBattleStatusBar>();
         secondaryStatusBarList = new List<TerraBattleStatusBar>();
         for(int i = 0; i < battleFormat.NumberOfLeadingPositions(); i++) {
-            GameObject primaryTerraStatusBar = Instantiate(terraStatusBarPrefab);
-            primaryTerraStatusBar.transform.SetParent(primaryStatusBarPanel.transform);
-            primaryStatusBarList.Add(primaryTerraStatusBar.GetComponent<TerraBattleStatusBar>());
-            GameObject secondaryTerraStatusBar = Instantiate(terraStatusBarPrefab);
-            secondaryTerraStatusBar.transform.SetParent(secondaryStatusBarPanel.transform);
-            secondaryStatusBarList.Add(secondaryTerraStatusBar.GetComponent<TerraBattleStatusBar>());
+            GameObject primaryTerraStatusBarObject = Instantiate(terraStatusBarPrefab);
+            primaryTerraStatusBarObject.transform.SetParent(primaryStatusBarPanel.transform);
+            primaryStatusBarList.Add(primaryTerraStatusBarObject.GetComponent<TerraBattleStatusBar>());
+            GameObject secondaryTerraStatusBarObject = Instantiate(terraStatusBarPrefab);
+            secondaryTerraStatusBarObject.transform.SetParent(secondaryStatusBarPanel.transform);
+            secondaryStatusBarList.Add(secondaryTerraStatusBarObject.GetComponent<TerraBattleStatusBar>());
         }
+
+        StaticUpdateAllStatusBars(battlefield);
+        HideStatusBars();
     }
 
-    public void UpdateTerraStatusBars(Battlefield battlefield)
+    public void StaticUpdateStatusBar(TerraBattlePosition terraBattlePosition)
+    {
+        TerraBattleStatusBar statusBar = terraBattlePosition.IsPrimarySide() ?
+            primaryStatusBarList[terraBattlePosition.GetBattlePositionIndex()] :
+            secondaryStatusBarList[terraBattlePosition.GetBattlePositionIndex()];
+
+        if (terraBattlePosition.GetTerra() != null) {
+            statusBar.StaticUpdateStatusBar(terraBattlePosition.GetTerra());
+            statusBar.gameObject.SetActive(true);
+        }
+        else
+            statusBar.gameObject.SetActive(false);
+    }
+
+    public void DynamicUpdateStatusBar(TerraBattlePosition terraBattlePosition)
+    {
+        TerraBattleStatusBar statusBar = terraBattlePosition.IsPrimarySide() ?
+            primaryStatusBarList[terraBattlePosition.GetBattlePositionIndex()] :
+            secondaryStatusBarList[terraBattlePosition.GetBattlePositionIndex()];
+
+        if (terraBattlePosition.GetTerra() != null) {
+            statusBar.DynamicUpdateStatusBar(terraBattlePosition.GetTerra());
+            statusBar.gameObject.SetActive(true);
+        }
+        else
+            statusBar.gameObject.SetActive(false);
+    }
+
+    private void StaticUpdateAllStatusBars(Battlefield battlefield)
     {
         TerraBattlePosition[] primaryTerraBattlePositionArr = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
         TerraBattlePosition[] secondaryTerraBattlePositionArr = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
@@ -35,8 +66,8 @@ public class TerraBattleStatusBarGroupUI : MonoBehaviour
                 continue;
             }
 
+            primaryStatusBarList[i].StaticUpdateStatusBar(primaryTerraBattlePositionArr[i].GetTerra());
             primaryStatusBarList[i].gameObject.SetActive(true);
-            primaryStatusBarList[i].UpdateStatusBar(primaryTerraBattlePositionArr[i].GetTerra());
         }
         for (int i = 0; i < secondaryStatusBarList.Count; i++) {
             if (secondaryTerraBattlePositionArr[i].GetTerra() == null) {
@@ -44,16 +75,28 @@ public class TerraBattleStatusBarGroupUI : MonoBehaviour
                 continue;
             }
 
+            secondaryStatusBarList[i].StaticUpdateStatusBar(secondaryTerraBattlePositionArr[i].GetTerra());
             secondaryStatusBarList[i].gameObject.SetActive(true);
-            secondaryStatusBarList[i].UpdateStatusBar(secondaryTerraBattlePositionArr[i].GetTerra());
         }
     }
 
-    public void HideTerraStatusBars()
+    public void HideStatusBars()
     {
         for (int i = 0; i < primaryStatusBarList.Count; i++)
             primaryStatusBarList[i].gameObject.SetActive(false);
         for (int i = 0; i < secondaryStatusBarList.Count; i++)
             secondaryStatusBarList[i].gameObject.SetActive(false);
+    }
+
+    public void ShowStatusBars()
+    {
+        for (int i = 0; i < primaryStatusBarList.Count; i++) {
+            if (primaryStatusBarList[i].GetCurrentHealth() > 0)
+                primaryStatusBarList[i].gameObject.SetActive(true);
+        }
+        for (int i = 0; i < secondaryStatusBarList.Count; i++) {
+            if (secondaryStatusBarList[i].GetCurrentHealth() > 0)
+                secondaryStatusBarList[i].gameObject.SetActive(true);
+        }
     }
 }

@@ -7,14 +7,12 @@ public class StartOfTurnBattleState : BattleState
 {
     public void EnterState(BattleStateManager battleManager)
     {
+        Debug.Log("============== Entered Start of Turn Battle State ==============");
         BattleSystem battleSystem = battleManager.GetBattleSystem();
 
         //*** Start of Turn Event ***
         battleSystem.InvokeOnStartOfTurn();
 
-        battleSystem.UpdateTerraStatusBars();
-
-        Debug.Log("============== Entered Start of Turn Battle State ==============");
         battleManager.SwitchState(battleManager.GetActionSelectionState());
     }
 }

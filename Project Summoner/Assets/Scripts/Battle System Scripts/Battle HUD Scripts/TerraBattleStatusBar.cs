@@ -14,9 +14,9 @@ public class TerraBattleStatusBar : MonoBehaviour
     [SerializeField] private TextMeshProUGUI terraMaxHealthTMP;
 
     float increment = 0.4f;
+    float maxHealth;
     float currentHealth;
     float previousHealth;
-    float maxHealth;
     float interpolationValue;
 
     private void Update()
@@ -40,7 +40,28 @@ public class TerraBattleStatusBar : MonoBehaviour
         terraCurrentHealthTMP.SetText(((int)interpolationHealth).ToString());
     }
 
-    public void UpdateStatusBar(Terra terra)
+    public void StaticUpdateStatusBar(Terra terra)
+    {
+        maxHealth = terra.GetMaxHP();
+        currentHealth = terra.GetCurrentHP();
+        previousHealth = currentHealth;
+        interpolationValue = 1f;
+
+        terraNameTMP.SetText(terra.GetTerraBase().GetSpeciesName());
+        terraLevelTMP.SetText("Lvl " + terra.GetLevel().ToString());
+        terraMaxHealthTMP.SetText(terra.GetMaxHP().ToString());
+        terraCurrentHealthTMP.SetText(terra.GetCurrentHP().ToString());
+
+        healthBar.SetProgress(currentHealth / maxHealth);
+        if (healthBar.GetProgress() > 0.5f)
+            healthBar.GetImage().color = HIGH_HP_RANGE_COLOR;
+        else if (healthBar.GetProgress() > 0.25)
+            healthBar.GetImage().color = MEDIUM_HP_RANGE_COLOR;
+        else
+            healthBar.GetImage().color = LOW_HP_RANGE_COLOR;
+    }
+
+    public void DynamicUpdateStatusBar(Terra terra)
     {
         terraNameTMP.SetText(terra.GetTerraBase().GetSpeciesName());
         terraLevelTMP.SetText("Lvl " + terra.GetLevel().ToString());
@@ -65,4 +86,6 @@ public class TerraBattleStatusBar : MonoBehaviour
     public TextMeshProUGUI GetTerraCurrentHealthTMP() { return terraCurrentHealthTMP; }
 
     public TextMeshProUGUI GetTerraMaxHealthTMP() { return terraMaxHealthTMP; }
+
+    public float GetCurrentHealth() { return currentHealth; }
 }

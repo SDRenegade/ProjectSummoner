@@ -33,6 +33,7 @@ public class BattleSequenceManager : MonoBehaviour
         battleSystem.OnEnteringActionSelectionState += StartIdleBattlefieldSequence;
         battleSystem.OnAttackDeclaration += AddActionToBattleSequence;
 
+        introSequence.OnSequenceComplete += ShowStatusBars;
         introSequence.OnSequenceComplete += ExitInitBattleState;
 
         battleActionSequence.OnSequenceStart += HideActionSelectionHUD;
@@ -163,6 +164,11 @@ public class BattleSequenceManager : MonoBehaviour
             idleBattlefieldSequence.StopSequence();
 
         battleActionSequence.StartSequence();
+    }
+
+    private void ShowStatusBars(object sender, EventArgs eventArgs)
+    {
+        battleSystem.GetBattleHUD().ShowTerraStatusBars();
     }
 
     private void ExitInitBattleState(object sender, EventArgs eventArgs)

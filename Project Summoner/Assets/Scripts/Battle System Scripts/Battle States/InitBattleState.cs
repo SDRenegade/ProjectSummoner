@@ -10,10 +10,9 @@ public class InitBattleState : BattleState
 
         BattleSystem battleSystem = battleManager.GetBattleSystem();
 
-        battleSystem.GetBattleHUD().InitBattleHUD(battleSystem);
-        battleSystem.GetBattleHUD().HideTerraStatusBars();
-        battleSystem.GetBattleStage().InitBattleStage(battleSystem.GetBattlefield().GetTerraBattlePositionList());
         InitBattleActions(battleSystem);
+        battleSystem.GetBattleHUD().InitBattleHUD(battleSystem);
+        battleSystem.GetBattleStage().InitBattleStage(battleSystem.GetBattlefield().GetTerraBattlePositionList());
 
         //*** End of Init Battle State Event ***
         battleSystem.InvokeOnEndOfInitState();

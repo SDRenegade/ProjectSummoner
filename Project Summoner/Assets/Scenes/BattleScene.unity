@@ -9334,7 +9334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01be67907353f744fa8f740cd75ecf05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  terraBattleStatusBarGroupUI: {fileID: 613251039}
+  statusBarGroupUI: {fileID: 613251039}
   menuSelectionUI: {fileID: 981711207}
   moveSelectionUI: {fileID: 1968184562}
   targetSelectionUI: {fileID: 90953240}
@@ -9756,7 +9756,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6010140372239047414, guid: c06d4570f53d83f4589af3644e398607, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6010140372239047414, guid: c06d4570f53d83f4589af3644e398607, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode

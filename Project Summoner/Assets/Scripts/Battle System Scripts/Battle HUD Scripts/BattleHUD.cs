@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class BattleHUD : MonoBehaviour
 {
-    [SerializeField] private TerraBattleStatusBarGroupUI terraBattleStatusBarGroupUI;
+    [SerializeField] private TerraBattleStatusBarGroupUI statusBarGroupUI;
     [SerializeField] private MenuSelectionUI menuSelectionUI;
     [SerializeField] private MoveSelectionUI moveSelectionUI;
     [SerializeField] private TargetSelectionUI targetSelectionUI;
@@ -19,7 +19,7 @@ public class BattleHUD : MonoBehaviour
 
     public void InitBattleHUD(BattleSystem battleSystem)
     {
-        terraBattleStatusBarGroupUI.InitStatusBars(battleSystem.GetBattleFormat());
+        statusBarGroupUI.InitStatusBarGroup(battleSystem.GetBattleFormat(), battleSystem.GetBattlefield());
 
         targetSelectionUI.GetOpponenet1Btn().onClick.AddListener(() => battleSystem.TargetSelection(0));
         targetSelectionUI.GetOpponenet2Btn().onClick.AddListener(() => battleSystem.TargetSelection(1));
@@ -28,19 +28,30 @@ public class BattleHUD : MonoBehaviour
         summonerDieMenuUI.InitButtonEvents(battleSystem);
     }
 
-    public void UpdateTerraStatusBars(Battlefield battlefield)
+    public void StaticUpdateStatusBar(TerraBattlePosition terraBattlePosition)
     {
-        terraBattleStatusBarGroupUI.UpdateTerraStatusBars(battlefield);
+        statusBarGroupUI.StaticUpdateStatusBar(terraBattlePosition);
+    }
+
+    public void DynamicUpdateStatusBar(TerraBattlePosition terraBattlePosition)
+    {
+        statusBarGroupUI.DynamicUpdateStatusBar(terraBattlePosition);
     }
 
     public void HideTerraStatusBars()
     {
-        terraBattleStatusBarGroupUI.HideTerraStatusBars();
+        statusBarGroupUI.HideStatusBars();
+    }
+
+    public void ShowTerraStatusBars()
+    {
+        statusBarGroupUI.ShowStatusBars();
     }
 
     public void OpenMenuSelectionUI(BattleActionManager battleActionManager)
     {
         CloseAllSelectionUI();
+        statusBarGroupUI.ShowStatusBars();
         menuSelectionUI.OpenMenuSelectionUI(battleActionManager);
     }
 
@@ -74,12 +85,6 @@ public class BattleHUD : MonoBehaviour
         CloseAllSelectionUI();
         HideTerraStatusBars();
         summonerDieMenuUI.OpenSummonerDieMenuUI(summonerDieItemStackList, 0);
-    }
-
-    public void ReturnToMenuSelection(Battlefield battlefield, BattleActionManager battleActionManager)
-    {
-        UpdateTerraStatusBars(battlefield);
-        OpenMenuSelectionUI(battleActionManager);
     }
 
     public void CloseAllSelectionUI()

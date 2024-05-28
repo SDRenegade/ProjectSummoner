@@ -64,8 +64,10 @@ public class PartyMenuUI : MonoBehaviour
 
         if (isMustSwitch)
             cancelBtn.interactable = false;
-        else
+        else {
+            cancelBtn.onClick.AddListener(() => battleSystem.OpenMenuSelectionUI());
             cancelBtn.interactable = true;
+        }
 
         gameObject.SetActive(true);
     }

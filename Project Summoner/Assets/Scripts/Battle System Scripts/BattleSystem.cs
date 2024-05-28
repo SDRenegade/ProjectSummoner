@@ -97,9 +97,14 @@ public class BattleSystem : MonoBehaviour
         battleStateManager = new BattleStateManager(this);
     }
 
-    public void UpdateTerraStatusBars()
+    public void StaticUpdateStatusBar(TerraBattlePosition terraBattlePosition)
     {
-        battleHUD.UpdateTerraStatusBars(battlefield);
+        battleHUD.StaticUpdateStatusBar(terraBattlePosition);
+    }
+
+    public void DynamicUpdateStatusBar(TerraBattlePosition terraBattlePosition)
+    {
+        battleHUD.DynamicUpdateStatusBar(terraBattlePosition);
     }
 
     public void OpenMenuSelectionUI()
@@ -110,11 +115,6 @@ public class BattleSystem : MonoBehaviour
     public void ExitMenuSelectionUI()
     {
         battleHUD.ExitMenuSelection(battleActionManager);
-    }
-
-    public void ReturnToMenuSelection()
-    {
-        battleHUD.ReturnToMenuSelection(battlefield, battleActionManager);
     }
 
     public void OpenPartyMenuUI()
@@ -317,7 +317,6 @@ public class BattleSystem : MonoBehaviour
                 targetableOpponentTerraPositions[i] = opponentTerraPositions[i];
         }
 
-        UpdateTerraStatusBars();
         battleHUD.OpenTargetSelectionUI(targetableOpponentTerraPositions, targetableAllyTerraPositions);
     }
 
@@ -476,7 +475,7 @@ public class BattleSystem : MonoBehaviour
         else
             battlefield.GetSecondaryBattleSide().UpdateLeadingTerra(terraList);
         battleStage.SetTerraAtPosition(terraSwitch.GetTerraBattlePosition());
-        UpdateTerraStatusBars();
+        StaticUpdateStatusBar(terraSwitch.GetTerraBattlePosition());
     }
 
     //Method used when a terra is dealt damage that is not from a terra attack
@@ -538,7 +537,6 @@ public class BattleSystem : MonoBehaviour
     public void SwitchFaintedTerra()
     {
         if (battleActionManager.GetFaintedTerraQueue().Count == 0) {
-            UpdateTerraStatusBars();
             battleActionManager.ResetActions(this);
             battleStateManager.SwitchState(battleStateManager.GetStartTurnState());
             return;

@@ -197,7 +197,7 @@ public class CombatBattleState : BattleState
                     directAttackLogList[i].GetDirectAttackParams().GetAttackerPosition().GetTerra(),
                     directAttackLogList[i].GetDirectAttackParams().GetHitCount()));
 
-            battleSystem.UpdateTerraStatusBars();
+            battleSystem.DynamicUpdateStatusBar(terraAttack.GetDefendersPositionList()[i]);
         }
     }
 
