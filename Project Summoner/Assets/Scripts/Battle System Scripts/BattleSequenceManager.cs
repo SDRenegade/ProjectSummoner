@@ -9,6 +9,7 @@ public class BattleSequenceManager : MonoBehaviour
 
     [SerializeField] private BattleSystem battleSystem;
     [SerializeField] private BattleStage battleStage;
+    [SerializeField] private BattleDialogUI battleDialogUI;
     [SerializeField] private LookAtPathFollower pathFollower;
     [SerializeField] private BattleCamera battleCam;
     [Header("Sequences")]
@@ -31,13 +32,18 @@ public class BattleSequenceManager : MonoBehaviour
     {
         battleSystem.OnEndOfInitState += StartIntroSequence;
         battleSystem.OnEnteringActionSelectionState += StartIdleBattlefieldSequence;
-        battleSystem.OnAttackDeclaration += AddActionToBattleSequence;
+        battleSystem.OnAttackDeclaration += AddAttackDeclarationToSequence;
+        battleSystem.OnStartTerraAttack += AddAttackerAnimationToSequence;
+        battleSystem.OnDirectAttackHit += AddAttackHitToSequence;
+        battleSystem.OnSwitchTerra += AddTerraSwitchToSequence;
+        battleSystem.OnEscapeAttempt += AddEscapeAttemptToSequence;
+        battleSystem.OnCaptureAttempt += AddCaptureAttemptToSequence;
 
         introSequence.OnSequenceComplete += ShowStatusBars;
         introSequence.OnSequenceComplete += ExitInitBattleState;
 
         battleActionSequence.OnSequenceStart += HideActionSelectionHUD;
-        battleActionSequence.OnSequenceComplete += ClearBattleSequenceOnCompletion;
+        battleActionSequence.OnSequenceComplete += ClearSequenceAndStartNextAction;
     }
 
     private void InitIntroSequence(Battlefield battlefield)
@@ -130,18 +136,10 @@ public class BattleSequenceManager : MonoBehaviour
         pathFollower.SetLookAtPath(null);
     }
 
-    public void AddActionToBattleSequence(object sender, BattleSequenceEventArgs eventArgs)
-    {
-        float sequenceDuration;
-        foreach (KeyValuePair<Action, float> kvp in eventArgs.GetBattleSequence().GetTasksByTime(battleStage, battleCam, out sequenceDuration))
-            battleActionSequence.AddTaskByTime(kvp.Key, kvp.Value + battleActionSequence.GetDuration());
-
-        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + sequenceDuration);
-    }
-
     public void StartIntroSequence(object sender, EventArgs eventArgs)
     {
-        InitIntroSequence(battleSystem.GetBattlefield());
+        // Temp Removed Intro sequence for testing
+        //InitIntroSequence(battleSystem.GetBattlefield());
         introSequence.StartSequence();
     }
 
@@ -181,11 +179,126 @@ public class BattleSequenceManager : MonoBehaviour
         battleSystem.GetBattleHUD().CloseAllSelectionUI();
     }
 
-    private void ClearBattleSequenceOnCompletion(object sender, EventArgs eventArgs)
+    private void ClearSequenceAndStartNextAction(object sender, EventArgs eventArgs)
     {
         battleActionSequence.ClearSequence();
+        battleDialogUI.HideDialog();
         battleSystem.NextCombatAction();
     }
+
+    private void AddAttackDeclarationToSequence(object sender, TerraAttackEventArgs eventArgs)
+    {
+        TerraBattlePosition attackerPosition = eventArgs.GetTerraAttack().GetAttackerPosition();
+
+        // Static shot at attacking terra
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(attackerPosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, attackerPosition.IsPrimarySide());
+
+            battleDialogUI.SetDialog(BattleDialog.AttackUsedMsg(eventArgs.GetTerraAttack()));
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.25f);
+    }
+
+    private void AddAttackerAnimationToSequence(object sender, TerraAttackEventArgs eventArgs)
+    {
+        TerraBattlePosition attackerPosition = eventArgs.GetTerraAttack().GetAttackerPosition();
+
+        // Terra attack animation
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(attackerPosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetAttackLookAt(terraOffsetPos, terraTransform.eulerAngles, attackerPosition.IsPrimarySide());
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 2f);
+    }
+
+    private void AddAttackHitToSequence(object sender, DirectAttackLogEventArgs eventArgs)
+    {
+        TerraBattlePosition targetPosition = eventArgs.GetDirectAttackLog().GetDefenderPosition();
+
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(targetPosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetAttackLookAt(terraOffsetPos, terraTransform.eulerAngles, targetPosition.IsPrimarySide());
+
+            // TODO Set battle dialog if the attack was a crit or if the attack was not neutral
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 2f);
+    }
+
+    private void AddTerraSwitchToSequence(object sender, SwitchTerraEventArgs eventArgs)
+    {
+        TerraBattlePosition battlePosition = eventArgs.GetTerraSwitch().GetTerraBattlePosition();
+
+        // Leading terra switch animation
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
+
+        // Switch terra gameobject and player throwing die animation
+        Transform summonerTransform = battlePosition.IsPrimarySide() ? battleStage.GetPrimarySummonerGO().transform : battleStage.GetSecondarySummonerGO().transform;
+        battleActionSequence.AddTaskByTime(() => {
+            battleStage.SetTerraAtPosition(battlePosition);
+            Vector3 terraOffsetPos = new Vector3(summonerTransform.position.x, summonerTransform.position.y + 1.75f, summonerTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, summonerTransform.eulerAngles, battlePosition.IsPrimarySide());
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
+
+        // Switched-in terra switch animation
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
+    }
+
+    private void AddEscapeAttemptToSequence(object sender, EscapeAttemptsEventArgs eventArgs)
+    {
+        bool isPrimarySide = eventArgs.GetEscapeAttempt().IsPrimarySide();
+
+        // Static summoner shot
+        Transform summonerTransform = eventArgs.GetEscapeAttempt().IsPrimarySide() ?
+            battleStage.GetPrimarySummonerGO().transform : battleStage.GetSecondarySummonerGO().transform;
+        battleActionSequence.AddTaskByTime(() => {
+            Vector3 terraOffsetPos = new Vector3(summonerTransform.position.x, summonerTransform.position.y + 1.75f, summonerTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, summonerTransform.eulerAngles, isPrimarySide);
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 2f);
+    }
+
+    private void AddCaptureAttemptToSequence(object sender, CaptureAttemptEventArgs eventArgs)
+    {
+        bool isPrimarySide = eventArgs.GetCaptureAttempt().IsPrimarySide();
+        TerraBattlePosition targetPosition = eventArgs.GetCaptureAttempt().GetTargetPosition();
+
+        // Player throwing die animation
+        Transform summonerTransform = isPrimarySide ? battleStage.GetPrimarySummonerGO().transform : battleStage.GetSecondarySummonerGO().transform;
+        battleActionSequence.AddTaskByTime(() => {
+            Vector3 terraOffsetPos = new Vector3(summonerTransform.position.x, summonerTransform.position.y + 1.75f, summonerTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, summonerTransform.eulerAngles, isPrimarySide);
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 2f);
+
+        // Target terra capture animation
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(targetPosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, targetPosition.IsPrimarySide());
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.25f);
+    }
+
+    private void AddTerraFaintToSequence()
+    {
+
+    }
+
 
     public static BattleSequenceManager GetInstance() { return instance; }
 }

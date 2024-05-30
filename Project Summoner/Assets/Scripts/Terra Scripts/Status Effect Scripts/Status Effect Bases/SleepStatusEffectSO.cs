@@ -38,7 +38,7 @@ public class SleepStatusEffect : StatusEffectBase
         battleSystem.OnAttackDeclaration -= SleepActive;
     }
 
-    private void SleepActive(object sender, AttackDeclarationEventArgs eventArgs)
+    private void SleepActive(object sender, TerraAttackEventArgs eventArgs)
     {
         if (eventArgs.GetTerraAttack().GetAttackerPosition() != terraBattlePosition)
             return;

@@ -27,7 +27,7 @@ public class FlinchedVolatileStatusEffect : VolatileStatusEffectBase
         battleSystem.OnEndOfTurn -= EndOfTurnStatusRemoval;
     }
 
-    public void CancelAttack(object sender, AttackDeclarationEventArgs eventArgs)
+    public void CancelAttack(object sender, TerraAttackEventArgs eventArgs)
     {
         if (eventArgs.GetTerraAttack().GetAttackerPosition() != terraBattlePosition)
             return;

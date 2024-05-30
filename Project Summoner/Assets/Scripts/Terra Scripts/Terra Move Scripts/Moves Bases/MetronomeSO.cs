@@ -27,7 +27,7 @@ public class Metronome : TerraMoveBase
         battleSystem.OnAttackDeclaration -= PickRandomMove;
     }
 
-    public void PickRandomMove(object sender, AttackDeclarationEventArgs eventArgs)
+    public void PickRandomMove(object sender, TerraAttackEventArgs eventArgs)
     {
         if (eventArgs.GetTerraAttack() != terraAttack)
             return;

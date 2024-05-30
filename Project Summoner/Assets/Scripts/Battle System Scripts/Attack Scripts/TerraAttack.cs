@@ -10,7 +10,7 @@ public enum SpeedPriority
     HIGH = 2
 }
 
-public class TerraAttack : IBattleSequence
+public class TerraAttack
 {
     private TerraBattlePosition attackerPosition;
     private List<TerraBattlePosition> defendersPositionList;
@@ -53,42 +53,6 @@ public class TerraAttack : IBattleSequence
         isRecharging = false;
         isPersistent = false;
         isCanceled = false;
-    }
-
-    public Dictionary<Action, float> GetTasksByTime(BattleStage battleStage, BattleCamera battleCam, out float sequenceDuration)
-    {
-        Dictionary<Action, float> tasksByTime = new Dictionary<Action, float>();
-        sequenceDuration = 0f;
-
-        // Static shot at attacking terra
-        tasksByTime.Add(() => {
-            Transform terraTransform = battleStage.GetTerraObject(attackerPosition).transform;
-            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
-            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, attackerPosition.IsPrimarySide());
-        }, sequenceDuration);
-        sequenceDuration += 1.25f;
-
-        // Terra attack animation
-        tasksByTime.Add(() => {
-            Transform terraTransform = battleStage.GetTerraObject(attackerPosition).transform;
-            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
-
-            battleCam.SetAttackLookAt(terraOffsetPos, terraTransform.eulerAngles, attackerPosition.IsPrimarySide());
-        }, sequenceDuration);
-        sequenceDuration += 2f;
-
-        // Target terra damage animation
-        for(int i = 0; i < defendersPositionList.Count; i++) {
-            int iValue = i;
-            tasksByTime.Add(() => {
-                Transform terraTransform = battleStage.GetTerraObject(defendersPositionList[iValue]).transform;
-                Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
-                battleCam.SetAttackLookAt(terraOffsetPos, terraTransform.eulerAngles, defendersPositionList[iValue].IsPrimarySide());
-            }, sequenceDuration);
-            sequenceDuration += 2f;
-        }
-
-        return tasksByTime;
     }
 
     public TerraBattlePosition GetAttackerPosition() { return attackerPosition; }

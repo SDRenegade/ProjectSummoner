@@ -38,7 +38,7 @@ public class ConfusionVolatileStatusEffect : VolatileStatusEffectBase
         battleSystem.OnEndOfTurn -= EndOfTurnCounterIncrement;
     }
 
-    private void TerraAttackConfusionActive(object sender, AttackDeclarationEventArgs eventArgs)
+    private void TerraAttackConfusionActive(object sender, TerraAttackEventArgs eventArgs)
     {
         if (eventArgs.GetTerraAttack().GetAttackerPosition() != terraBattlePosition)
             return;

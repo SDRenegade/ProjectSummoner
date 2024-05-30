@@ -1111,9 +1111,9 @@ MonoBehaviour:
   isClosedLoop: 1
   isVisableWhenNotSelected: 1
   bezierSegmentList:
-  - anchorPos: {x: -3.281433, y: 3.208067, z: -4.681241}
-    controlAPos: {x: -6.595108, y: 3.2092724, z: -4.6670227}
-    controlBPos: {x: 0.03224182, y: 3.2068615, z: -4.6954594}
+  - anchorPos: {x: -3.281433, y: 3.705576, z: -4.681241}
+    controlAPos: {x: -6.914093, y: 3.667904, z: -4.18789}
+    controlBPos: {x: 0.3512268, y: 3.743248, z: -5.174592}
   - anchorPos: {x: 6.362503, y: -2.971302, z: 3.9375048}
     controlAPos: {x: 5.7539062, y: -2.9381628, z: -1.5697255}
     controlBPos: {x: 6.9711, y: -3.0044413, z: 9.444735}
@@ -3177,7 +3177,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -7.93
+      value: 0.63
       objectReference: {fileID: 0}
     - target: {fileID: 5608180571702621483, guid: 5095e22dc2b6dab49bcb9c475e74df8f, type: 3}
       propertyPath: m_LocalPosition.y

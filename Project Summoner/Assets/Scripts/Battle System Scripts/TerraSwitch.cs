@@ -1,8 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
-// Refactor to use the TerraBattlePosition instead of the leadingPositionIndex
 public class TerraSwitch
 {
     private TerraBattlePosition battlePosition;

@@ -21,8 +21,10 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<EscapeAttemptsEventArgs> OnEscapeAttempt;
     public event EventHandler<CaptureAttemptEventArgs> OnCaptureAttempt;
     public event EventHandler<SwitchTerraEventArgs> OnSwitchTerra;
-    public event EventHandler<AttackDeclarationEventArgs> OnAttackDeclaration;
+    public event EventHandler<TerraAttackEventArgs> OnAttackDeclaration;
+    public event EventHandler<TerraAttackEventArgs> OnStartTerraAttack;
     public event EventHandler<DirectAttackEventArgs> OnDirectAttack;
+    public event EventHandler<DirectAttackLogEventArgs> OnDirectAttackHit;
     public event EventHandler<DirectAttackLogEventArgs> OnAttackMissed;
     public event EventHandler<TerraDamageByTerraEventArgs> OnTerraDamageByTerra;
     public event EventHandler<TerraDamageByTerraEventArgs> OnPostTerraDamageByTerra;
@@ -139,6 +141,15 @@ public class BattleSystem : MonoBehaviour
 
     public void OpenSummonerDieMenuUI()
     {
+        if(battleType == BattleType.Summoner) {
+            Debug.Log(BattleDialog.CANNOT_CAPTURE_SUMMONER_TERRA);
+            return;
+        }
+        if(battleActionManager.GetCaptureAttempt() != null) {
+            Debug.Log(BattleDialog.SECOND_TURN_CAPTURE_ATTEMPT);
+            return;
+        }
+
         List<SummonerDieItemStack> summonerDieList = battleActionManager.GetCurrentTerraActionSelection().IsPrimarySide() ? primarySummonerDieItemStackList : secondarySummonerDieItemStackList;
         battleHUD.OpenSummonerDieMenuUI(summonerDieList);
     }
@@ -398,9 +409,8 @@ public class BattleSystem : MonoBehaviour
         //*** Escape Attempt Event ***
         EscapeAttemptsEventArgs escapeAttemptEventArgs = InvokeOnEscapeAttempt(escapeAttempt);
 
-        if(escapeAttemptEventArgs.IsCanceled()) {
+        if(escapeAttemptEventArgs.IsCanceled())
             Debug.Log(BattleDialog.ESCAPE_ATTEMPT_FAILED);
-        }
         else if(escapeAttemptEventArgs.IsMustHit()) {
             Debug.Log(BattleDialog.ESCAPE_ATTEMPT_SUCCESS);
             isBattleFinished = true;
@@ -752,10 +762,18 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
-    public AttackDeclarationEventArgs InvokeOnAttackDeclaration(TerraAttack terraAttack)
+    public TerraAttackEventArgs InvokeOnAttackDeclaration(TerraAttack terraAttack)
     {
-        AttackDeclarationEventArgs eventArgs = new AttackDeclarationEventArgs(terraAttack, this);
+        TerraAttackEventArgs eventArgs = new TerraAttackEventArgs(terraAttack, this);
         OnAttackDeclaration?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public TerraAttackEventArgs InvokeOnStartTerraAttack(TerraAttack terraAttack)
+    {
+        TerraAttackEventArgs eventArgs = new TerraAttackEventArgs(terraAttack, this);
+        OnStartTerraAttack?.Invoke(this, eventArgs);
 
         return eventArgs;
     }
@@ -764,6 +782,14 @@ public class BattleSystem : MonoBehaviour
     {
         DirectAttackEventArgs eventArgs = new DirectAttackEventArgs(directAttackParams, this);
         OnDirectAttack?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public DirectAttackLogEventArgs InvokeOnDirectAttackHit(DirectAttackLog directAttackLog)
+    {
+        DirectAttackLogEventArgs eventArgs = new DirectAttackLogEventArgs(directAttackLog, this);
+        OnDirectAttackHit?.Invoke(this, eventArgs);
 
         return eventArgs;
     }

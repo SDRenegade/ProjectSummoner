@@ -6,14 +6,16 @@ using UnityEngine;
 public class DirectAttackLog
 {
     private DirectAttackParams directAttackParams;
-    private bool isSuccessfulHit;
+    private bool isSuccessful;
+    private bool isHit;
     private bool isCrit;
     private int? damage;
 
     public DirectAttackLog(TerraBattlePosition attackerPosition, TerraBattlePosition defenderPosition, TerraMove terraMove)
     {
         directAttackParams = new DirectAttackParams(attackerPosition, defenderPosition, terraMove);
-        isSuccessfulHit = false;
+        isSuccessful = false;
+        isHit = false;
         isCrit = false;
         damage = null;
     }
@@ -21,7 +23,8 @@ public class DirectAttackLog
     public DirectAttackLog(DirectAttackParams directAttackParams)
     {
         this.directAttackParams = directAttackParams;
-        isSuccessfulHit = false;
+        isSuccessful = false;
+        isHit = false;
         isCrit = false;
         damage = null;
     }
@@ -34,9 +37,13 @@ public class DirectAttackLog
 
     public void SetDirectAttackParams(DirectAttackParams directAttackParams) { this.directAttackParams = directAttackParams; }
 
-    public bool IsSuccessfulHit() {  return isSuccessfulHit; }
+    public bool IsSuccessful() { return isSuccessful; } 
 
-    public void SetSuccessfulHit(bool successfulHit) { this.isSuccessfulHit = successfulHit; }
+    public void SetSuccessful(bool isSuccessful) { this.isSuccessful = isSuccessful; }
+
+    public bool IsHit() {  return isHit; }
+
+    public void SetHit(bool isHit) { this.isHit = isHit; }
 
     public bool IsCrit() { return isCrit; }
 

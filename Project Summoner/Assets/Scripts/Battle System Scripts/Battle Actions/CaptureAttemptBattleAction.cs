@@ -13,11 +13,11 @@ public class CaptureAttemptBattleAction : BattleAction
 
     public override void Execute(BattleActionManager battleActionManager)
     {
-        battleActionManager.GetCaptureAttemptList().Add(captureAttempt);
+        battleActionManager.SetCaptureAttempt(captureAttempt);
     }
 
     public override void Undo(BattleActionManager battleActionManager)
     {
-        battleActionManager.GetCaptureAttemptList().Remove(captureAttempt);
+        battleActionManager.SetCaptureAttempt(null);
     }
 }

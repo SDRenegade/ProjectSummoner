@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.UI;
 using UnityEngine;
 
 public class BattleActionManager
@@ -11,7 +10,7 @@ public class BattleActionManager
     private List<List<TerraAttack>> attackLog;
     private List<TerraAttack> terraAttackList;
     private List<TerraSwitch> terraSwitchList;
-    private List<CaptureAttempt> captureAttemptList;
+    private CaptureAttempt captureAttempt;
     private EscapeAttempt escapeAttempt;
 
     private Queue<FaintedTerra> faintedTerraQueue;
@@ -27,7 +26,7 @@ public class BattleActionManager
         attackLog = new List<List<TerraAttack>>();
         terraAttackList = new List<TerraAttack>();
         terraSwitchList = new List<TerraSwitch>();
-        captureAttemptList = new List<CaptureAttempt>();
+        captureAttempt = null;
         escapeAttempt = null;
         faintedTerraQueue = new Queue<FaintedTerra>();
         pendingTerraAttack = null;
@@ -41,7 +40,7 @@ public class BattleActionManager
         attackLog.Add(new List<TerraAttack>());
     }
 
-    public void AddAttackLogEntry(object sender, AttackDeclarationEventArgs eventArgs)
+    public void AddAttackLogEntry(object sender, TerraAttackEventArgs eventArgs)
     {
         if (attackLog.Count == 0)
             return;
@@ -66,7 +65,7 @@ public class BattleActionManager
 
         selectedActionStack.Clear();
         terraSwitchList.Clear();
-        captureAttemptList.Clear();
+        captureAttempt = null;
         escapeAttempt = null;
     }
 
@@ -183,7 +182,9 @@ public class BattleActionManager
 
     public List<TerraSwitch> GetTerraSwitchList() { return terraSwitchList; }
 
-    public List<CaptureAttempt> GetCaptureAttemptList() {  return captureAttemptList; }
+    public CaptureAttempt GetCaptureAttempt() {  return captureAttempt; }
+
+    public void SetCaptureAttempt(CaptureAttempt captureAttempt) { this.captureAttempt = captureAttempt; }
 
     public EscapeAttempt GetEscapeAttempt() { return escapeAttempt; }
 

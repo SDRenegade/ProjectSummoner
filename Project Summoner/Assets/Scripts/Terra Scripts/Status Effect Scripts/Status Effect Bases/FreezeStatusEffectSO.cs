@@ -31,7 +31,7 @@ public class FreezeStatusEffect : StatusEffectBase
         battleSystem.OnAttackDeclaration -= FreezeActive;
     }
 
-    private void FreezeActive(object sender, AttackDeclarationEventArgs eventArgs)
+    private void FreezeActive(object sender, TerraAttackEventArgs eventArgs)
     {
         if (eventArgs.GetTerraAttack().GetAttackerPosition() != terraBattlePosition)
             return;

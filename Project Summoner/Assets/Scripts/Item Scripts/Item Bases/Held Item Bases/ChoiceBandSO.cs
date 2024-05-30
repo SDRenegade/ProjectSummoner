@@ -42,7 +42,7 @@ public class ChoiceBand : ItemBase
         battleSystem.OnDirectAttack -= ApplyDamageModifier;
     }
 
-    public void SetChosenAttack(object sender, AttackDeclarationEventArgs eventArgs)
+    public void SetChosenAttack(object sender, TerraAttackEventArgs eventArgs)
     {
         if (eventArgs.GetTerraAttack().GetAttackerPosition() != terraBattlePosition)
             return;

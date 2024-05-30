@@ -8,7 +8,9 @@ public static class BattleDialog
     public static readonly string ESCAPE_ATTEMPT_SUCCESS = "You have escaped from battle.";
     public static readonly string ESCAPE_ATTEMPT_FAILED = "You were unable to flee.";
     public static readonly string CANNOT_ESCAPE_SUMMONER_BATTLE = "You cannot escape from a summoner battle.";
-    public static readonly string MULTIPLE_ESCAPE_ATTEMPTS = "You can only attempt to escape from battle one a turn.";
+    public static readonly string MULTIPLE_ESCAPE_ATTEMPTS = "You can only attempt to escape from battle once a turn.";
+    public static readonly string CANNOT_CAPTURE_SUMMONER_TERRA = "You can not capture another summoners terra.";
+    public static readonly string SECOND_TURN_CAPTURE_ATTEMPT = "You can only attempt a capture on the first action.";
     public static readonly string NOT_VERY_EFFECTIVE_ATTACK = "The attack was not very effective.";
     public static readonly string SUPER_EFFECTIVE_ATTACK = "The attack was super effective!";
     public static readonly string ATTACK_MISSED = "The attack missed.";
@@ -17,7 +19,7 @@ public static class BattleDialog
 
     // ================== Combat Messages ==================
     public static string SwitchTerraMsg(TerraSwitch terraSwitch, List<Terra> terraList) {
-        return terraSwitch.GetTerraBattlePosition().GetTerra() + " has been switched out for " + terraList[terraSwitch.GetBenchPositionIndex()];
+        return terraSwitch.GetTerraBattlePosition().GetTerra() + " switched with " + terraList[terraSwitch.GetBenchPositionIndex()];
     }
 
     public static string AttackUsedMsg(Terra attackingTerra, TerraMove move) {
@@ -25,7 +27,7 @@ public static class BattleDialog
     }
 
     public static string AttackUsedMsg(TerraAttack terraAttack) {
-        return terraAttack.GetAttackerPosition().GetTerra() + " has used " + terraAttack.GetMove();
+        return terraAttack.GetAttackerPosition().GetTerra().ToString().ToUpper() + " has used " + terraAttack.GetMove().ToString().ToUpper();
     }
 
     public static string TerraDamagedMsg(Terra terra, int damage) {
@@ -54,7 +56,7 @@ public static class BattleDialog
     }
 
     public static string ResetStatStagesMsg(Terra terra) {
-        return "All stat stages have be reset to neutral for " + terra;
+        return "Stat stages reset for " + terra;
     }
 
     public static string TerraFaintedMsg(Terra terra) {
@@ -70,7 +72,7 @@ public static class BattleDialog
     }
 
     public static string ParalysisProkedMsg(Terra terra) {
-        return terra + " is paralyzed and unable to move this turn.";
+        return terra + " is paralyzed and unable to move.";
     }
 
     public static string BurnProkedMsg(Terra terra, int burnDamage) {
@@ -86,7 +88,7 @@ public static class BattleDialog
     }
 
     public static string FreezeProkedMsg(Terra terra) {
-        return terra + " is frozen and unable to move this turn.";
+        return terra + " is frozen and unable to move.";
     }
 
     public static string TerraThawedMsg(Terra terra) {
@@ -98,7 +100,7 @@ public static class BattleDialog
     }
 
     public static string ConfusionInflictedMsg(Terra terra) {
-        return terra + " has been been confused.";
+        return terra + " has been confused.";
     }
 
     public static string TerraIsConfusedMsg(Terra terra) {
@@ -114,7 +116,7 @@ public static class BattleDialog
     }
 
     public static string FlinchedMsg(Terra terra) {
-        return terra + " has flinched.";
+        return terra + " flinched.";
     }
 
     public static string AttackCharging(TerraMoveSO terraMoveSO) {
@@ -135,10 +137,6 @@ public static class BattleDialog
 
     public static string ProtectActiveMsg(Terra terra) {
         return terra + " was unaffected due to Protect.";
-    }
-
-    public static string ProtectCooldownMsg(Terra terra) {
-        return terra + " was unable to use protect.";
     }
 
     public static string BindDamageMsg(Terra terra, int bindDamage) {
@@ -166,7 +164,7 @@ public static class BattleDialog
     }
 
     public static string MistProkedMsg(Terra terra) {
-        return terra + " is immune to stat changes with mist active.";
+        return terra + " is immune to stat changes.";
     }
 
     // ============= Capture Attempt Messages =============

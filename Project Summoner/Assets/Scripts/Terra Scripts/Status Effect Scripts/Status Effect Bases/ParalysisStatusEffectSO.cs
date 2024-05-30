@@ -31,7 +31,7 @@ public class ParalysisStatusEffect : StatusEffectBase
         battleSystem.OnAttackDeclaration -= ParalysisActive;
     }
 
-    private void ParalysisActive(object sender, AttackDeclarationEventArgs eventArgs)
+    private void ParalysisActive(object sender, TerraAttackEventArgs eventArgs)
     {
         if (eventArgs.GetTerraAttack().GetAttackerPosition() != terraBattlePosition)
             return;
