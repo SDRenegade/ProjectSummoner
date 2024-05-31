@@ -5,8 +5,11 @@ using UnityEngine;
 
 public static class BattleDialog
 {
+    public static readonly string ESCAPE_ATTEMPT = "You attempt to escape battle.";
     public static readonly string ESCAPE_ATTEMPT_SUCCESS = "You have escaped from battle.";
     public static readonly string ESCAPE_ATTEMPT_FAILED = "You were unable to flee.";
+    public static readonly string CAPTURE_SUCCESS = "Terra has been captured!";
+    public static readonly string CAPTURE_FAILED = "The terra has broken free!";
     public static readonly string CANNOT_ESCAPE_SUMMONER_BATTLE = "You cannot escape from a summoner battle.";
     public static readonly string MULTIPLE_ESCAPE_ATTEMPTS = "You can only attempt to escape from battle once a turn.";
     public static readonly string CANNOT_CAPTURE_SUMMONER_TERRA = "You can not capture another summoners terra.";
@@ -18,6 +21,10 @@ public static class BattleDialog
     public static readonly string CRITICAL_HIT = "It was a critical hit!";
 
     // ================== Combat Messages ==================
+    public static string SendOutTerraMsg(TerraSwitch terraSwitch) {
+        return terraSwitch.GetTerraBattlePosition().GetTerra() + " has been summoned.";
+    }
+
     public static string SwitchTerraMsg(TerraSwitch terraSwitch, List<Terra> terraList) {
         return terraSwitch.GetTerraBattlePosition().GetTerra() + " switched with " + terraList[terraSwitch.GetBenchPositionIndex()];
     }
@@ -168,6 +175,10 @@ public static class BattleDialog
     }
 
     // ============= Capture Attempt Messages =============
+    public static string CaptureAttempt(CaptureAttempt captureAttempt) {
+        return "You have thrown a " + captureAttempt.GetSummonerDie();
+    }
+
     public static string CaptureAttemptSuccess(Terra terra) {
         return terra + " has been captured!";
     }

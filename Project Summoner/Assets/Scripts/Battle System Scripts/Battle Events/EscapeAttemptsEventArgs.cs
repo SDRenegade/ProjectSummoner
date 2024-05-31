@@ -5,21 +5,21 @@ using UnityEngine;
 public class EscapeAttemptsEventArgs : BattleEventArgs
 {
     private EscapeAttempt escapeAttempt;
-    private bool isMustHit;
+    private bool isGuaranteedEscape;
     private bool isCanceled;
 
     public EscapeAttemptsEventArgs(EscapeAttempt escapeAttempt, BattleSystem battleSystem) : base(battleSystem)
     {
         this.escapeAttempt = escapeAttempt;
-        isMustHit = false;
+        isGuaranteedEscape = false;
         isCanceled = false;
     }
 
     public EscapeAttempt GetEscapeAttempt() { return escapeAttempt; }
 
-    public bool IsMustHit() { return isMustHit; }
+    public bool IsGuaranteedEscape() { return isGuaranteedEscape; }
 
-    public void SetMustHit(bool mustHit) {  isMustHit = mustHit; }
+    public void SetGuaranteedEscape(bool mustHit) { isGuaranteedEscape = mustHit; }
 
     public bool IsCanceled() { return isCanceled; }
 

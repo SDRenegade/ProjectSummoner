@@ -7,4 +7,6 @@ public abstract class SummonerDieBase : ItemBase
     public SummonerDieBase(ItemSO itemSO) : base(itemSO) {}
 
     public abstract float? GetCaptureModifier(CaptureAttempt captureAttempt, BattleSystem battleSystem);
+
+    public override string ToString() { return itemSO.GetItemName(); }
 }

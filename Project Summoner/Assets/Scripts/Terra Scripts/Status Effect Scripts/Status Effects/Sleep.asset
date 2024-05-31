@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   statusName: Sleep
   description: The user is unable to attack until they wake up.
+  captureMultiplier: 1.5

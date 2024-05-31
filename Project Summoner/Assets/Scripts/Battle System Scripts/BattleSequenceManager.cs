@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class BattleSequenceManager : MonoBehaviour
@@ -36,8 +37,8 @@ public class BattleSequenceManager : MonoBehaviour
         battleSystem.OnStartTerraAttack += AddAttackerAnimationToSequence;
         battleSystem.OnDirectAttackHit += AddAttackHitToSequence;
         battleSystem.OnSwitchTerra += AddTerraSwitchToSequence;
-        battleSystem.OnEscapeAttempt += AddEscapeAttemptToSequence;
-        battleSystem.OnCaptureAttempt += AddCaptureAttemptToSequence;
+        battleSystem.OnPostEscapeAttempt += AddEscapeAttemptToSequence;
+        battleSystem.OnPostCaptureAttempt += AddCaptureAttemptToSequence;
 
         introSequence.OnSequenceComplete += ShowStatusBars;
         introSequence.OnSequenceComplete += ExitInitBattleState;
@@ -182,7 +183,7 @@ public class BattleSequenceManager : MonoBehaviour
     private void ClearSequenceAndStartNextAction(object sender, EventArgs eventArgs)
     {
         battleActionSequence.ClearSequence();
-        battleDialogUI.HideDialog();
+        battleDialogUI.gameObject.SetActive(false);
         battleSystem.NextCombatAction();
     }
 
@@ -222,10 +223,18 @@ public class BattleSequenceManager : MonoBehaviour
             Transform terraTransform = battleStage.GetTerraObject(targetPosition).transform;
             Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
             battleCam.SetAttackLookAt(terraOffsetPos, terraTransform.eulerAngles, targetPosition.IsPrimarySide());
-
-            // TODO Set battle dialog if the attack was a crit or if the attack was not neutral
         }, battleActionSequence.GetDuration());
         battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 2f);
+
+        if(eventArgs.GetDirectAttackLog().IsCrit()) {
+            battleActionSequence.AddTaskByTime(() => {
+                Transform terraTransform = battleStage.GetTerraObject(targetPosition).transform;
+                Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+                battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, targetPosition.IsPrimarySide());
+                battleDialogUI.SetDialog(BattleDialog.CRITICAL_HIT);
+            }, battleActionSequence.GetDuration());
+            battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.25f);
+        }
     }
 
     private void AddTerraSwitchToSequence(object sender, SwitchTerraEventArgs eventArgs)
@@ -254,6 +263,7 @@ public class BattleSequenceManager : MonoBehaviour
             Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
             Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
             battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+            battleDialogUI.SetDialog(BattleDialog.SendOutTerraMsg(eventArgs.GetTerraSwitch()));
         }, battleActionSequence.GetDuration());
         battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
     }
@@ -268,20 +278,30 @@ public class BattleSequenceManager : MonoBehaviour
         battleActionSequence.AddTaskByTime(() => {
             Vector3 terraOffsetPos = new Vector3(summonerTransform.position.x, summonerTransform.position.y + 1.75f, summonerTransform.position.z);
             battleCam.SetStaticLookAt(terraOffsetPos, summonerTransform.eulerAngles, isPrimarySide);
+            battleDialogUI.SetDialog(BattleDialog.ESCAPE_ATTEMPT);
         }, battleActionSequence.GetDuration());
         battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 2f);
+
+        if(!eventArgs.GetEscapeAttempt().IsSuccessful()) {
+            battleActionSequence.AddTaskByTime(() => {
+                battleDialogUI.SetDialog(BattleDialog.ESCAPE_ATTEMPT_FAILED);
+            }, battleActionSequence.GetDuration());
+            battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
+        }
     }
 
     private void AddCaptureAttemptToSequence(object sender, CaptureAttemptEventArgs eventArgs)
     {
-        bool isPrimarySide = eventArgs.GetCaptureAttempt().IsPrimarySide();
-        TerraBattlePosition targetPosition = eventArgs.GetCaptureAttempt().GetTargetPosition();
+        CaptureAttempt captureAttempt = eventArgs.GetCaptureAttempt();
+        TerraBattlePosition targetPosition = captureAttempt.GetTargetPosition();
+        bool isPrimarySide = captureAttempt.IsPrimarySide();
 
         // Player throwing die animation
         Transform summonerTransform = isPrimarySide ? battleStage.GetPrimarySummonerGO().transform : battleStage.GetSecondarySummonerGO().transform;
         battleActionSequence.AddTaskByTime(() => {
             Vector3 terraOffsetPos = new Vector3(summonerTransform.position.x, summonerTransform.position.y + 1.75f, summonerTransform.position.z);
             battleCam.SetStaticLookAt(terraOffsetPos, summonerTransform.eulerAngles, isPrimarySide);
+            battleDialogUI.SetDialog(BattleDialog.CaptureAttempt(eventArgs.GetCaptureAttempt()));
         }, battleActionSequence.GetDuration());
         battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 2f);
 
@@ -292,11 +312,28 @@ public class BattleSequenceManager : MonoBehaviour
             battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, targetPosition.IsPrimarySide());
         }, battleActionSequence.GetDuration());
         battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.25f);
+
+        // Capture dialog
+        string captureDialog = captureAttempt.IsSuccessful() ? BattleDialog.CAPTURE_SUCCESS : BattleDialog.CAPTURE_FAILED;
+        battleActionSequence.AddTaskByTime(() => {
+            Vector3 terraOffsetPos = new Vector3(summonerTransform.position.x, summonerTransform.position.y + 1.75f, summonerTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, summonerTransform.eulerAngles, isPrimarySide);
+            battleDialogUI.SetDialog(captureDialog);
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 2f);
     }
 
-    private void AddTerraFaintToSequence()
+    private void AddTerraFaintToSequence(object sender, TerraFaintedEventArgs eventArgs)
     {
+        TerraBattlePosition battlePosition = eventArgs.GetTerraBattlePosition();
 
+        // Terra faint animation
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.25f);
     }
 
 

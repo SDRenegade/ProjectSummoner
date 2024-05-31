@@ -19,7 +19,9 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<BattleEventArgs> OnActionSelection;
     public event EventHandler<BattleEventArgs> OnEnteringCombatState;
     public event EventHandler<EscapeAttemptsEventArgs> OnEscapeAttempt;
+    public event EventHandler<EscapeAttemptsEventArgs> OnPostEscapeAttempt;
     public event EventHandler<CaptureAttemptEventArgs> OnCaptureAttempt;
+    public event EventHandler<CaptureAttemptEventArgs> OnPostCaptureAttempt;
     public event EventHandler<SwitchTerraEventArgs> OnSwitchTerra;
     public event EventHandler<TerraAttackEventArgs> OnAttackDeclaration;
     public event EventHandler<TerraAttackEventArgs> OnStartTerraAttack;
@@ -409,10 +411,13 @@ public class BattleSystem : MonoBehaviour
         //*** Escape Attempt Event ***
         EscapeAttemptsEventArgs escapeAttemptEventArgs = InvokeOnEscapeAttempt(escapeAttempt);
 
-        if(escapeAttemptEventArgs.IsCanceled())
+        if(escapeAttemptEventArgs.IsCanceled()) {
             Debug.Log(BattleDialog.ESCAPE_ATTEMPT_FAILED);
-        else if(escapeAttemptEventArgs.IsMustHit()) {
+            escapeAttempt.SetSuccessful(false);
+        }
+        else if(escapeAttemptEventArgs.IsGuaranteedEscape()) {
             Debug.Log(BattleDialog.ESCAPE_ATTEMPT_SUCCESS);
+            escapeAttempt.SetSuccessful(true);
             isBattleFinished = true;
         }
         else {
@@ -428,13 +433,20 @@ public class BattleSystem : MonoBehaviour
             }
 
             bool hasEscaped = CombatCalculator.EscapeAttemptCalculation(escapingTerraList, wildTerraList);
+            Debug.Log("hasEscaped: " + hasEscaped);
             if (hasEscaped) {
                 Debug.Log(BattleDialog.ESCAPE_ATTEMPT_SUCCESS);
+                escapeAttempt.SetSuccessful(true);
                 isBattleFinished = true;
             }
-            else
+            else {
                 Debug.Log(BattleDialog.ESCAPE_ATTEMPT_FAILED);
+                escapeAttempt.SetSuccessful(false);
+            }
         }
+
+        //*** Post Escape Attempt Event ***
+        InvokeOnPostEscapeAttempt(escapeAttemptEventArgs);
     }
 
     public void CaptureAttempt(CaptureAttempt captureAttempt)
@@ -450,6 +462,7 @@ public class BattleSystem : MonoBehaviour
 
         if(CombatCalculator.CaptureAttemptCalculation(captureAttempt, this)) {
             Debug.Log(BattleDialog.CaptureAttemptSuccess(captureAttempt.GetTargetPosition().GetTerra()));
+            captureAttempt.SetSuccessful(true);
             List<Terra> playerPermanentTerraList = captureAttempt.IsPrimarySide() ? BattleLoader.GetInstance().GetPrimaryTerraList() : BattleLoader.GetInstance().GetSecondaryTerraList();
             List<Terra> opponentTerraList = captureAttempt.IsPrimarySide() ? secondaryTerraList : primaryTerraList;
             playerPermanentTerraList.Add(captureAttempt.GetTargetPosition().GetTerra());
@@ -461,6 +474,9 @@ public class BattleSystem : MonoBehaviour
         }
         else
             Debug.Log(BattleDialog.CaptureAttemptFailed(captureAttempt.GetTargetPosition().GetTerra()));
+
+        //*** Post Capture Attempt Event ***
+        InvokeOnPostCaptureAttempt(eventArgs);
     }
 
     public void SwitchTerra(TerraSwitch terraSwitch)
@@ -547,8 +563,7 @@ public class BattleSystem : MonoBehaviour
     public void SwitchFaintedTerra()
     {
         if (battleActionManager.GetFaintedTerraQueue().Count == 0) {
-            battleActionManager.ResetActions(this);
-            battleStateManager.SwitchState(battleStateManager.GetStartTurnState());
+            NextCombatAction();
             return;
         }
 
@@ -682,6 +697,7 @@ public class BattleSystem : MonoBehaviour
         isBattleFinished = true;
     }
 
+    #region InvokeEventsRegion
     public BattleEventArgs InvokeOnEndOfInitState()
     {
         BattleEventArgs eventArgs = new BattleEventArgs(this);
@@ -746,11 +762,23 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
+    public EscapeAttemptsEventArgs InvokeOnPostEscapeAttempt(EscapeAttemptsEventArgs eventArgs)
+    {
+        OnPostEscapeAttempt?.Invoke(this, eventArgs);
+        return eventArgs;
+    }
+
     public CaptureAttemptEventArgs InvokeOnCaptureAttempt(CaptureAttempt captureAttempt)
     {
         CaptureAttemptEventArgs eventArgs = new CaptureAttemptEventArgs(captureAttempt, this);
         OnCaptureAttempt?.Invoke(this, eventArgs);
 
+        return eventArgs;
+    }
+
+    public CaptureAttemptEventArgs InvokeOnPostCaptureAttempt(CaptureAttemptEventArgs eventArgs)
+    {
+        OnPostCaptureAttempt?.Invoke(this, eventArgs);
         return eventArgs;
     }
 
@@ -927,6 +955,8 @@ public class BattleSystem : MonoBehaviour
 
         return eventArgs;
     }
+
+    #endregion
 
     public bool IsBattleFinished() { return isBattleFinished; }
 

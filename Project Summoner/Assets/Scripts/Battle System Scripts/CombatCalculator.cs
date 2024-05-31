@@ -14,7 +14,7 @@ public static class CombatCalculator
     public static readonly float STAB_BONUS = 1.5f;
     public static readonly float HIGHEST_DAMAGE_ROLL = 1f;
     public static readonly float LOWEST_DAMAGE_ROLL = 0.85f;
-    public static readonly float CRIT_CHANCE = 1/16f;
+    public static readonly float BASE_CRIT_CHANCE = 1/16f;
     public static readonly float CRIT_MULTIPLIER = 2f;
 
     public static bool HitCheck(DirectAttackParams directAttackParams)
@@ -36,7 +36,7 @@ public static class CombatCalculator
     {
         float randomCritIndex = Random.Range(0f, 1f);
 
-        return randomCritIndex <= CRIT_CHANCE * directAttackParams.GetCritModifier();
+        return randomCritIndex <= BASE_CRIT_CHANCE * directAttackParams.GetCritModifier();
     }
 
     public static int? DamageCalculation(DirectAttackParams directAttackParams, bool isCrit)
@@ -137,16 +137,7 @@ public static class CombatCalculator
         int currentHP = targetTerra.GetCurrentHP();
         int baseCatchRate = targetTerra.GetTerraBase().GetBaseCatchRate();
         float dieModifier = (float)captureAttempt.GetSummonerDie().GetCaptureModifier(captureAttempt, battleSystem);
-        float statusModifier = 1f;
-        if(targetTerra.GetStatusEffect() != null) {
-            if (targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Sleep")
-                || targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Freeze"))
-                statusModifier = 1.5f;
-            else if (targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Paralysis")
-                || targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Blight")
-                || targetTerra.GetStatusEffect().GetStatusEffectSO() == SODatabase.GetInstance().GetStatusEffectByName("Burn"))
-                statusModifier = 1.25f;
-        }
+        float statusModifier = targetTerra.GetStatusEffect() != null ? targetTerra.GetStatusEffect().GetStatusEffectSO().GetCaptureMultiplier() : 1f;
 
         int catchRate = (int)((3 * (float)maxHP - 2 * (float)currentHP) / (3 * (float)maxHP) * baseCatchRate * dieModifier * statusModifier);
         catchRate = Mathf.Clamp(catchRate, 0, TerraBase.MAX_CATCH_RATE);

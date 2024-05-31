@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   statusName: Blight
   description: Inflicts increased amounts of damage each subsequent turn.
+  captureMultiplier: 1.25

@@ -15,3 +15,4 @@ MonoBehaviour:
   statusName: Freeze
   description: Each turn the user has a chance of being frozen and not being able
     to attack.
+  captureMultiplier: 1.5

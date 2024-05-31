@@ -54,6 +54,10 @@ public class CombatBattleState : BattleState
             ProcessTerraAttack(terraAttackQueue.Dequeue(), battleSystem);
             BattleSequenceManager.GetInstance().StartBattleActionSequence();
         }
+        else if(battleSystem.GetBattleActionManager().GetFaintedTerraQueue().Count > 0) {
+            battleSystem.SwitchFaintedTerra();
+            BattleSequenceManager.GetInstance().StartIdleBattlefieldSequence(this, EventArgs.Empty);
+        }
         else
             battleManager.SwitchState(battleManager.GetEndTurnState());
     }
@@ -157,11 +161,11 @@ public class CombatBattleState : BattleState
         battleSystem.InvokeOnAttackDeclaration(terraAttack);
 
         bool hasValidTarget = false;
-        foreach(TerraBattlePosition targetPosition in terraAttack.GetDefendersPositionList()) {
-            if(targetPosition.GetTerra() != null) {
+        for(int i = terraAttack.GetDefendersPositionList().Count - 1; i >= 0; i--) {
+            if (terraAttack.GetDefendersPositionList()[i].GetTerra() != null)
                 hasValidTarget = true;
-                break;
-            }
+            else
+                terraAttack.GetDefendersPositionList().RemoveAt(i);
         }
 
         //If the attack is canceled or there are no valid targest, cancel attack
