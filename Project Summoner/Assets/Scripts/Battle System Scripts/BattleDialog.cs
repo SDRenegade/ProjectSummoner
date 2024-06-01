@@ -45,21 +45,29 @@ public static class BattleDialog
         return terra + " has recovered " + healAmt + " health";
     }
 
-    public static string StatStageChangeMsg(Terra terra, Stats stat, StatStages currentStatStage, int modification) {
+    public static string StatStageChangeMsg(Terra terra, Stats stat, StatStages initialStatStage, int modification) {
+        string statChangeMsg;
+
         if (modification == 0)
-            return terra + "'s " + stat + " has not changed.";
-        else if(modification > 0) {
+            statChangeMsg = terra.ToString().ToUpper() + "'s " + stat.ToString().ToUpper() + " has not changed.";
+        else if (modification > 0 && initialStatStage == StatStages.STAGE_THREE)
+            statChangeMsg = terra.ToString().ToUpper() + "'s " + stat.ToString().ToUpper() + " can not be raised any higher.";
+        else if(modification < 0 && initialStatStage == StatStages.STAGE_NEG_THREE)
+            statChangeMsg = terra.ToString().ToUpper() + "'s " + stat.ToString().ToUpper() + " can not be lowered any further.";
+        else if(modification >= 1) {
             if(modification == 1)
-                return terra + "'s " + stat + " has rose to " + currentStatStage;
+                statChangeMsg = terra.ToString().ToUpper() + "'s " + stat.ToString().ToUpper() + " has rose!";
             else
-                return terra + "'s " + stat + " has sharply rose to " + currentStatStage;
+                statChangeMsg = terra.ToString().ToUpper() + "'s " + stat.ToString().ToUpper() + " has sharply rose!";
         }
         else {
             if (modification == -1)
-                return terra + "'s " + stat + " has lowerd to " + currentStatStage;
+                statChangeMsg = terra.ToString().ToUpper() + "'s " + stat.ToString().ToUpper() + " has lowerd!";
             else
-                return terra + "'s " + stat + " has sharply lowered to " + currentStatStage;
+                statChangeMsg = terra.ToString().ToUpper() + "'s " + stat.ToString().ToUpper() + " has sharply lowered!";
         }
+
+        return statChangeMsg;
     }
 
     public static string ResetStatStagesMsg(Terra terra) {

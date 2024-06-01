@@ -34,6 +34,7 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<TerraDamagedEventArgs> OnPostTerraDamaged;
     public event EventHandler<TerraHealedEventArgs> OnTerraHealed;
     public event EventHandler<StatChangeEventArgs> OnStatChange;
+    public event EventHandler<StatChangeEventArgs> OnPostStatChange;
     public event EventHandler<StatusEffectAddedEventArgs> OnStatusEffectAdded;
     public event EventHandler<StatusEffectEventArgs> OnPostStatusEffectAdded;
     public event EventHandler<VolatileStatusEffectRollEventArgs> OnVolatileStatusEffectRoll;
@@ -620,10 +621,14 @@ public class BattleSystem : MonoBehaviour
         //*** Stat Change Event ***
         StatChangeEventArgs statChangeEventArgs = InvokeOnStatChange(terraBattlePosition, stat, modification);
 
-        if (!statChangeEventArgs.IsCanceled()) {
-            terraBattlePosition.SetStatStage(stat, StatStagesExtension.ChangeStatStage(terraBattlePosition.GetStatStage(stat), statChangeEventArgs.GetModification()));
-            Debug.Log(BattleDialog.StatStageChangeMsg(terraBattlePosition.GetTerra(), stat, terraBattlePosition.GetStatStage(stat), statChangeEventArgs.GetModification()));
-        }
+        if (statChangeEventArgs.IsCanceled())
+            return;
+
+        terraBattlePosition.SetStatStage(stat, StatStagesExtension.ChangeStatStage(terraBattlePosition.GetStatStage(stat), statChangeEventArgs.GetModification()));
+        Debug.Log(BattleDialog.StatStageChangeMsg(terraBattlePosition.GetTerra(), stat, statChangeEventArgs.GetInitialStatStage(), statChangeEventArgs.GetModification()));
+
+        //*** Post Stat Change Event ***
+        InvokeOnPostStatChange(statChangeEventArgs);
     }
 
     public bool AddStatusEffect(TerraBattlePosition terraBattlePosition, StatusEffectSO statusEffectSO)
@@ -841,7 +846,6 @@ public class BattleSystem : MonoBehaviour
     public TerraDamageByTerraEventArgs InvokeOnPostTerraDamageByTerra(TerraDamageByTerraEventArgs eventArgs)
     {
         OnPostTerraDamageByTerra?.Invoke(this, eventArgs);
-
         return eventArgs;
     }
 
@@ -873,6 +877,12 @@ public class BattleSystem : MonoBehaviour
         StatChangeEventArgs eventArgs = new StatChangeEventArgs(terraBattlePosition, stat, modification, this);
         OnStatChange?.Invoke(this, eventArgs);
 
+        return eventArgs;
+    }
+
+    public StatChangeEventArgs InvokeOnPostStatChange(StatChangeEventArgs eventArgs)
+    {
+        OnPostStatChange?.Invoke(this, eventArgs);
         return eventArgs;
     }
 

@@ -6,6 +6,7 @@ public class StatChangeEventArgs : BattleEventArgs
 {
     private TerraBattlePosition terraBattlePosition;
     private Stats stat;
+    private StatStages initialStatStage;
     private int modification;
     private bool isCanceled;
 
@@ -13,6 +14,7 @@ public class StatChangeEventArgs : BattleEventArgs
     {
         this.terraBattlePosition = terraBattlePosition;
         this.stat = stat;
+        initialStatStage = terraBattlePosition.GetStatStage(stat);
         this.modification = modification;
         isCanceled = false;
     }
@@ -20,8 +22,8 @@ public class StatChangeEventArgs : BattleEventArgs
     public TerraBattlePosition GetTerraBattlePosition() { return terraBattlePosition; }
 
     public Stats GetStat() { return stat; }
-    
-    public void SetStat(Stats stat) { this.stat = stat; }
+
+    public StatStages GetInitialStatStage() {  return initialStatStage; }
 
     public int GetModification() { return modification; }
 

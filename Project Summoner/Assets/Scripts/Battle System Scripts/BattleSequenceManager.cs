@@ -39,6 +39,7 @@ public class BattleSequenceManager : MonoBehaviour
         battleSystem.OnSwitchTerra += AddTerraSwitchToSequence;
         battleSystem.OnPostEscapeAttempt += AddEscapeAttemptToSequence;
         battleSystem.OnPostCaptureAttempt += AddCaptureAttemptToSequence;
+        battleSystem.OnPostStatChange += AddStatChangeToSequence;
 
         introSequence.OnSequenceComplete += ShowStatusBars;
         introSequence.OnSequenceComplete += ExitInitBattleState;
@@ -237,6 +238,12 @@ public class BattleSequenceManager : MonoBehaviour
         }
     }
 
+    // TODO Finish attack canceled sequence
+    private void AddAttackCanceledToSequence()
+    {
+
+    }
+
     private void AddTerraSwitchToSequence(object sender, SwitchTerraEventArgs eventArgs)
     {
         TerraBattlePosition battlePosition = eventArgs.GetTerraSwitch().GetTerraBattlePosition();
@@ -323,19 +330,35 @@ public class BattleSequenceManager : MonoBehaviour
         battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 2f);
     }
 
+    // TODO Finish Faint sequence
     private void AddTerraFaintToSequence(object sender, TerraFaintedEventArgs eventArgs)
     {
         TerraBattlePosition battlePosition = eventArgs.GetTerraBattlePosition();
-
-        // Terra faint animation
+    
         battleActionSequence.AddTaskByTime(() => {
             Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
             Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
             battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
         }, battleActionSequence.GetDuration());
-        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.25f);
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
     }
 
+    private void AddStatChangeToSequence(object sender, StatChangeEventArgs eventArgs)
+    {
+        TerraBattlePosition battlePosition = eventArgs.GetTerraBattlePosition();
+
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+            battleDialogUI.SetDialog(BattleDialog.StatStageChangeMsg(
+                eventArgs.GetTerraBattlePosition().GetTerra(),
+                eventArgs.GetStat(),
+                eventArgs.GetInitialStatStage(),
+                eventArgs.GetModification()));
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
+    }
 
     public static BattleSequenceManager GetInstance() { return instance; }
 }
