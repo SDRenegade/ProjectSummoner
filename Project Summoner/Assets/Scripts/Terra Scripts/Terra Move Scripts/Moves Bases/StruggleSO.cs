@@ -22,7 +22,7 @@ public class Struggle : TerraMoveBase
         TerraBattlePosition terraBattlePosition = directAttackLog.GetAttackerPosition();
 
         int recoilDamage = (int)(terraBattlePosition.GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_RECOIL);
-        battleSystem.DamageTerra(terraBattlePosition, recoilDamage);
+        battleSystem.RecoilDamage(terraBattlePosition, recoilDamage);
     }
 
     public override void AddMoveListeners(BattleSystem battleSystem) {}

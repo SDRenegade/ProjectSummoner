@@ -23,12 +23,12 @@ public class CheriBerry : ItemBase
     {
         this.terraBattlePosition = terraBattlePosition;
 
-        battleSystem.OnPostStatusEffectAdded += RemoveParalysis;
+        battleSystem.OnStatusEffectInflicted += RemoveParalysis;
     }
 
     public override void RemoveItemListeners(BattleSystem battleSystem)
     {
-        battleSystem.OnPostStatusEffectAdded -= RemoveParalysis;
+        battleSystem.OnStatusEffectInflicted -= RemoveParalysis;
     }
 
     private void RemoveParalysis(object sender, StatusEffectEventArgs eventArgs)

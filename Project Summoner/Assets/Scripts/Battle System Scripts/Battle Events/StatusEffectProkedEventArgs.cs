@@ -2,19 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StatusEffectEventArgs : BattleEventArgs
+public class StatusEffectProkedEventArgs : BattleEventArgs
 {
     private TerraBattlePosition terraBattlePosition;
     private Terra terra;
     private StatusEffectSO statusEffectSO;
-    private bool isCanceled;
+    private bool isProked;
+    private bool isEffectRemoved;
 
-    public StatusEffectEventArgs(TerraBattlePosition terraBattlePosition, StatusEffectSO statusEffectSO, BattleSystem battleSystem) : base(battleSystem)
+    public StatusEffectProkedEventArgs(TerraBattlePosition terraBattlePosition, StatusEffectSO statusEffectSO, bool isProked, bool isEfectRemoved, BattleSystem battleSystem) : base(battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
         terra = terraBattlePosition.GetTerra();
         this.statusEffectSO = statusEffectSO;
-        isCanceled = false;
+        this.isProked = isProked;
+        this.isEffectRemoved = isEfectRemoved;
     }
 
     public TerraBattlePosition GetTerraBattlePosition() { return terraBattlePosition; }
@@ -23,7 +25,7 @@ public class StatusEffectEventArgs : BattleEventArgs
 
     public StatusEffectSO GetStatusEffectSO() { return statusEffectSO; }
 
-    public bool IsCanceled() { return isCanceled; }
+    public bool IsProked() { return isProked; }
 
-    public void SetCanceled(bool isCanceled) {  this.isCanceled = isCanceled; }
+    public bool IsEffectRemoved() {  return isEffectRemoved; }
 }

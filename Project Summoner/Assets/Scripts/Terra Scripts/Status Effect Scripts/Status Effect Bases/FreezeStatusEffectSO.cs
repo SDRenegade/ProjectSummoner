@@ -45,5 +45,8 @@ public class FreezeStatusEffect : StatusEffectBase
             eventArgs.GetTerraAttack().SetCanceled(true);
             Debug.Log(BattleDialog.FreezeProkedMsg(terraBattlePosition.GetTerra()));
         }
+
+        //*** Status Effect Proked Event ***
+        eventArgs.GetBattleSystem().InvokeOnStatusEffectProked(terraBattlePosition, statusEffectSO, !hasThawed, hasThawed);
     }
 }

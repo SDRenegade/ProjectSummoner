@@ -11,7 +11,6 @@ public class ExplosionSO : TerraMoveSO
     }
 }
 
-//TODO Add an AttackMissed method for taking damage even when the attack misses
 public class Explosion : TerraMoveBase
 {
     public Explosion(TerraAttack terraAttack, TerraMoveSO terraMoveSO) : base(terraAttack, terraMoveSO) {}
@@ -19,10 +18,25 @@ public class Explosion : TerraMoveBase
     public override void PostAttackEffect(DirectAttackLog directAttackLog, BattleSystem battleSystem)
     {
         TerraBattlePosition terraBattlePosition = directAttackLog.GetAttackerPosition();
-        battleSystem.DamageTerra(terraBattlePosition, terraBattlePosition.GetTerra().GetCurrentHP());
+        battleSystem.RecoilDamage(terraBattlePosition, terraBattlePosition.GetTerra().GetCurrentHP());
     }
 
-    public override void AddMoveListeners(BattleSystem battleSystem) {}
+    public override void AddMoveListeners(BattleSystem battleSystem)
+    {
+        battleSystem.OnAttackMissed += ExplosionMissed;
+    }
 
-    public override void RemoveMoveListeners(BattleSystem battleSystem) {}
+    public override void RemoveMoveListeners(BattleSystem battleSystem)
+    {
+        battleSystem.OnAttackMissed -= ExplosionMissed;
+    }
+
+    private void ExplosionMissed(object sender, DirectAttackLogEventArgs eventArgs)
+    {
+        if (eventArgs.GetDirectAttackLog().GetDirectAttackParams().GetMove() != terraAttack.GetMove())
+            return;
+
+        TerraBattlePosition terraBattlePosition = eventArgs.GetDirectAttackLog().GetAttackerPosition();
+        eventArgs.GetBattleSystem().RecoilDamage(terraBattlePosition, terraBattlePosition.GetTerra().GetCurrentHP());
+    }
 }

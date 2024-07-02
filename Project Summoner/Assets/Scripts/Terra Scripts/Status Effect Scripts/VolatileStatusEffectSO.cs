@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class VolatileStatusEffectSO : ScriptableObject
 {
     [SerializeField] protected string statusName;
-    [SerializeField] [TextArea] protected string description;
+    [SerializeField, TextArea] protected string description;
 
     public abstract VolatileStatusEffectBase CreateVolatileStatusEffect(TerraBattlePosition terraBattlePosition);
 

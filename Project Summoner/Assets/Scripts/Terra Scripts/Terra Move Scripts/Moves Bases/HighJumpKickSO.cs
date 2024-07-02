@@ -45,7 +45,7 @@ public class HighJumpKick : TerraMoveBase
             directAttackLog.SetDamage((int)(directAttackLog.GetDamage() * DAMAGE_MULTIPLIER));
 
         TerraBattlePosition attackerPosition = terraAttack.GetAttackerPosition();
-        eventArgs.GetBattleSystem().DamageTerra(attackerPosition, directAttackLog.GetDamage());
+        eventArgs.GetBattleSystem().RecoilDamage(attackerPosition, directAttackLog.GetDamage());
 
         if (directAttackLog.IsCrit())
             Debug.Log(BattleDialog.CRITICAL_HIT);

@@ -151,14 +151,12 @@ public class CombatBattleState : BattleState
 
     public void ProcessTerraAttack(TerraAttack terraAttack, BattleSystem battleSystem)
     {
-        if (terraAttack.GetAttackerPosition().GetTerra() == null) {
-            Debug.LogError("Attacker position terra is null in CombatBattleState.ProcessTerraAttack");
+        if (terraAttack.GetAttackerPosition().GetTerra() == null)
             return;
-        }
 
         Debug.Log(BattleDialog.AttackUsedMsg(terraAttack));
         //*** Terra Attack Declaration Event ***
-        battleSystem.InvokeOnAttackDeclaration(terraAttack);
+        TerraAttackEventArgs terraAttackEventArgs = battleSystem.InvokeOnAttackDeclaration(terraAttack);
 
         bool hasValidTarget = false;
         for(int i = terraAttack.GetDefendersPositionList().Count - 1; i >= 0; i--) {
@@ -171,7 +169,8 @@ public class CombatBattleState : BattleState
         //If the attack is canceled or there are no valid targest, cancel attack
         if (terraAttack.IsCanceled() || !hasValidTarget) {
             terraAttack.GetTerraMoveBase()?.RemoveMoveListeners(battleSystem);
-            // TODO Add attack canceled event
+            //*** Attack Canceled Event ***
+            battleSystem.InvokOnAttackCanceled(terraAttackEventArgs);
             return;
         }
 
@@ -183,13 +182,17 @@ public class CombatBattleState : BattleState
                 terraAttack.SetCharging(false);
             else {
                 Debug.Log(BattleDialog.AttackCharging(terraAttack.GetMove().GetMoveSO()));
+                //*** Attack Canceld From Charging Event ***
+                battleSystem.InvokeOnAttackCanceledFromCharging(attackChargingEventArgs);
                 return;
             }
         }
 
         if (terraAttack.IsRecharging()) {
-            // TODO Add recharging event
             Debug.Log(BattleDialog.AttackRecharging(terraAttack.GetAttackerPosition().GetTerra()));
+            //*** Attack Canceled Form Recharging Event ***
+            battleSystem.InvokeOnAttackCanceledFromRecharging(terraAttack);
+
             terraAttack.SetRecharging(false);
             return;
         }
@@ -233,11 +236,11 @@ public class CombatBattleState : BattleState
 
             directAttackLogList[i].SetHit(true);
 
-            for (int j = 0; j < directAttackLogList[i].GetDirectAttackParams().GetHitCount(); j++)
+            for (int j = 0; j < directAttackLogList[i].GetDirectAttackParams().GetHitCount(); j++) {
+                //*** Direct Attack Hit Event ***
+                battleSystem.InvokeOnDirectAttackHit(directAttackLogList[i]);
                 DamageStep(terraAttack, directAttackLogList[i], battleSystem);
-
-            //*** Direct Attack Hit Event ***
-            battleSystem.InvokeOnDirectAttackHit(directAttackLogList[i]);
+            }
 
             terraAttack.GetTerraMoveBase()?.PostAttackEffect(directAttackLogList[i], battleSystem);
 
@@ -257,9 +260,6 @@ public class CombatBattleState : BattleState
                 Debug.Log(BattleDialog.MultiHitMsg(
                     directAttackLogList[i].GetDirectAttackParams().GetAttackerPosition().GetTerra(),
                     directAttackLogList[i].GetDirectAttackParams().GetHitCount()));
-
-            // *** Temp ***
-            battleSystem.DynamicUpdateStatusBar(terraAttack.GetDefendersPositionList()[i]);
         }
     }
 

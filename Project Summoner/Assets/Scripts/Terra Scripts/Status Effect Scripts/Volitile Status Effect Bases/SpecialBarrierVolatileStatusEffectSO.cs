@@ -63,6 +63,9 @@ public class SpecialBarrierVolatileStatusEffect : VolatileStatusEffectBase
         if (turnCounter >= turnDuration) {
             Debug.Log(BattleDialog.LightScreenExpiredMsg(terraBattlePosition.GetTerra()));
             terraBattlePosition.RemoveVolatileStatusEffect(vStatusEffectSO, eventArgs.GetBattleSystem());
+
+            //*** Volatile Status Effect Proked Event ***
+            eventArgs.GetBattleSystem().InvokeOnVolatileStatusEffectProked(terraBattlePosition, this, false, true);
         }
     }
 }

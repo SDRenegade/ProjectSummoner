@@ -44,7 +44,8 @@ public class SleepStatusEffect : StatusEffectBase
             return;
 
         turnCounter++;
-        if (turnCounter <= numTurnsSleep) {
+        bool hasWokenUp = turnCounter <= numTurnsSleep;
+        if (hasWokenUp) {
             Debug.Log(BattleDialog.SleepProkedMsg(terraBattlePosition.GetTerra()));
             eventArgs.GetTerraAttack().SetCanceled(true);
         }
@@ -53,6 +54,9 @@ public class SleepStatusEffect : StatusEffectBase
             terraBattlePosition.GetTerra().SetStatusEffect(null);
             RemoveStatusListeners(eventArgs.GetBattleSystem());
         }
+
+        //*** Status Effect Proked Event ***
+        eventArgs.GetBattleSystem().InvokeOnStatusEffectProked(terraBattlePosition, statusEffectSO, !hasWokenUp, hasWokenUp);
     }
 }
 

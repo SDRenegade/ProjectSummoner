@@ -2,24 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TerraDamagedEventArgs : BattleEventArgs
+public class ItemProkedEventArgs : BattleEventArgs
 {
     private TerraBattlePosition terraBattlePosition;
     private Terra terra;
-    private int? damage;
+    private ItemSO item;
 
-    public TerraDamagedEventArgs(TerraBattlePosition terraBattlePosition, int? damage, BattleSystem battleSystem) : base(battleSystem)
+    public ItemProkedEventArgs(TerraBattlePosition terraBattlePosition, ItemSO item, BattleSystem battleSystem) : base(battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
         terra = terraBattlePosition.GetTerra();
-        this.damage = damage;
+        this.item = item;
     }
 
     public TerraBattlePosition GetTerraBattlePosition() { return terraBattlePosition; }
 
     public Terra GetTerra() { return terra; }
 
-    public int? GetDamage() { return damage; }
-
-    public void SetDamage(int? damage) { this.damage = damage; }
+    public ItemSO GetItemSO() { return item; }
 }

@@ -42,6 +42,9 @@ public class FocusSash : ItemBase
             return;
 
         Debug.Log(BattleDialog.ItemProkedMsg(this));
+        //*** Item Proked Event ***
+        eventArgs.GetBattleSystem().InvokeOnItemProked(terraBattlePosition, itemSO);
+
         eventArgs.GetDirectAttackLog().SetDamage(terraBattlePosition.GetTerra().GetMaxHP() - 1);
 
         ConsumeOnUse(eventArgs.GetBattleSystem());

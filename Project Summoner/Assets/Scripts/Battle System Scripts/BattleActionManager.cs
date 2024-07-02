@@ -12,8 +12,7 @@ public class BattleActionManager
     private List<TerraSwitch> terraSwitchList;
     private CaptureAttempt captureAttempt;
     private EscapeAttempt escapeAttempt;
-
-    private Queue<FaintedTerra> faintedTerraQueue;
+    private Queue<TerraBattlePosition> faintedTerraQueue;
 
     private TerraAttack pendingTerraAttack;
     private CaptureAttempt pendingCaptureAttempt;
@@ -28,7 +27,7 @@ public class BattleActionManager
         terraSwitchList = new List<TerraSwitch>();
         captureAttempt = null;
         escapeAttempt = null;
-        faintedTerraQueue = new Queue<FaintedTerra>();
+        faintedTerraQueue = new Queue<TerraBattlePosition>();
         pendingTerraAttack = null;
 
         battleSystem.OnEnteringCombatState += CreateNewTurnLog;
@@ -190,7 +189,7 @@ public class BattleActionManager
 
     public void SetEscapeAttempt(EscapeAttempt escapeAttempt) { this.escapeAttempt = escapeAttempt; }
 
-    public Queue<FaintedTerra> GetFaintedTerraQueue() {  return faintedTerraQueue; }
+    public Queue<TerraBattlePosition> GetFaintedTerraQueue() {  return faintedTerraQueue; }
 
     public TerraAttack GetPendingTerraAttack() { return pendingTerraAttack; }
 

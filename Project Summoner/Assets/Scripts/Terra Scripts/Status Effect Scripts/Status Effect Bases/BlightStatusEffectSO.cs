@@ -41,7 +41,7 @@ public class BlightStatusEffect : StatusEffectBase
 
     private void BlightActive(object sender, BattleEventArgs eventArgs)
     {
-        //Check that blightCounter is within a valid range
+        // Check that blightCounter is within a valid range
         if (blightCounter > BLIGHT_DAMAGE_LIST.Length)
             blightCounter = BLIGHT_DAMAGE_LIST.Length;
         else if (blightCounter < 0)
@@ -51,7 +51,10 @@ public class BlightStatusEffect : StatusEffectBase
             blightCounter++;
 
         int blightDamage = (int)(terraBattlePosition.GetTerra().GetMaxHP() * BLIGHT_DAMAGE_LIST[blightCounter - 1]);
-        Debug.Log(BattleDialog.BlightProkedMsg(terraBattlePosition.GetTerra(), blightDamage));
+        Debug.Log(BattleDialog.BlightProkedMsg(terraBattlePosition.GetTerra()));
+        //*** Status Effect Proked Event ***
+        eventArgs.GetBattleSystem().InvokeOnStatusEffectProked(terraBattlePosition, statusEffectSO, true, false);
+
         eventArgs.GetBattleSystem().DamageTerra(terraBattlePosition, blightDamage);
     }
 }

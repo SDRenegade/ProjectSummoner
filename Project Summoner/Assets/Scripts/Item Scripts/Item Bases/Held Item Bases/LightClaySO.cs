@@ -24,15 +24,15 @@ public class LightClay : ItemBase
     public override void AddItemListeners(TerraBattlePosition terraBattlePosition, BattleSystem battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
-        battleSystem.OnVolatileStatusEffectAdded += EnhanceBarrierEffect;
+        battleSystem.OnVolatileStatusEffect += EnhanceBarrierEffect;
     }
 
     public override void RemoveItemListeners(BattleSystem battleSystem)
     {
-        battleSystem.OnVolatileStatusEffectAdded -= EnhanceBarrierEffect;
+        battleSystem.OnVolatileStatusEffect -= EnhanceBarrierEffect;
     }
 
-    public void EnhanceBarrierEffect(object sender, VolatileStatusEffectAddedEventArgs eventArgs)
+    public void EnhanceBarrierEffect(object sender, VolatileStatusEffectEventArgs eventArgs)
     {
         if (eventArgs.GetTerraBattlePosition() != terraBattlePosition)
             return;

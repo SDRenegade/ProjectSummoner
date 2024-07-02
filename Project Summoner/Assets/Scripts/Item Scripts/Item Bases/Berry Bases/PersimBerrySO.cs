@@ -23,12 +23,12 @@ public class PersimBerry : ItemBase
     {
         this.terraBattlePosition = terraBattlePosition;
 
-        battleSystem.OnPostVolatileStatusEffectAdded += RemoveConfusion;
+        battleSystem.OnVolatileStatusEffectInflicted += RemoveConfusion;
     }
 
     public override void RemoveItemListeners(BattleSystem battleSystem)
     {
-        battleSystem.OnPostVolatileStatusEffectAdded -= RemoveConfusion;
+        battleSystem.OnVolatileStatusEffectInflicted -= RemoveConfusion;
     }
 
     private void RemoveConfusion(object sender, VolatileStatusEffectEventArgs eventArgs)

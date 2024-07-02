@@ -41,13 +41,19 @@ public class StatResistanceVolatileStatusEffect : VolatileStatusEffectBase
             return;
 
         Debug.Log(BattleDialog.MistProkedMsg(terraBattlePosition.GetTerra()));
+        //*** Volatile Status Effect Proked Event ***
+        eventArgs.GetBattleSystem().InvokeOnVolatileStatusEffectProked(terraBattlePosition, this, true, false);
+
         eventArgs.SetCanceled(true);
     }
 
     public void EndOfTurnIncrement(object sender, BattleEventArgs eventArgs)
     {
         turnCounter++;
-        if (turnCounter >= TURN_DURATION)
+        if (turnCounter >= TURN_DURATION) {
             terraBattlePosition.RemoveVolatileStatusEffect(vStatusEffectSO, eventArgs.GetBattleSystem());
+            //*** Volatile Status Effect Proked Event ***
+            eventArgs.GetBattleSystem().InvokeOnVolatileStatusEffectProked(terraBattlePosition, this, false, true);
+        }
     }
 }

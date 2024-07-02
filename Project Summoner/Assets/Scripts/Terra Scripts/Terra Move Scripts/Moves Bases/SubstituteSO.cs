@@ -23,7 +23,7 @@ public class Substitute : TerraMoveBase
         TerraBattlePosition terraBattlePosition = terraAttack.GetAttackerPosition();
         if (!terraBattlePosition.ContainsVolatileStatusEffect(SODatabase.GetInstance().GetVolatileStatusEffectByName("Substituted"))) {
             int recoilDamage = (int)(terraBattlePosition.GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_RECOIL);
-            Debug.Log(BattleDialog.RecoilDamageMsg(terraBattlePosition.GetTerra(), recoilDamage));
+            Debug.Log(BattleDialog.RecoilDamageMsg(terraBattlePosition.GetTerra()));
             battleSystem.DamageTerra(terraBattlePosition, recoilDamage);
             battleSystem.AddVolatileStatusEffect(directAttackLog.GetAttackerPosition(), SODatabase.GetInstance().GetVolatileStatusEffectByName("Substituted"));
         }

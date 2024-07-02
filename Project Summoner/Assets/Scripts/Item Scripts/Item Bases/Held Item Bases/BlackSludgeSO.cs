@@ -36,6 +36,8 @@ public class BlackSludge : ItemBase
     public void TerraHealthUpdate(object sender, BattleEventArgs eventArgs)
     {
         Debug.Log(BattleDialog.ItemProkedMsg(this));
+        //*** Item Proked Event ***
+        eventArgs.GetBattleSystem().InvokeOnItemProked(terraBattlePosition, itemSO);
 
         Terra terra = terraBattlePosition.GetTerra();
         int? hpUpdate = (int)(terra.GetMaxHP() * PERCENT_MAX_HEALTH_UPDATE);

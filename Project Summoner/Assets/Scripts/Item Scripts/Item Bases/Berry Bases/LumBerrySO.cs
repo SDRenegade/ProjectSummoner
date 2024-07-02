@@ -23,12 +23,12 @@ public class LumBerry : ItemBase
     {
         this.terraBattlePosition = terraBattlePosition;
 
-        battleSystem.OnPostStatusEffectAdded += RemoveStatusEffect;
+        battleSystem.OnStatusEffectInflicted += RemoveStatusEffect;
     }
 
     public override void RemoveItemListeners(BattleSystem battleSystem)
     {
-        battleSystem.OnPostStatusEffectAdded -= RemoveStatusEffect;
+        battleSystem.OnStatusEffectInflicted -= RemoveStatusEffect;
     }
 
     private void RemoveStatusEffect(object sender, StatusEffectEventArgs eventArgs)

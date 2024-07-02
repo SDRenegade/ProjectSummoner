@@ -34,6 +34,8 @@ public class FlinchedVolatileStatusEffect : VolatileStatusEffectBase
 
         eventArgs.GetTerraAttack().SetCanceled(true);
         Debug.Log(BattleDialog.FlinchedMsg(terraBattlePosition.GetTerra()));
+        //*** Volatile Status Effect Proked Event ***
+        eventArgs.GetBattleSystem().InvokeOnVolatileStatusEffectProked(terraBattlePosition, this, true, false);
     }
 
     public void EndOfTurnStatusRemoval(object sender, BattleEventArgs eventArgs)

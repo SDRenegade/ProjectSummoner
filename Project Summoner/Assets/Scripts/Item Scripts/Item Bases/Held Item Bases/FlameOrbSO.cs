@@ -39,6 +39,9 @@ public class FlameOrb : ItemBase
 
         isFirstInteraction = false;
         Debug.Log(BattleDialog.ItemProkedMsg(this));
+        //*** Item Proked Event ***
+        eventArgs.GetBattleSystem().InvokeOnItemProked(terraBattlePosition, itemSO);
+
         eventArgs.GetBattleSystem().AddStatusEffect(terraBattlePosition, SODatabase.GetInstance().GetStatusEffectByName("Burn"));
     }
 }

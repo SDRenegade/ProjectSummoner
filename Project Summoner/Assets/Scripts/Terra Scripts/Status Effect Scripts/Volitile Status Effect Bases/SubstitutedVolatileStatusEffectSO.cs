@@ -45,6 +45,9 @@ public class SubstitutedVolatileStatusEffect : VolatileStatusEffectBase
         if (substituteCurrentHealth <= 0) {
             Debug.Log(BattleDialog.SubstituteExpired(terraBattlePosition.GetTerra()));
             terraBattlePosition.RemoveVolatileStatusEffect(vStatusEffectSO, eventArgs.GetBattleSystem());
+
+            //*** Volatile Status Effect Proked Event ***
+            eventArgs.GetBattleSystem().InvokeOnVolatileStatusEffectProked(terraBattlePosition, this, false, true);
         }
     }
 }

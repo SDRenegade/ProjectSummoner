@@ -1,13 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class BattleCamera : MonoBehaviour
 {
-    private readonly Vector3 STATIC_CAMERA_POSITION_OFFSET = new Vector3(4f, 0, 5f);
-    private readonly Vector3 ATTACK_CAMERA_POSITION_OFFSET = new Vector3(3.5f, 0, 5f);
+    private readonly Vector3 STATIC_CAMERA_POSITION_OFFSET = new Vector3(6f, 0, 4f);
+    private readonly Vector3 ATTACK_CAMERA_POSITION_OFFSET = new Vector3(3.5f, 0, 5.5f);
     private readonly Vector3 LOOK_AT_OFFSET = new Vector3(0, 0, 1.5f);
 
     private Vector3? staticLookAt;

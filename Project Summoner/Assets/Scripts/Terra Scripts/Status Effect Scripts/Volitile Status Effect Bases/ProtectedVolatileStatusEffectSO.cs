@@ -43,7 +43,8 @@ public class ProtectedVolatileStatusEffect : VolatileStatusEffectBase
         eventArgs.SetCanceled(true);
         Debug.Log(BattleDialog.ProtectActiveMsg(terraBattlePosition.GetTerra()));
 
-        eventArgs.GetBattleSystem().OnDirectAttack -= ProtectActivate;
+        //*** Volatile Status Effect Proked Event ***
+        eventArgs.GetBattleSystem().InvokeOnVolatileStatusEffectProked(terraBattlePosition, this, true, false);
     }
 
     private void EndOfTurnSetCooldown(object sender, BattleEventArgs eventArgs)

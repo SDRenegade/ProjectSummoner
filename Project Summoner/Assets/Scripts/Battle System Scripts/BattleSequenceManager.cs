@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
+using System.Diagnostics.Tracing;
 using UnityEngine;
 
 public class BattleSequenceManager : MonoBehaviour
@@ -10,6 +10,7 @@ public class BattleSequenceManager : MonoBehaviour
 
     [SerializeField] private BattleSystem battleSystem;
     [SerializeField] private BattleStage battleStage;
+    [SerializeField] private TerraBattleStatusBarGroupUI statusBarGroupUI;
     [SerializeField] private BattleDialogUI battleDialogUI;
     [SerializeField] private LookAtPathFollower pathFollower;
     [SerializeField] private BattleCamera battleCam;
@@ -34,18 +35,35 @@ public class BattleSequenceManager : MonoBehaviour
         battleSystem.OnEndOfInitState += StartIntroSequence;
         battleSystem.OnEnteringActionSelectionState += StartIdleBattlefieldSequence;
         battleSystem.OnAttackDeclaration += AddAttackDeclarationToSequence;
+        battleSystem.OnAttackCanceled += AddAttackCanceledToSequence;
         battleSystem.OnStartTerraAttack += AddAttackerAnimationToSequence;
         battleSystem.OnDirectAttackHit += AddAttackHitToSequence;
+        battleSystem.OnTerraFainted += AddTerraFaintToSequence;
         battleSystem.OnSwitchTerra += AddTerraSwitchToSequence;
         battleSystem.OnPostEscapeAttempt += AddEscapeAttemptToSequence;
         battleSystem.OnPostCaptureAttempt += AddCaptureAttemptToSequence;
+        battleSystem.OnTerraHealed += AddTerraHealedToSequence;
         battleSystem.OnPostStatChange += AddStatChangeToSequence;
+        battleSystem.OnStatusEffectInflicted += AddStatusEffectInflictedToSequence;
+        battleSystem.OnStatusEffectProked += AddStatusEffectProkedToSequence;
+        battleSystem.OnVolatileStatusEffectInflicted += AddVolatileStatusEffectInflictedToSequence;
+        battleSystem.OnVolatileStatusEffectProked += AddVolatileStatusEffectProkedToSequence;
+        battleSystem.OnAttackCanceledFromCharging += AddAttackChargingToSequence;
+        battleSystem.OnAttackCanceledFromRecharging += AddAttackRechargingToSequence;
+        battleSystem.OnItemProked += AddItemProkedToSequence;
 
         introSequence.OnSequenceComplete += ShowStatusBars;
         introSequence.OnSequenceComplete += ExitInitBattleState;
 
+        idleBattlefieldSequence.OnSequenceStop += RemoveLookAtPathOnPathFollower;
+
         battleActionSequence.OnSequenceStart += HideActionSelectionHUD;
         battleActionSequence.OnSequenceComplete += ClearSequenceAndStartNextAction;
+    }
+
+    private void BattleSystem_OnItemProked(object sender, ItemProkedEventArgs e)
+    {
+        throw new NotImplementedException();
     }
 
     private void InitIntroSequence(Battlefield battlefield)
@@ -118,15 +136,6 @@ public class BattleSequenceManager : MonoBehaviour
     {
         idleBattlefieldSequence.SetIsLoop(true);
 
-        idleBattlefieldSequence.OnSequenceStart -= SetIdleBattlefieldSequenceStartParams;
-        idleBattlefieldSequence.OnSequenceStart += SetIdleBattlefieldSequenceStartParams;
-
-        idleBattlefieldSequence.OnSequenceStop -= RemoveLookAtPathOnPathFollower;
-        idleBattlefieldSequence.OnSequenceStop += RemoveLookAtPathOnPathFollower;
-    }
-
-    private void SetIdleBattlefieldSequenceStartParams(object sender, EventArgs eventArgs)
-    {
         pathFollower.SetLookAtPath(idleBattlefieldPathList);
         pathFollower.SetSpeed(3.2f);
         pathFollower.SetIsLoop(true);
@@ -147,11 +156,6 @@ public class BattleSequenceManager : MonoBehaviour
 
     public void StartIdleBattlefieldSequence(object sender, EventArgs eventArgs)
     {
-        if (introSequence.IsPlaying())
-            introSequence.StopSequence();
-        if(battleActionSequence.IsPlaying())
-            battleActionSequence.StopSequence();
-
         InitIdleBattlefieldSequence();
         idleBattlefieldSequence.StartSequence();
     }
@@ -168,7 +172,7 @@ public class BattleSequenceManager : MonoBehaviour
 
     private void ShowStatusBars(object sender, EventArgs eventArgs)
     {
-        battleSystem.GetBattleHUD().ShowTerraStatusBars();
+        battleSystem.ShowStatusBars();
     }
 
     private void ExitInitBattleState(object sender, EventArgs eventArgs)
@@ -197,10 +201,10 @@ public class BattleSequenceManager : MonoBehaviour
             Transform terraTransform = battleStage.GetTerraObject(attackerPosition).transform;
             Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
             battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, attackerPosition.IsPrimarySide());
-
+            statusBarGroupUI.ShowSingleStatusBar(attackerPosition.GetBattlePositionIndex(), attackerPosition.IsPrimarySide());
             battleDialogUI.SetDialog(BattleDialog.AttackUsedMsg(eventArgs.GetTerraAttack()));
         }, battleActionSequence.GetDuration());
-        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.25f);
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
     }
 
     private void AddAttackerAnimationToSequence(object sender, TerraAttackEventArgs eventArgs)
@@ -218,14 +222,19 @@ public class BattleSequenceManager : MonoBehaviour
 
     private void AddAttackHitToSequence(object sender, DirectAttackLogEventArgs eventArgs)
     {
+        if (eventArgs.GetDirectAttackLog().GetDirectAttackParams().GetMove().GetMoveSO().IsSelfTargeting())
+            return;
+
         TerraBattlePosition targetPosition = eventArgs.GetDirectAttackLog().GetDefenderPosition();
 
         battleActionSequence.AddTaskByTime(() => {
             Transform terraTransform = battleStage.GetTerraObject(targetPosition).transform;
             Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
             battleCam.SetAttackLookAt(terraOffsetPos, terraTransform.eulerAngles, targetPosition.IsPrimarySide());
+            statusBarGroupUI.ShowSingleStatusBar(targetPosition.GetBattlePositionIndex(), targetPosition.IsPrimarySide());
+            statusBarGroupUI.DynamicUpdateStatusBar(targetPosition, eventArgs.GetDefendingTerra());
         }, battleActionSequence.GetDuration());
-        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 2f);
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 2.5f);
 
         if(eventArgs.GetDirectAttackLog().IsCrit()) {
             battleActionSequence.AddTaskByTime(() => {
@@ -234,14 +243,21 @@ public class BattleSequenceManager : MonoBehaviour
                 battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, targetPosition.IsPrimarySide());
                 battleDialogUI.SetDialog(BattleDialog.CRITICAL_HIT);
             }, battleActionSequence.GetDuration());
-            battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.25f);
+            battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
         }
     }
 
-    // TODO Finish attack canceled sequence
-    private void AddAttackCanceledToSequence()
+    private void AddAttackCanceledToSequence(object sender, TerraAttackEventArgs eventArgs)
     {
+        TerraBattlePosition battlePosition = eventArgs.GetTerraAttack().GetAttackerPosition();
 
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+            battleDialogUI.SetDialog(BattleDialog.ATTACK_FAILED);
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
     }
 
     private void AddTerraSwitchToSequence(object sender, SwitchTerraEventArgs eventArgs)
@@ -330,8 +346,7 @@ public class BattleSequenceManager : MonoBehaviour
         battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 2f);
     }
 
-    // TODO Finish Faint sequence
-    private void AddTerraFaintToSequence(object sender, TerraFaintedEventArgs eventArgs)
+    private void AddTerraFaintToSequence(object sender, TerraBattlePositionEventArgs eventArgs)
     {
         TerraBattlePosition battlePosition = eventArgs.GetTerraBattlePosition();
     
@@ -339,8 +354,35 @@ public class BattleSequenceManager : MonoBehaviour
             Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
             Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
             battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+            battleDialogUI.SetDialog(BattleDialog.TerraFaintedMsg(eventArgs.GetTerra()));
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 2f);
+    }
+
+    private void AddTerraHealedToSequence(object sender, TerraHealedEventArgs eventArgs)
+    {
+        TerraBattlePosition battlePosition = eventArgs.GetTerraBattlePosition();
+
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+            battleDialogUI.SetDialog(BattleDialog.TerraHealedMsg(eventArgs.GethealedTerra()));
         }, battleActionSequence.GetDuration());
         battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
+    }
+
+    private void AddRecoilToSequence(object sender, TerraDamagedEventArgs eventArgs)
+    {
+        TerraBattlePosition battlePosition = eventArgs.GetTerraBattlePosition();
+
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+            battleDialogUI.SetDialog(BattleDialog.RecoilDamageMsg(eventArgs.GetTerra()));
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration());
     }
 
     private void AddStatChangeToSequence(object sender, StatChangeEventArgs eventArgs)
@@ -352,10 +394,125 @@ public class BattleSequenceManager : MonoBehaviour
             Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
             battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
             battleDialogUI.SetDialog(BattleDialog.StatStageChangeMsg(
-                eventArgs.GetTerraBattlePosition().GetTerra(),
+                eventArgs.GetTerra(),
                 eventArgs.GetStat(),
                 eventArgs.GetInitialStatStage(),
                 eventArgs.GetModification()));
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
+    }
+
+    private void AddStatusEffectInflictedToSequence(object sender, StatusEffectEventArgs eventArgs)
+    {
+        TerraBattlePosition battlePosition = eventArgs.GetTerraBattlePosition();
+
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+            battleDialogUI.SetDialog(BattleDialog.StatusInflictionMsg(eventArgs.GetTerra(), eventArgs.GetStatusEffectSO()));
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
+    }
+
+    private void AddStatusEffectProkedToSequence(object sender, StatusEffectProkedEventArgs eventArgs)
+    {
+        TerraBattlePosition battlePosition = eventArgs.GetTerraBattlePosition();
+
+        if(eventArgs.IsProked()) {
+            battleActionSequence.AddTaskByTime(() => {
+                Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+                Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+                battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+                battleDialogUI.SetDialog(BattleDialog.StatusEffectProkedMsg(eventArgs.GetTerra(), eventArgs.GetStatusEffectSO()));
+            }, battleActionSequence.GetDuration());
+            battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
+        }
+
+        if(eventArgs.IsEffectRemoved()) {
+            battleActionSequence.AddTaskByTime(() => {
+                Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+                Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+                battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+                battleDialogUI.SetDialog(BattleDialog.StatusEffectRemovedMsg(eventArgs.GetTerra(), eventArgs.GetStatusEffectSO()));
+            }, battleActionSequence.GetDuration());
+            battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
+        }
+    }
+
+    private void AddVolatileStatusEffectInflictedToSequence(object sender, VolatileStatusEffectEventArgs eventArgs)
+    {
+        TerraBattlePosition battlePosition = eventArgs.GetTerraBattlePosition();
+
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+            battleDialogUI.SetDialog(BattleDialog.VolatileStatusInflictionMsg(eventArgs.GetTerra(), eventArgs.GetVolatileStatusEffect().GetVolatileStatusEffectSO()));
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
+    }
+
+    private void AddVolatileStatusEffectProkedToSequence(object sender, VolatileStatusEffectProkedEventArgs eventArgs)
+    {
+        TerraBattlePosition battlePosition = eventArgs.GetTerraBattlePosition();
+
+        if (eventArgs.IsProked()) {
+            battleActionSequence.AddTaskByTime(() => {
+                Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+                Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+                battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+                battleDialogUI.SetDialog(BattleDialog.VolatileStatusEffectProkedMsg(eventArgs.GetTerra(), eventArgs.GetVolatileStatusEffectBase().GetVolatileStatusEffectSO()));
+            }, battleActionSequence.GetDuration());
+            battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
+        }
+
+        if (eventArgs.IsEffectRemoved()) {
+            battleActionSequence.AddTaskByTime(() => {
+                Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+                Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+                battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+                battleDialogUI.SetDialog(BattleDialog.VolatileStatusEffectRemovedMsg(eventArgs.GetTerra(), eventArgs.GetVolatileStatusEffectBase().GetVolatileStatusEffectSO()));
+            }, battleActionSequence.GetDuration());
+            battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
+        }
+    }
+
+    private void AddAttackChargingToSequence(object sender, AttackChargingEventArgs eventArgs)
+    {
+        TerraBattlePosition battlePosition = eventArgs.GetTerraAttack().GetAttackerPosition();
+
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+            battleDialogUI.SetDialog(BattleDialog.AttackCharging(eventArgs.GetTerraAttack().GetTerraMoveBase().GetTerraMoveSO()));
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
+    }
+
+    private void AddAttackRechargingToSequence(object sender, AttackChargingEventArgs eventArgs)
+    {
+        TerraBattlePosition battlePosition = eventArgs.GetTerraAttack().GetAttackerPosition();
+
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+            battleDialogUI.SetDialog(BattleDialog.AttackRecharging(battlePosition.GetTerra()));
+        }, battleActionSequence.GetDuration());
+        battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
+    }
+
+    private void AddItemProkedToSequence(object sender, ItemProkedEventArgs eventArgs)
+    {
+        TerraBattlePosition battlePosition = eventArgs.GetTerraBattlePosition();
+
+        battleActionSequence.AddTaskByTime(() => {
+            Transform terraTransform = battleStage.GetTerraObject(battlePosition).transform;
+            Vector3 terraOffsetPos = new Vector3(terraTransform.position.x, terraTransform.position.y + 1.75f, terraTransform.position.z);
+            battleCam.SetStaticLookAt(terraOffsetPos, terraTransform.eulerAngles, battlePosition.IsPrimarySide());
+            battleDialogUI.SetDialog(eventArgs.GetItemSO().GetItemProkeDialog());
         }, battleActionSequence.GetDuration());
         battleActionSequence.SetDuration(battleActionSequence.GetDuration() + 1.5f);
     }

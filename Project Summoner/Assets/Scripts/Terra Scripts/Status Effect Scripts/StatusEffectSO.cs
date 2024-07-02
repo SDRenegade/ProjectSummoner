@@ -6,10 +6,8 @@ using UnityEngine;
 public abstract class StatusEffectSO : ScriptableObject
 {
     [SerializeField] protected string statusName;
-    [SerializeField] [TextArea] protected string description;
+    [SerializeField, TextArea] protected string description;
     [SerializeField] protected float captureMultiplier;
-
-    public StatusEffectSO() {}
 
     public abstract StatusEffectBase CreateStatusEffectInstance();
 

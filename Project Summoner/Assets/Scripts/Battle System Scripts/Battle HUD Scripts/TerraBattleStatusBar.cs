@@ -13,7 +13,7 @@ public class TerraBattleStatusBar : MonoBehaviour
     [SerializeField] private TextMeshProUGUI terraCurrentHealthTMP;
     [SerializeField] private TextMeshProUGUI terraMaxHealthTMP;
 
-    float increment = 0.4f;
+    float increment = 0.5f;
     float maxHealth;
     float currentHealth;
     float previousHealth;
@@ -25,8 +25,8 @@ public class TerraBattleStatusBar : MonoBehaviour
             return;
 
         interpolationValue += increment * Time.deltaTime;
-        if(interpolationValue > currentHealth)
-            interpolationValue = currentHealth;
+        if(interpolationValue > 1f)
+            interpolationValue = 1f;
 
         float interpolationHealth = Mathf.Lerp(previousHealth, currentHealth, interpolationValue);
         healthBar.SetProgress(interpolationHealth / maxHealth);
@@ -63,11 +63,14 @@ public class TerraBattleStatusBar : MonoBehaviour
 
     public void DynamicUpdateStatusBar(Terra terra)
     {
+        Debug.Log("Dynamic Update Status Bar entered");
         terraNameTMP.SetText(terra.GetTerraBase().GetSpeciesName());
         terraLevelTMP.SetText("Lvl " + terra.GetLevel().ToString());
 
         maxHealth = terra.GetMaxHP();
+        Debug.Log("Max Health: " + maxHealth);
         float newCurrentHealth = terra.GetCurrentHP();
+        Debug.Log("newCurrentHealth: " + terra.GetCurrentHP());
         if(currentHealth != newCurrentHealth) {
             previousHealth = currentHealth;
             currentHealth = newCurrentHealth;

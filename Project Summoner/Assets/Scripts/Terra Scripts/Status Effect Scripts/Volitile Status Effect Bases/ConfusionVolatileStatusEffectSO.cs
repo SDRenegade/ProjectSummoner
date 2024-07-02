@@ -44,16 +44,24 @@ public class ConfusionVolatileStatusEffect : VolatileStatusEffectBase
             return;
 
         Debug.Log(BattleDialog.TerraIsConfusedMsg(terraBattlePosition.GetTerra()));
+
         if (turnCounter <= turnDuration) {
             int randConfusionRoll = Random.Range(0, 2);
-            if (randConfusionRoll == 1) {
+            bool isDamagedByConfusion = randConfusionRoll == 1;
+            //*** Volatile Status Effect Proked Event ***
+            eventArgs.GetBattleSystem().InvokeOnVolatileStatusEffectProked(terraBattlePosition, this, isDamagedByConfusion, false);
+
+            if (isDamagedByConfusion) {
                 int recoilDamage = (int)CombatCalculator.InitialAttackDamage(terraBattlePosition, terraBattlePosition, RECOIL_POWER);
                 eventArgs.GetBattleSystem().DamageTerra(terraBattlePosition, recoilDamage);
                 eventArgs.GetTerraAttack().SetCanceled(true);
             }
         }
         else {
-            Debug.Log(BattleDialog.TerraSnappedOutOfConfusionMsg(terraBattlePosition.GetTerra()));
+            Debug.Log(BattleDialog.ConfusionRemovedMsg(terraBattlePosition.GetTerra()));
+            //*** Volatile Status Effect Proked Event ***
+            eventArgs.GetBattleSystem().InvokeOnVolatileStatusEffectProked(terraBattlePosition, this, false, true);
+
             terraBattlePosition.RemoveVolatileStatusEffect(vStatusEffectSO, eventArgs.GetBattleSystem());
         }
     }

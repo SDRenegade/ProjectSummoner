@@ -36,9 +36,13 @@ public class ParalysisStatusEffect : StatusEffectBase
         if (eventArgs.GetTerraAttack().GetAttackerPosition() != terraBattlePosition)
             return;
 
-        if (PARALYSIS_CHANCE >= Random.Range(0f, 1f)) {
+        bool isParalyzed = PARALYSIS_CHANCE >= Random.Range(0f, 1f);
+        if (isParalyzed) {
             eventArgs.GetTerraAttack().SetCanceled(true);
             Debug.Log(BattleDialog.ParalysisProkedMsg(terraBattlePosition.GetTerra()));
         }
+
+        //*** Status Effect Proked Event ***
+        eventArgs.GetBattleSystem().InvokeOnStatusEffectProked(terraBattlePosition, statusEffectSO, isParalyzed, false);
     }
 }

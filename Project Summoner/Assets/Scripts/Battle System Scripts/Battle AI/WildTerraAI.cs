@@ -37,10 +37,10 @@ public class WildTerraAI : BattleAI
         }
     }
 
-    public int? SwitchFaintedTerra(FaintedTerra faintedTerra, BattleSystem battleSystem)
+    public int? SwitchFaintedTerra(TerraBattlePosition faintedTerraPosition, BattleSystem battleSystem)
     {
         // Temp Since wild terra encounters should never have bench terra in the terra list.
-        bool isPirmarySide = faintedTerra.IsPrimarySide();
+        bool isPirmarySide = faintedTerraPosition.IsPrimarySide();
         List<Terra> terraList = isPirmarySide ? battleSystem.GetPrimaryTerraList() : battleSystem.GetSecondaryTerraList();
         for(int i = battleSystem.GetBattleFormat().NumberOfLeadingPositions(); i < terraList.Count; i++) {
             if (terraList[i].GetCurrentHP() > 0)

@@ -42,7 +42,10 @@ public class BoundVolatileStatusEffect : VolatileStatusEffectBase
         Terra defendingTerra = terraBattlePosition.GetTerra();
         int boundDamage = (int)(defendingTerra.GetMaxHP() * PERCENT_HEALTH_DAMAGE);
 
-        Debug.Log(BattleDialog.BindDamageMsg(defendingTerra, boundDamage));
+        Debug.Log(BattleDialog.BindProkedMsg(defendingTerra));
+        //*** Volatile Status Effect Proked Event ***
+        eventArgs.GetBattleSystem().InvokeOnVolatileStatusEffectProked(terraBattlePosition, this, true, false);
+
         eventArgs.GetBattleSystem().DamageTerra(terraBattlePosition, boundDamage);
 
         turnCounter++;

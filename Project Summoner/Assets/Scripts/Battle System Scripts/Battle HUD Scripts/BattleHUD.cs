@@ -33,9 +33,9 @@ public class BattleHUD : MonoBehaviour
         statusBarGroupUI.StaticUpdateStatusBar(terraBattlePosition);
     }
 
-    public void DynamicUpdateStatusBar(TerraBattlePosition terraBattlePosition)
+    public void DynamicUpdateStatusBar(TerraBattlePosition terraBattlePosition, Terra terra)
     {
-        statusBarGroupUI.DynamicUpdateStatusBar(terraBattlePosition);
+        statusBarGroupUI.DynamicUpdateStatusBar(terraBattlePosition, terra);
     }
 
     public void HideTerraStatusBars()
@@ -43,15 +43,15 @@ public class BattleHUD : MonoBehaviour
         statusBarGroupUI.HideStatusBars();
     }
 
-    public void ShowTerraStatusBars()
+    public void ShowTerraStatusBars(Battlefield battlefield)
     {
-        statusBarGroupUI.ShowStatusBars();
+        statusBarGroupUI.StaticUpdateAllStatusBars(battlefield);
     }
 
-    public void OpenMenuSelectionUI(BattleActionManager battleActionManager)
+    public void OpenMenuSelectionUI(BattleActionManager battleActionManager, Battlefield battlefield)
     {
         CloseAllSelectionUI();
-        statusBarGroupUI.ShowStatusBars();
+        statusBarGroupUI.StaticUpdateAllStatusBars(battlefield);
         menuSelectionUI.OpenMenuSelectionUI(battleActionManager);
     }
 

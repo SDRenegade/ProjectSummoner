@@ -8,5 +8,5 @@ public interface BattleAI
     // position and disabled move indicies
     void PerformAction(TerraBattlePosition terraBattlePosition, List<int> disabledMoveIndicies, BattleSystem battleSystem);
 
-    int? SwitchFaintedTerra(FaintedTerra faintedTerra, BattleSystem battleSystem);
+    int? SwitchFaintedTerra(TerraBattlePosition faintedTerraPosition, BattleSystem battleSystem);
 }

@@ -41,21 +41,21 @@ public class TerraBattleStatusBarGroupUI : MonoBehaviour
             statusBar.gameObject.SetActive(false);
     }
 
-    public void DynamicUpdateStatusBar(TerraBattlePosition terraBattlePosition)
+    public void DynamicUpdateStatusBar(TerraBattlePosition terraBattlePosition, Terra terra)
     {
         TerraBattleStatusBar statusBar = terraBattlePosition.IsPrimarySide() ?
             primaryStatusBarList[terraBattlePosition.GetBattlePositionIndex()] :
             secondaryStatusBarList[terraBattlePosition.GetBattlePositionIndex()];
 
-        if (terraBattlePosition.GetTerra() != null) {
-            statusBar.DynamicUpdateStatusBar(terraBattlePosition.GetTerra());
+        if (terra != null) {
+            statusBar.DynamicUpdateStatusBar(terra);
             statusBar.gameObject.SetActive(true);
         }
         else
             statusBar.gameObject.SetActive(false);
     }
 
-    private void StaticUpdateAllStatusBars(Battlefield battlefield)
+    public void StaticUpdateAllStatusBars(Battlefield battlefield)
     {
         TerraBattlePosition[] primaryTerraBattlePositionArr = battlefield.GetPrimaryBattleSide().GetTerraBattlePositionArr();
         TerraBattlePosition[] secondaryTerraBattlePositionArr = battlefield.GetSecondaryBattleSide().GetTerraBattlePositionArr();
@@ -80,23 +80,18 @@ public class TerraBattleStatusBarGroupUI : MonoBehaviour
         }
     }
 
+    public void ShowSingleStatusBar(int positionIndex, bool isPrimarySide)
+    {
+        HideStatusBars();
+        TerraBattleStatusBar shownStatusBar = isPrimarySide ? primaryStatusBarList[positionIndex] : secondaryStatusBarList[positionIndex];
+        shownStatusBar.gameObject.SetActive(true);
+    }
+
     public void HideStatusBars()
     {
         for (int i = 0; i < primaryStatusBarList.Count; i++)
             primaryStatusBarList[i].gameObject.SetActive(false);
         for (int i = 0; i < secondaryStatusBarList.Count; i++)
             secondaryStatusBarList[i].gameObject.SetActive(false);
-    }
-
-    public void ShowStatusBars()
-    {
-        for (int i = 0; i < primaryStatusBarList.Count; i++) {
-            if (primaryStatusBarList[i].GetCurrentHealth() > 0)
-                primaryStatusBarList[i].gameObject.SetActive(true);
-        }
-        for (int i = 0; i < secondaryStatusBarList.Count; i++) {
-            if (secondaryStatusBarList[i].GetCurrentHealth() > 0)
-                secondaryStatusBarList[i].gameObject.SetActive(true);
-        }
     }
 }

@@ -44,7 +44,7 @@ public class PartyOptionSelectionUI : MonoBehaviour
                 CloseOptionSelection();
                 battleSystem.OpenMenuSelectionUI();
                 TerraBattlePosition[] terraBattlePositionArr = battleSystem.GetBattlefield().GetPrimaryBattleSide().GetTerraBattlePositionArr();
-                TerraSwitch terraSwitch = new TerraSwitch(activeTerraPosition, selectedTerraIndex, true);
+                TerraSwitch terraSwitch = new TerraSwitch(activeTerraPosition, selectedTerraIndex);
                 switchAction?.Invoke(activeTerraPosition, terraSwitch);
             });
         }
@@ -62,7 +62,7 @@ public class PartyOptionSelectionUI : MonoBehaviour
         if (terraList[terraPartyIndex].GetCurrentHP() <= 0)
             return false;
         foreach(TerraSwitch terraSwitch in battleSystem.GetBattleActionManager().GetTerraSwitchList()) {
-            if (!terraSwitch.IsPrimarySide())
+            if (!terraSwitch.GetTerraBattlePosition().IsPrimarySide())
                 continue;
 
             if (terraPartyIndex == terraSwitch.GetBenchPositionIndex())

@@ -37,7 +37,10 @@ class BurnStatusEffect : StatusEffectBase
     private void BurnActive(object sender, BattleEventArgs eventArgs)
     {
         int burnDamage = (int)(terraBattlePosition.GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_BURN);
-        Debug.Log(BattleDialog.BurnProkedMsg(terraBattlePosition.GetTerra(), burnDamage));
+        Debug.Log(BattleDialog.BurnProkedMsg(terraBattlePosition.GetTerra()));
+        //*** Status Effect Proked Event ***
+        eventArgs.GetBattleSystem().InvokeOnStatusEffectProked(terraBattlePosition, statusEffectSO, true, false);
+
         eventArgs.GetBattleSystem().DamageTerra(terraBattlePosition, burnDamage);
     }
 

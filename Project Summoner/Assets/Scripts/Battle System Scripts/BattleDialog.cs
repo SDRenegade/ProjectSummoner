@@ -41,7 +41,11 @@ public static class BattleDialog
             return terra + " has taken " + damage + " damage";
     }
 
-    public static string TerraHealedMsg(Terra terra, int healAmt) {
+    public static string TerraHealedMsg(Terra terra) {
+        return terra + " has recovered health!";
+    }
+
+    public static string TerraHealedMsgDebug(Terra terra, int healAmt) {
         return terra + " has recovered " + healAmt + " health";
     }
 
@@ -86,76 +90,148 @@ public static class BattleDialog
         return terra + " has been inflicted with " + vStatusEffectSO;
     }
 
-    public static string ParalysisProkedMsg(Terra terra) {
-        return terra + " is paralyzed and unable to move.";
+    public static string StatusEffectProkedMsg(Terra terra, StatusEffectSO statusEffectSO) {
+        switch(statusEffectSO.GetStatusName()) {
+            case "Paralysis":
+                return ParalysisProkedMsg(terra);
+            case "Blight":
+                return BlightProkedMsg(terra);
+            case "Burn":
+                return BurnProkedMsg(terra);
+            case "Freeze":
+                return FreezeProkedMsg(terra);
+            case "Sleep":
+                return SleepProkedMsg(terra);
+            default:
+                return "Unknown Status Proked";
+        }
     }
 
-    public static string BurnProkedMsg(Terra terra, int burnDamage) {
-        return terra + " has been burned for " + burnDamage + " damage.";
+    public static string StatusEffectRemovedMsg(Terra terra, StatusEffectSO statusEffectSO) {
+        switch (statusEffectSO.GetStatusName()) {
+            case "Freeze":
+                return TerraThawedMsg(terra);
+            case "Sleep":
+                return TerraWokeUpMsg(terra);
+            default:
+                return "Unknown Status Removed";
+        }
+    }
+
+    public static string VolatileStatusEffectProkedMsg(Terra terra, VolatileStatusEffectSO vStatusEffectSO)
+    {
+        switch (vStatusEffectSO.GetStatusName()) {
+            case "Bound":
+                return BindProkedMsg(terra);
+            case "Confusion":
+                return ConfusionProkedMsg(terra);
+            case "Flinch":
+                return FlinchedMsg(terra);
+            case "Protect":
+                return ProtectActiveMsg(terra);
+            default:
+                return "Unknown Volatile Status Proked";
+        }
+    }
+
+    public static string VolatileStatusEffectRemovedMsg(Terra terra, VolatileStatusEffectSO vStatusEffectSO)
+    {
+        switch (vStatusEffectSO.GetStatusName()) {
+            case "Confusion":
+                return ConfusionRemovedMsg(terra);
+            case "Special Barrier":
+                return SpecialBarrierRemovedMsg(terra);
+            case "Mist":
+                return StatResistanceRemovedMsg(terra);
+            case "Substitution":
+                return SubsitutionRemovedMsg(terra);
+            default:
+                return "Unknown Volatile Status Removed";
+        }
+    }
+
+    public static string ParalysisProkedMsg(Terra terra) {
+        return terra.ToString().ToUpper() + " is paralyzed and unable to move.";
+    }
+
+    public static string BurnProkedMsg(Terra terra) {
+        return terra.ToString().ToUpper() + " has been burned.";
     }
 
     public static string SleepProkedMsg(Terra terra) {
-        return terra + " is fast asleep.";
+        return terra.ToString().ToUpper() + " is fast asleep.";
     }
 
     public static string TerraWokeUpMsg(Terra terra) {
-        return terra + " has woken up.";
+        return terra.ToString().ToUpper() + " has woken up.";
     }
 
     public static string FreezeProkedMsg(Terra terra) {
-        return terra + " is frozen and unable to move.";
+        return terra.ToString().ToUpper() + " is frozen and unable to move.";
     }
 
     public static string TerraThawedMsg(Terra terra) {
-        return terra + " has thawed.";
+        return terra.ToString().ToUpper() + " has thawed.";
     }
 
-    public static string BlightProkedMsg(Terra terra, int blightDamage) {
-        return terra + " has been inflicted by blight for " + blightDamage + " damage.";
+    public static string BlightProkedMsg(Terra terra) {
+        return terra.ToString().ToUpper() + " has been inflicted by blight.";
     }
 
     public static string ConfusionInflictedMsg(Terra terra) {
-        return terra + " has been confused.";
+        return terra.ToString().ToUpper() + " has been confused.";
     }
 
     public static string TerraIsConfusedMsg(Terra terra) {
-        return terra + " is confused.";
+        return terra.ToString().ToUpper() + " is confused.";
     }
 
-    public static string ConfusionProkedMsg(Terra terra, int damage) {
-        return terra + " hit themself for " + damage + " damage.";
+    public static string ConfusionProkedMsg(Terra terra) {
+        return terra.ToString().ToUpper() + " hit themself.";
     }
 
-    public static string TerraSnappedOutOfConfusionMsg(Terra terra) {
-        return terra + " has snapped out of confusion.";
+    public static string ConfusionRemovedMsg(Terra terra) {
+        return terra.ToString().ToUpper() + " has snapped out of confusion.";
+    }
+
+    public static string SpecialBarrierRemovedMsg(Terra terra) {
+        return terra.ToString().ToUpper() + " special barrier is gone.";
+    }
+
+    public static string StatResistanceRemovedMsg(Terra terra) {
+        return terra.ToString().ToUpper() + " mist is gone.";
+    }
+
+    public static string SubsitutionRemovedMsg(Terra terra) {
+        return terra.ToString().ToUpper() + " substitution is gone.";
     }
 
     public static string FlinchedMsg(Terra terra) {
-        return terra + " flinched.";
+        return terra.ToString().ToUpper() + " flinched.";
     }
 
     public static string AttackCharging(TerraMoveSO terraMoveSO) {
-        return terraMoveSO + " is charging.";
+        return terraMoveSO.ToString().ToUpper() + " is charging.";
     }
 
     public static string AttackRecharging(Terra terra) {
-        return terra + " is recharging.";
+        return terra.ToString().ToUpper() + " is recharging.";
     }
 
     public static string MultiHitMsg(Terra terra, int numHits) {
-        return terra + " has landed " + numHits + " hits.";
+        return terra.ToString().ToUpper() + " has landed " + numHits + " hits.";
     }
 
-    public static string RecoilDamageMsg(Terra terra, int recoilDamage) {
-        return terra + " has taken " + recoilDamage + " recoil damage.";
+    public static string RecoilDamageMsg(Terra terra) {
+        return terra.ToString().ToUpper() + " has taken recoil damage.";
     }
 
     public static string ProtectActiveMsg(Terra terra) {
-        return terra + " was unaffected due to Protect.";
+        return terra.ToString().ToUpper() + " was unaffected due to Protect.";
     }
 
-    public static string BindDamageMsg(Terra terra, int bindDamage) {
-        return terra + " has taken " + bindDamage + " damage from bind.";
+    public static string BindProkedMsg(Terra terra) {
+        return terra.ToString().ToUpper() + " is being constricted.";
     }
 
     public static string HighJumpKickMissedMsg(Terra terra, int recoilDamage) {

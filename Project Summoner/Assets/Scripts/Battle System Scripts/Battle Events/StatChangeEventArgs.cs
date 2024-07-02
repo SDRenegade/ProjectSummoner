@@ -5,6 +5,7 @@ using UnityEngine;
 public class StatChangeEventArgs : BattleEventArgs
 {
     private TerraBattlePosition terraBattlePosition;
+    private Terra terra;
     private Stats stat;
     private StatStages initialStatStage;
     private int modification;
@@ -13,6 +14,7 @@ public class StatChangeEventArgs : BattleEventArgs
     public StatChangeEventArgs(TerraBattlePosition terraBattlePosition, Stats stat, int modification, BattleSystem battleSystem) : base(battleSystem)
     {
         this.terraBattlePosition = terraBattlePosition;
+        terra = terraBattlePosition.GetTerra();
         this.stat = stat;
         initialStatStage = terraBattlePosition.GetStatStage(stat);
         this.modification = modification;
@@ -20,6 +22,8 @@ public class StatChangeEventArgs : BattleEventArgs
     }
 
     public TerraBattlePosition GetTerraBattlePosition() { return terraBattlePosition; }
+
+    public Terra GetTerra() {  return terra; }
 
     public Stats GetStat() { return stat; }
 

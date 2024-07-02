@@ -24,6 +24,7 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<CaptureAttemptEventArgs> OnPostCaptureAttempt;
     public event EventHandler<SwitchTerraEventArgs> OnSwitchTerra;
     public event EventHandler<TerraAttackEventArgs> OnAttackDeclaration;
+    public event EventHandler<TerraAttackEventArgs> OnAttackCanceled;
     public event EventHandler<TerraAttackEventArgs> OnStartTerraAttack;
     public event EventHandler<DirectAttackEventArgs> OnDirectAttack;
     public event EventHandler<DirectAttackLogEventArgs> OnDirectAttackHit;
@@ -33,17 +34,23 @@ public class BattleSystem : MonoBehaviour
     public event EventHandler<TerraDamagedEventArgs> OnTerraDamaged;
     public event EventHandler<TerraDamagedEventArgs> OnPostTerraDamaged;
     public event EventHandler<TerraHealedEventArgs> OnTerraHealed;
+    public event EventHandler<TerraDamagedEventArgs> OnRecoilDamage;
     public event EventHandler<StatChangeEventArgs> OnStatChange;
     public event EventHandler<StatChangeEventArgs> OnPostStatChange;
-    public event EventHandler<StatusEffectAddedEventArgs> OnStatusEffectAdded;
-    public event EventHandler<StatusEffectEventArgs> OnPostStatusEffectAdded;
+    public event EventHandler<StatusEffectEventArgs> OnStatusEffect;
+    public event EventHandler<StatusEffectEventArgs> OnStatusEffectInflicted;
+    public event EventHandler<StatusEffectProkedEventArgs> OnStatusEffectProked;
     public event EventHandler<VolatileStatusEffectRollEventArgs> OnVolatileStatusEffectRoll;
-    public event EventHandler<VolatileStatusEffectAddedEventArgs> OnVolatileStatusEffectAdded;
-    public event EventHandler<VolatileStatusEffectEventArgs> OnPostVolatileStatusEffectAdded;
+    public event EventHandler<VolatileStatusEffectEventArgs> OnVolatileStatusEffect;
+    public event EventHandler<VolatileStatusEffectEventArgs> OnVolatileStatusEffectInflicted;
+    public event EventHandler<VolatileStatusEffectProkedEventArgs> OnVolatileStatusEffectProked;
     public event EventHandler<AttackChargingEventArgs> OnAttackCharging;
+    public event EventHandler<AttackChargingEventArgs> OnAttackCanceledFromCharging;
     public event EventHandler<AttackChargingEventArgs> OnAttackRecharging;
-    public event EventHandler<TerraFaintedEventArgs> OnTerraFainted;
+    public event EventHandler<AttackChargingEventArgs> OnAttackCanceledFromRecharging;
+    public event EventHandler<TerraBattlePositionEventArgs> OnTerraFainted;
     public event EventHandler<DirectAttackLogEventArgs> OnPostAttack;
+    public event EventHandler<ItemProkedEventArgs> OnItemProked;
     public event EventHandler<BattleEventArgs> OnEndOfTurn;
 
     [SerializeField] private BattleHUD battleHUD;
@@ -54,7 +61,6 @@ public class BattleSystem : MonoBehaviour
     private List<SummonerDieItemStack> primarySummonerDieItemStackList;
     private List<SummonerDieItemStack> secondarySummonerDieItemStackList;
 
-    private bool isBattleFinished;
     private BattleType battleType;
     private BattleFormat battleFormat;
     private BattleAI primarySideAI;
@@ -62,6 +68,7 @@ public class BattleSystem : MonoBehaviour
     private Battlefield battlefield;
     private BattleActionManager battleActionManager;
     private BattleStateManager battleStateManager;
+    private bool isBattleFinished;
 
     public void Start()
     {
@@ -107,14 +114,19 @@ public class BattleSystem : MonoBehaviour
         battleHUD.StaticUpdateStatusBar(terraBattlePosition);
     }
 
-    public void DynamicUpdateStatusBar(TerraBattlePosition terraBattlePosition)
+    public void DynamicUpdateStatusBar(TerraBattlePosition terraBattlePosition, Terra terra)
     {
-        battleHUD.DynamicUpdateStatusBar(terraBattlePosition);
+        battleHUD.DynamicUpdateStatusBar(terraBattlePosition, terra);
+    }
+
+    public void ShowStatusBars()
+    {
+        battleHUD.ShowTerraStatusBars(battlefield);
     }
 
     public void OpenMenuSelectionUI()
     {
-        battleHUD.OpenMenuSelectionUI(battleActionManager);
+        battleHUD.OpenMenuSelectionUI(battleActionManager, battlefield);
     }
 
     public void ExitMenuSelectionUI()
@@ -136,9 +148,9 @@ public class BattleSystem : MonoBehaviour
             this);
     }
 
-    public void OpenForceSwitchPartyMenuUI(TerraBattlePosition activeTerraPosition, bool isPrimarySide, Action<TerraBattlePosition, TerraSwitch> switchAction)
+    public void OpenForceSwitchPartyMenuUI(TerraBattlePosition activeTerraPosition, Action<TerraBattlePosition, TerraSwitch> switchAction)
     {
-        List<Terra> terraList = isPrimarySide ? primaryTerraList : secondaryTerraList;
+        List<Terra> terraList = activeTerraPosition.IsPrimarySide() ? primaryTerraList : secondaryTerraList;
         battleHUD.OpenPartyMenuUI(activeTerraPosition, terraList, true, switchAction, this);
     }
 
@@ -497,12 +509,23 @@ public class BattleSystem : MonoBehaviour
         terraList[terraSwitch.GetTerraBattlePosition().GetBattlePositionIndex()] = terraList[terraSwitch.GetBenchPositionIndex()];
         terraList[terraSwitch.GetBenchPositionIndex()] = tmp;
         terraSwitch.GetTerraBattlePosition().SetTerra(terraList[terraSwitch.GetTerraBattlePosition().GetBattlePositionIndex()]);
-        if(terraSwitch.IsPrimarySide())
+        if(terraSwitch.GetTerraBattlePosition().IsPrimarySide())
             battlefield.GetPrimaryBattleSide().UpdateLeadingTerra(terraList);
         else
             battlefield.GetSecondaryBattleSide().UpdateLeadingTerra(terraList);
         battleStage.SetTerraAtPosition(terraSwitch.GetTerraBattlePosition());
         StaticUpdateStatusBar(terraSwitch.GetTerraBattlePosition());
+    }
+
+    public void RecoilDamage(TerraBattlePosition terraBattlePosition, int? damage)
+    {
+        if (terraBattlePosition.GetTerra() == null || damage == null)
+            return;
+
+        //*** Recoil Damage Event ***
+        InvokeOnTerraRecoilDamage(terraBattlePosition, damage);
+
+        DamageTerra(terraBattlePosition, damage);
     }
 
     //Method used when a terra is dealt damage that is not from a terra attack
@@ -543,20 +566,11 @@ public class BattleSystem : MonoBehaviour
 
         bool isPrimarySide = terraBattlePosition.IsPrimarySide();
         List<Terra> terraList = isPrimarySide ? primaryTerraList : secondaryTerraList;
-        int faintedTerraIndex = 0;
-        for (int i = 0; i < battleFormat.NumberOfLeadingPositions(); i++) {
-            if (i >= terraList.Count)
-                break;
-            if (terraBattlePosition.GetTerra() == terraList[i]) {
-                faintedTerraIndex = i;
-                break;
-            }
-        }
 
         terraBattlePosition.ResetBattlePosition(this);
 
         if (TerraUtils.HasLivingPartyMember(terraList))
-            battleActionManager.GetFaintedTerraQueue().Enqueue(new FaintedTerra(terraBattlePosition, faintedTerraIndex, isPrimarySide));
+            battleActionManager.GetFaintedTerraQueue().Enqueue(terraBattlePosition);
         else
             EndBattle();
     }
@@ -564,35 +578,31 @@ public class BattleSystem : MonoBehaviour
     public void SwitchFaintedTerra()
     {
         if (battleActionManager.GetFaintedTerraQueue().Count == 0) {
-            NextCombatAction();
+            BattleSequenceManager.GetInstance().StartBattleActionSequence();
             return;
         }
 
-        FaintedTerra faintedTerra = battleActionManager.GetFaintedTerraQueue().Dequeue();
-        List<Terra> terraList = faintedTerra.IsPrimarySide() ? primaryTerraList : secondaryTerraList;
+        TerraBattlePosition faintedTerraPosition = battleActionManager.GetFaintedTerraQueue().Dequeue();
+        List<Terra> terraList = faintedTerraPosition.IsPrimarySide() ? primaryTerraList : secondaryTerraList;
         if (TerraUtils.HasLivingBenchedPartyMember(terraList, battleFormat)) {
-            BattleAI battleAI = faintedTerra.IsPrimarySide() ? primarySideAI : secondarySideAI;
+            BattleAI battleAI = faintedTerraPosition.IsPrimarySide() ? primarySideAI : secondarySideAI;
             if (battleAI == null)
                 OpenForceSwitchPartyMenuUI(
-                    faintedTerra.GetTerraBattlePosition(),
-                    faintedTerra.IsPrimarySide(),
+                    faintedTerraPosition,
                     (terraBattlePosition, terraSwitch) => {
                         SwitchTerra(terraSwitch);
                         SwitchFaintedTerra();
                     });
             else {
-                int? switchIndex = battleAI.SwitchFaintedTerra(faintedTerra, this);
+                int? switchIndex = battleAI.SwitchFaintedTerra(faintedTerraPosition, this);
                 if (switchIndex != null)
-                    SwitchTerra(new TerraSwitch(
-                        faintedTerra.GetTerraBattlePosition(),
-                        (int)switchIndex,
-                        faintedTerra.IsPrimarySide()));
+                    SwitchTerra(new TerraSwitch(faintedTerraPosition, (int)switchIndex));
                 SwitchFaintedTerra();
             }
         }
         else {
-            faintedTerra.GetTerraBattlePosition().SetTerra(null);
-            battleStage.SetTerraAtPosition(faintedTerra.GetTerraBattlePosition());
+            faintedTerraPosition.SetTerra(null);
+            battleStage.SetTerraAtPosition(faintedTerraPosition);
             SwitchFaintedTerra();
         }
     }
@@ -602,11 +612,11 @@ public class BattleSystem : MonoBehaviour
         if (terraBattlePosition.GetTerra() == null || healAmt == null)
             return null;
 
-        //*** Terra Damaged Event ***
+        //*** Terra Healed Event ***
         TerraHealedEventArgs terraHealedEventArgs = InvokeOnTerraHealed(terraBattlePosition, healAmt);
 
         if (terraHealedEventArgs.GetHealAmt() != null) {
-            Debug.Log(BattleDialog.TerraHealedMsg(terraBattlePosition.GetTerra(), (int)healAmt));
+            Debug.Log(BattleDialog.TerraHealedMsgDebug(terraBattlePosition.GetTerra(), (int)healAmt));
             terraBattlePosition.GetTerra().RecoverHP((int)terraHealedEventArgs.GetHealAmt());
         }
 
@@ -636,8 +646,8 @@ public class BattleSystem : MonoBehaviour
         if (terraBattlePosition.GetTerra() == null || terraBattlePosition.GetTerra().HasStatusEffect())
             return false;
 
-        //*** Status Effect Added Event ***
-        StatusEffectAddedEventArgs statusEffectAddedEventArgs = InvokeOnStatusEffectAdded(terraBattlePosition, statusEffectSO);
+        //*** Status Effect Event ***
+        StatusEffectEventArgs statusEffectAddedEventArgs = InvokeOnStatusEffect(terraBattlePosition, statusEffectSO);
 
         if (statusEffectAddedEventArgs.IsCanceled())
             return false;
@@ -645,8 +655,8 @@ public class BattleSystem : MonoBehaviour
         Debug.Log(BattleDialog.StatusInflictionMsg(terraBattlePosition.GetTerra(), statusEffectSO));
         terraBattlePosition.GetTerra().SetStatusEffect(statusEffectSO, terraBattlePosition, this);
 
-        //*** Post Status Effect Added Event ***
-        InvokeOnPostStatusEffectAdded(terraBattlePosition, statusEffectSO);
+        //*** Status Effect Inflicted Event ***
+        InvokeOnStatusEffectInflicted(statusEffectAddedEventArgs);
 
         return true;
     }
@@ -666,8 +676,8 @@ public class BattleSystem : MonoBehaviour
 
         VolatileStatusEffectBase vStatusEffect = vStatusEffectSO.CreateVolatileStatusEffect(terraBattlePosition);
 
-        //*** Volatile Status Effect Added Event ***
-        VolatileStatusEffectAddedEventArgs vStatusEffectAddedEventArgs = InvokeOnVolatileStatusEffectAdded(terraBattlePosition, vStatusEffect);
+        //*** Volatile Status Effect Event ***
+        VolatileStatusEffectEventArgs vStatusEffectAddedEventArgs = InvokeOnVolatileStatusEffect(terraBattlePosition, vStatusEffect);
 
         if (vStatusEffectAddedEventArgs.IsCanceled())
             return false;
@@ -675,8 +685,8 @@ public class BattleSystem : MonoBehaviour
         Debug.Log(BattleDialog.VolatileStatusInflictionMsg(terraBattlePosition.GetTerra(), vStatusEffectSO));
         terraBattlePosition.AddVolatileStatusEffect(vStatusEffectAddedEventArgs.GetVolatileStatusEffect(), this);
 
-        //*** Post Volatile Status Effect Added Event ***
-        InvokeOnPostVolatileStatusEffectAdded(terraBattlePosition, vStatusEffect);
+        //*** Volatile Status Effect Inflicted Event ***
+        InvokeOnVolatileStatusEffectInflicted(vStatusEffectAddedEventArgs);
 
         return true;
     }
@@ -803,6 +813,12 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
+    public TerraAttackEventArgs InvokOnAttackCanceled(TerraAttackEventArgs eventArgs)
+    {
+        OnAttackDeclaration?.Invoke(this, eventArgs);
+        return eventArgs;
+    }
+
     public TerraAttackEventArgs InvokeOnStartTerraAttack(TerraAttack terraAttack)
     {
         TerraAttackEventArgs eventArgs = new TerraAttackEventArgs(terraAttack, this);
@@ -872,6 +888,14 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
+    public TerraDamagedEventArgs InvokeOnTerraRecoilDamage(TerraBattlePosition terraBattlePosition, int? damage)
+    {
+        TerraDamagedEventArgs eventArgs = new TerraDamagedEventArgs(terraBattlePosition, damage, this);
+        OnRecoilDamage?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
     public StatChangeEventArgs InvokeOnStatChange(TerraBattlePosition terraBattlePosition, Stats stat, int modification)
     {
         StatChangeEventArgs eventArgs = new StatChangeEventArgs(terraBattlePosition, stat, modification, this);
@@ -886,18 +910,24 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
-    public StatusEffectAddedEventArgs InvokeOnStatusEffectAdded(TerraBattlePosition terraBattlePosition, StatusEffectSO statusEffectSO)
+    public StatusEffectEventArgs InvokeOnStatusEffect(TerraBattlePosition terraBattlePosition, StatusEffectSO statusEffectSO)
     {
-        StatusEffectAddedEventArgs eventArgs = new StatusEffectAddedEventArgs(terraBattlePosition, statusEffectSO, this);
-        OnStatusEffectAdded?.Invoke(this, eventArgs);
+        StatusEffectEventArgs eventArgs = new StatusEffectEventArgs(terraBattlePosition, statusEffectSO, this);
+        OnStatusEffect?.Invoke(this, eventArgs);
 
         return eventArgs;
     }
 
-    public StatusEffectEventArgs InvokeOnPostStatusEffectAdded(TerraBattlePosition terraBattlePosition, StatusEffectSO statusEffectSO)
+    public StatusEffectEventArgs InvokeOnStatusEffectInflicted(StatusEffectEventArgs eventArgs)
     {
-        StatusEffectEventArgs eventArgs = new StatusEffectEventArgs(terraBattlePosition, statusEffectSO, this);
-        OnPostStatusEffectAdded?.Invoke(this, eventArgs);
+        OnStatusEffectInflicted?.Invoke(this, eventArgs);
+        return eventArgs;
+    }
+
+    public StatusEffectProkedEventArgs InvokeOnStatusEffectProked(TerraBattlePosition terraBattlePosition, StatusEffectSO statusEffectSO, bool isProked, bool isStatusEffectRemoved)
+    {
+        StatusEffectProkedEventArgs eventArgs = new StatusEffectProkedEventArgs(terraBattlePosition, statusEffectSO, isProked, isStatusEffectRemoved, this);
+        OnStatusEffectProked?.Invoke(this, eventArgs);
 
         return eventArgs;
     }
@@ -910,18 +940,24 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
-    public VolatileStatusEffectAddedEventArgs InvokeOnVolatileStatusEffectAdded(TerraBattlePosition terraBattlePosition, VolatileStatusEffectBase vStatusEffect)
+    public VolatileStatusEffectEventArgs InvokeOnVolatileStatusEffect(TerraBattlePosition terraBattlePosition, VolatileStatusEffectBase vStatusEffect)
     {
-        VolatileStatusEffectAddedEventArgs eventArgs = new VolatileStatusEffectAddedEventArgs(terraBattlePosition, vStatusEffect, this);
-        OnVolatileStatusEffectAdded?.Invoke(this, eventArgs);
+        VolatileStatusEffectEventArgs eventArgs = new VolatileStatusEffectEventArgs(terraBattlePosition, vStatusEffect, this);
+        OnVolatileStatusEffect?.Invoke(this, eventArgs);
 
         return eventArgs;
     }
 
-    public VolatileStatusEffectEventArgs InvokeOnPostVolatileStatusEffectAdded(TerraBattlePosition terraBattlePosition, VolatileStatusEffectBase vStatusEffect)
+    public VolatileStatusEffectEventArgs InvokeOnVolatileStatusEffectInflicted(VolatileStatusEffectEventArgs eventArgs)
     {
-        VolatileStatusEffectEventArgs eventArgs = new VolatileStatusEffectEventArgs(terraBattlePosition, vStatusEffect, this);
-        OnPostVolatileStatusEffectAdded?.Invoke(this, eventArgs);
+        OnVolatileStatusEffectInflicted?.Invoke(this, eventArgs);
+        return eventArgs;
+    }
+
+    public VolatileStatusEffectProkedEventArgs InvokeOnVolatileStatusEffectProked(TerraBattlePosition terraBattlePosition, VolatileStatusEffectBase vStatusEffect, bool isProked, bool isEffectRemoved)
+    {
+        VolatileStatusEffectProkedEventArgs eventArgs = new VolatileStatusEffectProkedEventArgs(terraBattlePosition, vStatusEffect, isProked, isEffectRemoved, this);
+        OnVolatileStatusEffectProked?.Invoke(this, eventArgs);
 
         return eventArgs;
     }
@@ -934,6 +970,12 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
+    public AttackChargingEventArgs InvokeOnAttackCanceledFromCharging(AttackChargingEventArgs eventArgs)
+    {
+        OnAttackCanceledFromCharging?.Invoke(this, eventArgs);
+        return eventArgs;
+    }
+
     public AttackChargingEventArgs InvokeOnAttackRecharging(TerraAttack terraAttack)
     {
         AttackChargingEventArgs eventArgs = new AttackChargingEventArgs(terraAttack, this);
@@ -942,9 +984,17 @@ public class BattleSystem : MonoBehaviour
         return eventArgs;
     }
 
-    public TerraFaintedEventArgs InvokeOnTerraFainted(TerraBattlePosition terraBattlePosition)
+    public AttackChargingEventArgs InvokeOnAttackCanceledFromRecharging(TerraAttack terraAttack)
     {
-        TerraFaintedEventArgs eventArgs = new TerraFaintedEventArgs(terraBattlePosition, this);
+        AttackChargingEventArgs eventArgs = new AttackChargingEventArgs(terraAttack, this);
+        OnAttackCanceledFromRecharging?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public TerraBattlePositionEventArgs InvokeOnTerraFainted(TerraBattlePosition terraBattlePosition)
+    {
+        TerraBattlePositionEventArgs eventArgs = new TerraBattlePositionEventArgs(terraBattlePosition, this);
         OnTerraFainted?.Invoke(this, eventArgs);
 
         return eventArgs;
@@ -954,6 +1004,14 @@ public class BattleSystem : MonoBehaviour
     {
         DirectAttackLogEventArgs eventArgs = new DirectAttackLogEventArgs(directAttackLog, this);
         OnPostAttack?.Invoke(this, eventArgs);
+
+        return eventArgs;
+    }
+
+    public ItemProkedEventArgs InvokeOnItemProked(TerraBattlePosition terraBattlePosition, ItemSO itemSO)
+    {
+        ItemProkedEventArgs eventArgs = new ItemProkedEventArgs(terraBattlePosition, itemSO, this);
+        OnItemProked?.Invoke(this, eventArgs);
 
         return eventArgs;
     }

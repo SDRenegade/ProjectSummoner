@@ -544,8 +544,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 70, y: -20}
-  m_SizeDelta: {x: 220, y: 60}
+  m_AnchoredPosition: {x: 20, y: -20}
+  m_SizeDelta: {x: 225, y: 65}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &91297884
 MonoBehaviour:
@@ -1465,7 +1465,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -70, y: -20}
-  m_SizeDelta: {x: 220, y: 60}
+  m_SizeDelta: {x: 225, y: 65}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &202236013
 MonoBehaviour:
@@ -3840,7 +3840,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   text: {fileID: 402726822}
-  borderHeight: 8
 --- !u!114 &594541633
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3906,8 +3905,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 12
-    m_Right: 12
+    m_Left: 15
+    m_Right: 15
     m_Top: 8
     m_Bottom: 8
   m_ChildAlignment: 0
@@ -5063,8 +5062,8 @@ MonoBehaviour:
   m_Padding:
     m_Left: 5
     m_Right: 5
-    m_Top: 0
-    m_Bottom: 0
+    m_Top: 5
+    m_Bottom: 5
   m_ChildAlignment: 0
   m_Spacing: 0
   m_ChildForceExpandWidth: 1
@@ -6251,8 +6250,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -70, y: 40}
-  m_SizeDelta: {x: 220, y: 60}
+  m_AnchoredPosition: {x: -70, y: 20}
+  m_SizeDelta: {x: 225, y: 65}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &1170076696
 MonoBehaviour:
@@ -7400,8 +7399,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 70, y: 40}
-  m_SizeDelta: {x: 220, y: 60}
+  m_AnchoredPosition: {x: 20, y: 20}
+  m_SizeDelta: {x: 225, y: 65}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1451462762
 MonoBehaviour:
@@ -7706,7 +7705,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6010140372239047414, guid: c06d4570f53d83f4589af3644e398607, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ReturnToMenuSelection
+      value: OpenMenuSelectionUI
       objectReference: {fileID: 0}
     - target: {fileID: 6010140372239047414, guid: c06d4570f53d83f4589af3644e398607, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -9451,6 +9450,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   battleSystem: {fileID: 2145235993}
   battleStage: {fileID: 1195796264}
+  statusBarGroupUI: {fileID: 613251039}
   battleDialogUI: {fileID: 594541632}
   pathFollower: {fileID: 552977779}
   battleCam: {fileID: 552977778}
@@ -9565,7 +9565,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 600, y: 200}
+  m_SizeDelta: {x: 550, y: 180}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1968184562
 MonoBehaviour:

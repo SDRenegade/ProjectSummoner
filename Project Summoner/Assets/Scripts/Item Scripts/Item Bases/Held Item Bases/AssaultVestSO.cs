@@ -41,6 +41,9 @@ public class AssaultVest : ItemBase
             return;
 
         Debug.Log(BattleDialog.ItemProkedMsg(this));
+        //*** Item Proked Event ***
+        eventArgs.GetBattleSystem().InvokeOnItemProked(terraBattlePosition, itemSO);
+
         int damage = (int)(eventArgs.GetDirectAttackLog().GetAttackerPosition().GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_DAMAGE);
         eventArgs.GetBattleSystem().DamageTerra(eventArgs.GetDirectAttackLog().GetAttackerPosition(), damage);
     }

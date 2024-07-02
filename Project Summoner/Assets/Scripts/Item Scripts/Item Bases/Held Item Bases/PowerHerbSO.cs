@@ -37,6 +37,9 @@ public class PowerHerb : ItemBase
             return;
 
         Debug.Log(BattleDialog.ItemProkedMsg(this));
+        //*** Item Proked Event ***
+        eventArgs.GetBattleSystem().InvokeOnItemProked(terraBattlePosition, itemSO);
+
         eventArgs.SetCanceled(true);
 
         ConsumeOnUse(eventArgs.GetBattleSystem());

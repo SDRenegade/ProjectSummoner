@@ -52,6 +52,9 @@ public class LifeOrb : ItemBase
             return;
 
         Debug.Log(BattleDialog.ItemProkedMsg(this));
+        //*** Item Proked Event ***
+        eventArgs.GetBattleSystem().InvokeOnItemProked(terraBattlePosition, itemSO);
+
         int recoilDamage = (int)(terraBattlePosition.GetTerra().GetMaxHP() * PERCENT_MAX_HEALTH_RECOIL);
         eventArgs.GetBattleSystem().DamageTerra(terraBattlePosition, recoilDamage);
     }
